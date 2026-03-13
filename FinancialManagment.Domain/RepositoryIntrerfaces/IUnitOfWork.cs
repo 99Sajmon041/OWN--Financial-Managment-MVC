@@ -4,7 +4,7 @@ public interface IUnitOfWork
 {
     IExpenseCategoryRepository ExpenseCategoryRepository { get; }
     IExpenseRepository ExpenseRepository { get; }
-    IIncomeCategory IncomeCategory { get; }
+    IIncomeCategoryRepository IncomeCategoryRepository { get; }
     IIncomeRepository IncomeRepository { get; }
     Task SaveChangesAsync(CancellationToken ct);
 }

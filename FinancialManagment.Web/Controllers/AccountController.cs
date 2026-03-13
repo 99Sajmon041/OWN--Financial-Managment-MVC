@@ -78,7 +78,7 @@ namespace FinancialManagment.Web.Controllers
             {
                 return View(model);
             }
-            
+
             try
             {
                 await accountService.LoginAsync(model, ct);
