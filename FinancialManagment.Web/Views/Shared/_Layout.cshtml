@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,18 +11,105 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm mb-3 position-relative">
+        <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm mb-3 position-relative app-navbar">
             <div class="container-fluid">
 
+                <a class="navbar-brand fw-semibold text-dark mb-0 text-decoration-none brand-link"
+                   asp-controller="Home" asp-action="Index">
+                    Domů
+                </a>
+
+                <button class="navbar-toggler custom-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNavbar">
+
+                    <ul class="navbar-nav me-auto mt-3 mt-md-0 gap-2 nav-animated">
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Income" ? "active-pill" : "")"
+                               asp-controller="Income"
+                               asp-action="Index">
+                                Příjmy
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Expense" ? "active-pill" : "")"
+                               asp-controller="Expense"
+                               asp-action="Index">
+                                Výdaje
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "IncomeCategory" ? "active-pill" : "")"
+                               asp-controller="IncomeCategory"
+                               asp-action="Index">
+                                Kategorie příjmů
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "ExpenseCategory" ? "active-pill" : "")"
+                               asp-controller="ExpenseCategory"
+                               asp-action="Index">
+                                Kategorie výdajů
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Statistics" ? "active-pill" : "")"
+                               asp-controller="Statistics"
+                               asp-action="Index">
+                                Statistiky
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-md-center gap-2 mt-3 mt-md-0">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <span class="text-muted small d-none d-md-inline">
+                                @(User.FindFirst("full_name")?.Value ?? User.Identity?.Name)
+                            </span>
+
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="mb-0">
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" class="btn btn-outline-danger btn-sm w-100 w-md-auto auth-btn">
+                                    Odhlásit
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm w-100 w-md-auto auth-btn">
+                                Přihlásit
+                            </a>
+                            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-sm w-100 w-md-auto auth-btn">
+                                Registrovat
+                            </a>
+                        }
+                    </div>
+
+                </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
 
             @if (TempData["Error"] is string error && !string.IsNullOrWhiteSpace(error))
             {
-                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <div class="alert alert-danger alert-dismissible fade show mt-3 custom-alert" role="alert">
                     @error
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
                 </div>
@@ -30,7 +117,7 @@
 
             @if (TempData["Success"] is string success && !string.IsNullOrWhiteSpace(success))
             {
-                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <div class="alert alert-success alert-dismissible fade show mt-3 custom-alert" role="alert">
                     @success
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -38,7 +125,7 @@
 
             @if (TempData["Info"] is string info && !string.IsNullOrWhiteSpace(info))
             {
-                <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+                <div class="alert alert-info alert-dismissible fade show mt-3 custom-alert" role="alert">
                     @info
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -46,7 +133,7 @@
 
             @if (TempData["Warning"] is string warning && !string.IsNullOrWhiteSpace(warning))
             {
-                <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+                <div class="alert alert-warning alert-dismissible fade show mt-3 custom-alert" role="alert">
                     @warning
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -56,11 +143,12 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
+    <footer class="border-top footer text-muted app-footer">
+        <div class="container text-center">
             &copy; @DateTime.UtcNow.Year - Správa financí. Vytvořil <strong>Šimon Durák</strong>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -40,7 +40,12 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.Name = "FinancialManagment.Auth";
     options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+
+    options.ExpireTimeSpan = TimeSpan.FromDays(14);
+    options.SlidingExpiration = true;
 });
 
 builder.Services.AddControllersWithViews();
