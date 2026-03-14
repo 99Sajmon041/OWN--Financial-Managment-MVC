@@ -1,4 +1,5 @@
-﻿using FinancialManagment.Application.Services.Implementations;
+﻿using FinancialManagment.Application.Mapping;
+using FinancialManagment.Application.Services.Implementations;
 using FinancialManagment.Application.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,8 @@ public static class ApplicationServicesRegistrations
     {
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IIncomeCategoryService, IncomeCategoryService>();
+
+        services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 
         return services;
     }

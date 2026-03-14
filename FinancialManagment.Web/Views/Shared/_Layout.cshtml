@@ -31,49 +31,52 @@
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
 
-                    <ul class="navbar-nav me-auto mt-3 mt-md-0 gap-2 nav-animated">
-                        <li class="nav-item">
-                            <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Income" ? "active-pill" : "")"
-                               asp-controller="Income"
-                               asp-action="Index">
-                                Příjmy
-                            </a>
-                        </li>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <ul class="navbar-nav me-auto mt-3 mt-md-0 gap-2 nav-animated">
+                            <li class="nav-item">
+                                <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Income" ? "active-pill" : "")"
+                                   asp-controller="Income"
+                                   asp-action="Index">
+                                    Příjmy
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Expense" ? "active-pill" : "")"
-                               asp-controller="Expense"
-                               asp-action="Index">
-                                Výdaje
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Expense" ? "active-pill" : "")"
+                                   asp-controller="Expense"
+                                   asp-action="Index">
+                                    Výdaje
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "IncomeCategory" ? "active-pill" : "")"
-                               asp-controller="IncomeCategory"
-                               asp-action="Index">
-                                Kategorie příjmů
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "IncomeCategory" ? "active-pill" : "")"
+                                   asp-controller="IncomeCategory"
+                                   asp-action="Index">
+                                    Kategorie příjmů
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "ExpenseCategory" ? "active-pill" : "")"
-                               asp-controller="ExpenseCategory"
-                               asp-action="Index">
-                                Kategorie výdajů
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "ExpenseCategory" ? "active-pill" : "")"
+                                   asp-controller="ExpenseCategory"
+                                   asp-action="Index">
+                                    Kategorie výdajů
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Statistics" ? "active-pill" : "")"
-                               asp-controller="Statistics"
-                               asp-action="Index">
-                                Statistiky
-                            </a>
-                        </li>
-                    </ul>
+                            <li class="nav-item">
+                                <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Statistics" ? "active-pill" : "")"
+                                   asp-controller="Statistics"
+                                   asp-action="Index">
+                                    Statistiky
+                                </a>
+                            </li>
+                        </ul>
+                    }
 
-                    <div class="d-flex align-items-md-center gap-2 mt-3 mt-md-0">
+                    <div class="d-flex align-items-md-center gap-2 mt-3 mt-md-0 ms-md-auto">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <span class="text-muted small d-none d-md-inline">

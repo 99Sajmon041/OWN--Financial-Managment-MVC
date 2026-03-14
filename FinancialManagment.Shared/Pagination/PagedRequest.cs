@@ -6,5 +6,5 @@ public sealed class PagedRequest
     public int PageSize { get; set; } = 20;
     public string? Search { get; set; }
     public string? SortBy { get; set; }
-    public bool Desc { get; set; } = true;
+    public bool Desc { get; set; }
 }

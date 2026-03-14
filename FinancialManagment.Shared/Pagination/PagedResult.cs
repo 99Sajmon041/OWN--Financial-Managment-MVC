@@ -10,6 +10,6 @@ public sealed class PagedResult<T> where T : class
     public bool HasNext => Page < TotalPages;
     public string? Search { get; init; }
     public string? SortBy { get; init; }
-    public bool Desc { get; init; } = true;
+    public bool Desc { get; init; }
     public List<T> Items { get; init; } = [];
 }
