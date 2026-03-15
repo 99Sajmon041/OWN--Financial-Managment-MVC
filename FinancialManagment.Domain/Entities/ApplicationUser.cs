@@ -8,6 +8,5 @@ public sealed class ApplicationUser : IdentityUser
     public string LastName { get; set; } = default!;
     public ICollection<IncomeCategory> IncomeCategories { get; set; } = [];
     public ICollection<ExpenseCategory> ExpenseCategories { get; set; } = [];
-    public ICollection<Income> Incomes { get; set; } = [];
-    public ICollection<Expense> Expenses { get; set; } = [];
+    public ICollection<HouseholdMember> HouseholdMembers { get; set; } = [];
 }

@@ -14,6 +14,11 @@ public sealed class RegisterViewModel
     [StringLength(200, ErrorMessage = "Zadejte příjmení v rozmezí znaků: 2 - 200.", MinimumLength = 2)]
     public string LastName { get; set; } = default!;
 
+    [Display(Name = "Přezdívka")]
+    [Required(ErrorMessage = "Přezdívka je povinná.")]
+    [StringLength(200, ErrorMessage = "Zadejte přezdívku v rozmezí znaků: 4 - 50.", MinimumLength = 4)]
+    public string Nickname { get; set; } = default!;
+
     [Display(Name = "E-mail")]
     [Required(ErrorMessage = "E-mail je povinný.")]
     [EmailAddress(ErrorMessage = "Zadejte e-mail ve správném formátu.")]

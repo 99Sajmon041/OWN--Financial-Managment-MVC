@@ -1,0 +1,45 @@
+﻿@model HouseholdMemberUpsertViewModel
+
+@{
+    ViewData["Title"] = "Úprava člena domácnosti";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-6">Úprava člena domácnosti</h1>
+</div>
+
+<form asp-controller="HouseholdMember" asp-action="Update" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="row justify-content-center">
+        <div class="col-11 col-sm-10 col-md-6 col-lg-5">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3 model-validation"></div>
+
+            <div class="mb-3">
+                <label asp-for="Id" class="form-label"></label>
+                <input asp-for="Id" disabled class="form-control" />
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Nickname" class="form-label"></label>
+                <input asp-for="Nickname" class="form-control" />
+                <span asp-validation-for="Nickname" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+                <a asp-controller="HouseholdMember" asp-action="Index" class="btn btn-outline-primary">
+                    Zpět
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Upravit
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

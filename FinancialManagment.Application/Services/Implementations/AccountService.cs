@@ -2,7 +2,9 @@
 using FinancialManagment.Application.Models.Account;
 using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Domain.Entities;
+using FinancialManagment.Domain.RepositoryIntrerfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
 namespace FinancialManagment.Application.Services.Implementations;
@@ -10,7 +12,8 @@ namespace FinancialManagment.Application.Services.Implementations;
 public sealed class AccountService(
     ILogger<AccountService> logger,
     UserManager<ApplicationUser> userManager,
-    SignInManager<ApplicationUser> signInManager) : IAccountService
+    SignInManager<ApplicationUser> signInManager,
+    IUnitOfWork unitOfWork) : IAccountService
 {
     public async Task RegisterAsync(RegisterViewModel model, CancellationToken ct)
     {
@@ -40,6 +43,24 @@ public sealed class AccountService(
 
             logger.LogWarning("Creating user with e-mail: {Email} failed. Message: {Error}.", newUser.Email, errorMessage);
             throw new DomainException("Účet se nepodařilo vytvořit. Kontaktujte administrátora webu.");
+        }
+
+        var houseHoldMember = new HouseholdMember
+        {
+            ApplicationUserId = newUser.Id,
+            Nickname = model.Nickname.Trim()
+        };
+
+        try
+        {
+            unitOfWork.HouseholdMemberRepository.Add(houseHoldMember);
+            await unitOfWork.SaveChangesAsync(ct);
+        }
+        catch(Exception ex)
+        {
+            await userManager.DeleteAsync(newUser);
+            logger.LogError(ex, "Creating default household member for user with e-mail: {Email} failed. User account was rolled back.", newUser.Email);
+            throw new DomainException("Nepodařilo se vytvořit uživatele. Kontaktujte prosím administrátora webu.");
         }
 
         logger.LogInformation("User with e-mail: {Email} was created successfully.", newUser.Email);

@@ -10,6 +10,7 @@ public sealed class FinancialManagmentDbContext(DbContextOptions options) : Iden
     public DbSet<Income> Incomes { get; set; } = default!;
     public DbSet<ExpenseCategory> ExpenseCategories { get; set; } = default!;
     public DbSet<IncomeCategory> IncomeCategories { get; set; } = default!;
+    public DbSet<HouseholdMember> HouseholdMembers { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -26,7 +27,7 @@ public sealed class FinancialManagmentDbContext(DbContextOptions options) : Iden
             entity.Property(x => x.Amount)
                 .HasPrecision(18, 2);
 
-            entity.HasIndex(x => new { x.ApplicationUserId, x.Date, x.ExpenseCategoryId });
+            entity.HasIndex(x => new { x.HouseholdMemberId, x.Date, x.ExpenseCategoryId });
         });
 
         builder.Entity<Income>(entity =>
@@ -37,7 +38,7 @@ public sealed class FinancialManagmentDbContext(DbContextOptions options) : Iden
             entity.Property(x => x.Amount)
                 .HasPrecision(18, 2);
 
-            entity.HasIndex(x => new { x.ApplicationUserId, x.Date, x.IncomeCategoryId });
+            entity.HasIndex(x => new { x.HouseholdMemberId, x.Date, x.IncomeCategoryId });
 
         });
 
@@ -85,15 +86,28 @@ public sealed class FinancialManagmentDbContext(DbContextOptions options) : Iden
                 .HasForeignKey(x => x.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasMany(x => x.Incomes)
+            entity.HasMany(x => x.HouseholdMembers)
                 .WithOne(x => x.ApplicationUser)
                 .HasForeignKey(x => x.ApplicationUserId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<HouseholdMember>(entity =>
+        {
+            entity.Property(x => x.Nickname)
+                .HasMaxLength(50);
+
+            entity.HasIndex(x => new { x.ApplicationUserId, x.Nickname }).IsUnique();
+
+            entity.HasMany(x => x.Incomes)
+                .WithOne(x => x.HouseholdMember)
+                .HasForeignKey(x => x.HouseholdMemberId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasMany(x => x.Expenses)
-                .WithOne(x => x.ApplicationUser)
-                .HasForeignKey(x => x.ApplicationUserId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .WithOne(x => x.HouseholdMember)
+                .HasForeignKey(x => x.HouseholdMemberId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

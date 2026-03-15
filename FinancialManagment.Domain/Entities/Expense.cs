@@ -3,10 +3,10 @@
 public sealed class Expense
 {
     public int Id { get; set; }
-    public ApplicationUser ApplicationUser { get; set; } = default!;
-    public string ApplicationUserId { get; set; } = default!;
+    public HouseholdMember HouseholdMember { get; set; } = default!;
+    public int HouseholdMemberId { get; set; }
     public ExpenseCategory ExpenseCategory { get; set; } = default!;
-    public int ExpenseCategoryId { get; set; } = default!;
+    public int ExpenseCategoryId { get; set; }
     public decimal Amount { get; set; }
     public DateTime Date { get; set; }
     public string? Description { get; set; }

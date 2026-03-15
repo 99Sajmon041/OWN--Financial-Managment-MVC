@@ -5,7 +5,7 @@
 }
 
 <div class="text-center mb-5">
-    <h1 class="display-4">Registrace</h1>
+    <h1 class="display-6">Registrace</h1>
 </div>
 
 <form asp-controller="Account" asp-action="Register" method="post">
@@ -31,6 +31,12 @@
                 <label asp-for="Email" class="form-label"></label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Nickname" class="form-label"></label>
+                <input asp-for="Nickname" class="form-control" />
+                <span asp-validation-for="Nickname" class="text-danger"></span>
             </div>
 
             <div class="mb-3">

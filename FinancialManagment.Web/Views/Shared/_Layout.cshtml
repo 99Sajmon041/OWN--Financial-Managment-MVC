@@ -73,6 +73,14 @@
                                     Statistiky
                                 </a>
                             </li>
+
+                            <li>
+                                <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "HouseholdMember" ? "active-pill" : "")"
+                                   asp-controller="HouseholdMember"
+                                   asp-action="Index">
+                                    Členové domácnosti
+                                </a>
+                            </li>
                         </ul>
                     }
 
