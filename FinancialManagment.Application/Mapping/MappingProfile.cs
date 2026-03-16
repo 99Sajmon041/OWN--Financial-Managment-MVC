@@ -13,6 +13,6 @@ public sealed class MappingProfile : Profile
         CreateMap<IncomeCategory, IncomeCategoryUpsertViewModel>();
 
         CreateMap<HouseholdMember, HouseholdMemberViewModel>();
-        CreateMap<HouseholdMemberUpsertViewModel, HouseholdMember>();
+        CreateMap<HouseholdMemberUpsertViewModel, HouseholdMember>().ReverseMap();
     }
 }

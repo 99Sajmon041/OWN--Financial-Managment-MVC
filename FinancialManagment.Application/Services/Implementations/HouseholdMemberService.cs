@@ -4,7 +4,7 @@ using FinancialManagment.Application.Models.HouseholdMember;
 using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
-using FinancialManagment.Domain.RepositoryIntrerfaces;
+using FinancialManagment.Domain.RepositoryInterfaces;
 using Microsoft.Extensions.Logging;
 
 namespace FinancialManagment.Application.Services.Implementations;
@@ -54,6 +54,7 @@ public sealed class HouseholdMemberService(
         var houseHoldMemberEntity = mapper.Map<HouseholdMember>(model);
 
         houseHoldMemberEntity.ApplicationUserId = userId;
+        houseHoldMemberEntity.IsActive = true;
 
         unitOfWork.HouseholdMemberRepository.Add(houseHoldMemberEntity);
         await unitOfWork.SaveChangesAsync(ct);

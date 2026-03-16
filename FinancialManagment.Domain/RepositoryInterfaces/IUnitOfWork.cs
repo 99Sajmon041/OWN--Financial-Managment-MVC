@@ -1,4 +1,4 @@
-﻿namespace FinancialManagment.Domain.RepositoryIntrerfaces;
+﻿namespace FinancialManagment.Domain.RepositoryInterfaces;
 
 public interface IUnitOfWork
 {

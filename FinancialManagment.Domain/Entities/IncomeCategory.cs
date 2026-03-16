@@ -1,11 +1,8 @@
-﻿namespace FinancialManagment.Domain.Entities;
+﻿using FinancialManagment.Domain.EntityInterface;
 
-public sealed class IncomeCategory
+namespace FinancialManagment.Domain.Entities;
+
+public sealed class IncomeCategory : BaseCategory
 {
-    public int Id { get; set; }
-    public ApplicationUser ApplicationUser { get; set; } = default!;
-    public string ApplicationUserId { get; set; } = default!;
-    public string Name { get; set; } = default!;
-    public bool IsActive { get; set; } = true;
     public ICollection<Income> Incomes { get; set; } = [];
 }

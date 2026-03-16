@@ -1,5 +1,5 @@
 ﻿using FinancialManagment.Domain.Entities;
-using FinancialManagment.Domain.RepositoryIntrerfaces;
+using FinancialManagment.Domain.RepositoryInterfaces;
 using FinancialManagment.Infrastructure.Database;
 using FinancialManagment.Infrastructure.Identity;
 using FinancialManagment.Infrastructure.Repositories;

@@ -1,6 +1,6 @@
 ﻿using FinancialManagment.Domain.Entities;
 
-namespace FinancialManagment.Domain.RepositoryIntrerfaces;
+namespace FinancialManagment.Domain.RepositoryInterfaces;
 
 public interface IHouseholdMemberRepository
 {

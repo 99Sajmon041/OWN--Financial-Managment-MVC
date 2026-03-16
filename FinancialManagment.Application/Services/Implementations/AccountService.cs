@@ -2,9 +2,8 @@
 using FinancialManagment.Application.Models.Account;
 using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Domain.Entities;
-using FinancialManagment.Domain.RepositoryIntrerfaces;
+using FinancialManagment.Domain.RepositoryInterfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
 namespace FinancialManagment.Application.Services.Implementations;

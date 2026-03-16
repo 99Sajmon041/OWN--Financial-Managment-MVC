@@ -4,7 +4,7 @@ using FinancialManagment.Application.Models.IncomeCategory;
 using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
-using FinancialManagment.Domain.RepositoryIntrerfaces;
+using FinancialManagment.Domain.RepositoryInterfaces;
 using FinancialManagment.Shared.Pagination;
 using Microsoft.Extensions.Logging;
 
