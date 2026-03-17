@@ -101,13 +101,13 @@ public sealed class IncomeCategoryService(
         logger.LogInformation("User with ID: {UserId} {Phrase} income category with ID: {IncomeCategoryId}.", userId, action, id);
     }
 
-    public async Task<PagedResult<IncomeCategoryViewModel>> GetAllAsync(PagedRequest pagedRequest, CancellationToken ct)
+    public async Task<PagedResult<IncomeCategoryViewModel>> GetAllAsync(PagedRequest pagedRequest, bool? isActive, CancellationToken ct)
     {
         var userId = currentUser.ValidatedUserId;
 
         pagedRequest = pagedRequest.Normalize();
 
-        var (items, totalItemsCount) = await unitOfWork.IncomeCategoryRepository.GetAllAsync(userId, pagedRequest, ct);
+        var (items, totalItemsCount) = await unitOfWork.IncomeCategoryRepository.GetAllAsync(userId, isActive, pagedRequest, ct);
 
         var incomeCategories = mapper.Map<List<IncomeCategoryViewModel>>(items);
 

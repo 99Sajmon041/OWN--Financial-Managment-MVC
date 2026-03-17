@@ -9,5 +9,5 @@ public interface IExpenseCategoryService
     Task UpdateAsync(int id, ExpenseCategoryUpsertViewModel model, CancellationToken ct);
     Task ChangeStatusAsync(int id, CancellationToken ct);
     Task<ExpenseCategoryUpsertViewModel?> GetByIdAsync(int id, CancellationToken ct);
-    Task<PagedResult<ExpenseCategoryViewModel>> GetAllAsync(PagedRequest pagedRequest, CancellationToken ct);
+    Task<PagedResult<ExpenseCategoryViewModel>> GetAllAsync(PagedRequest pagedRequest, bool? isActive, CancellationToken ct);
 }

@@ -4,96 +4,95 @@ using FinancialManagment.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinancialManagment.Web.Controllers
+namespace FinancialManagment.Web.Controllers;
+
+[Authorize]
+public class HouseholdMemberController(IHouseholdMemberService householdMemberService) : Controller
 {
-    [Authorize]
-    public class HouseholdMemberController(IHouseholdMemberService householdMemberService) : Controller
+    [HttpGet]
+    public async Task<IActionResult> Index(CancellationToken ct)
     {
-        [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken ct)
-        {
-            var result = await householdMemberService.GetAllAsync(ct);
+        var result = await householdMemberService.GetAllAsync(ct);
 
-            return View(result);
+        return View(result);
+    }
+
+
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View(new HouseholdMemberUpsertViewModel());
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(HouseholdMemberUpsertViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
         }
 
-
-        [HttpGet]
-        public IActionResult Create()
+        try
         {
-            return View(new HouseholdMemberUpsertViewModel());
+            await householdMemberService.AddAsync(model, ct);
+            TempData["Success"] = "Člen domácnosti byl úspěšně přidán.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch(ConflictException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
+    }
+
+
+    [HttpGet]
+    public async Task<IActionResult> Update(int id, CancellationToken ct)
+    {
+        var result = await householdMemberService.GetByIdAsync(id, ct);
+        return View(result);
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Update(int id, HouseholdMemberUpsertViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
         }
 
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(HouseholdMemberUpsertViewModel model, CancellationToken ct)
+        try
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            try
-            {
-                await householdMemberService.AddAsync(model, ct);
-                TempData["Success"] = "Člen domácnosti byl úspěšně přidán.";
-                return RedirectToAction(nameof(Index));
-            }
-            catch(ConflictException ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View(model);
-            }
+            await householdMemberService.UpdateAsync(id, model, ct);
+            TempData["Success"] = "Člen domácnosti byl úspěšně upraven.";
+            return RedirectToAction(nameof(Index));
         }
-
-
-        [HttpGet]
-        public async Task<IActionResult> Update(int id, CancellationToken ct)
+        catch (Exception ex) when (ex is ConflictException or DomainException)
         {
-            var result = await householdMemberService.GetByIdAsync(id, ct);
-            return View(result);
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
         }
+    }
 
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(int id, HouseholdMemberUpsertViewModel model, CancellationToken ct)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangeStatus(int id, CancellationToken ct)
+    {
+        try
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            try
-            {
-                await householdMemberService.UpdateAsync(id, model, ct);
-                TempData["Success"] = "Člen domácnosti byl úspěšně upraven.";
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex) when (ex is ConflictException or DomainException)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View(model);
-            }
+            await householdMemberService.ChangeStatusAsync(id, ct);
+            TempData["Success"] = "Stav člena domácnosti byl úspěšně upraven.";
+            return RedirectToAction(nameof(Index));
         }
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangeStatus(int id, CancellationToken ct)
+        catch(DomainException ex)
         {
-            try
-            {
-                await householdMemberService.ChangeStatusAsync(id, ct);
-                TempData["Success"] = "Stav člena domácnosti byl úspěšně upraven.";
-                return RedirectToAction(nameof(Index));
-            }
-            catch(DomainException ex)
-            {
-                TempData["Error"] = ex.Message;
-                return RedirectToAction(nameof(Index));
-            }
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(Index));
         }
     }
 }

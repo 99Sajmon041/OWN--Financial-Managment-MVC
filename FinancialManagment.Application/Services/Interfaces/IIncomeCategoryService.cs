@@ -9,5 +9,5 @@ public interface IIncomeCategoryService
     Task UpdateAsync(int id, IncomeCategoryUpsertViewModel model, CancellationToken ct);
     Task ChangeStatusAsync(int id, CancellationToken ct);
     Task<IncomeCategoryUpsertViewModel?> GetByIdAsync(int id, CancellationToken ct);
-    Task<PagedResult<IncomeCategoryViewModel>> GetAllAsync(PagedRequest pagedRequest, CancellationToken ct);
+    Task<PagedResult<IncomeCategoryViewModel>> GetAllAsync(PagedRequest pagedRequest, bool? isActive, CancellationToken ct);
 }

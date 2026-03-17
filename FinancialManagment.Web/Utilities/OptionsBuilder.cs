@@ -4,12 +4,12 @@ namespace FinancialManagment.Web.Utilities;
 
 public static class OptionsBuilder
 {
-    public static List<SelectListItem> GetOptionsForIncomeCategory()
+    public static List<SelectListItem> GetOptionsForCategory()
     {
         return
         [
             new SelectListItem { Text = "Stav", Value = "IsActive" },
-            new SelectListItem { Text = "Jméno", Value = "Name" }
+            new SelectListItem { Text = "Název", Value = "Name" }
         ];
     }
 

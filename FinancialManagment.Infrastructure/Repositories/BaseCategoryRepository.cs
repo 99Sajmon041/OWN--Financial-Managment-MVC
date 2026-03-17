@@ -25,11 +25,16 @@ public abstract class BaseCategoryRepository<T>(FinancialManagmentDbContext cont
         return await db.AnyAsync(x => x.ApplicationUserId == userId && x.Name == name && x.Id != id, ct);
     }
 
-    public async Task<(IReadOnlyList<T>, int)> GetAllAsync(string userId, PagedRequest request, CancellationToken ct)
+    public async Task<(IReadOnlyList<T>, int)> GetAllAsync(string userId, bool? isActive, PagedRequest request, CancellationToken ct)
     {
         var query = db
             .AsNoTracking()
             .Where(x => x.ApplicationUserId == userId);
+
+        if (isActive is not null)
+        {
+            query = query.Where(x => x.IsActive == isActive);
+        }
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {

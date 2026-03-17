@@ -1,5 +1,5 @@
 ﻿using FinancialManagment.Application.Exceptions;
-using FinancialManagment.Application.Models.IncomeCategory;
+using FinancialManagment.Application.Models.ExpenseCategory;
 using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Shared.Pagination;
 using FinancialManagment.Web.Utilities;
@@ -9,14 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinancialManagment.Web.Controllers;
 
 [Authorize]
-public class IncomeCategoryController(IIncomeCategoryService incomeCategoryService) : Controller
+public class ExpenseCategoryController(IExpenseCategoryService expenseCategoryService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(PagedRequest request, bool? isActive, CancellationToken ct)
     {
-        var model = new IncomeCategoryIndexViewModel
+        var model = new ExpenseCategoryIndexViewModel
         {
-            Result = await incomeCategoryService.GetAllAsync(request, isActive, ct),
+            Result = await expenseCategoryService.GetAllAsync(request, isActive, ct),
             SortOptions = OptionsBuilder.GetOptionsForCategory()
         };
 
@@ -27,13 +27,13 @@ public class IncomeCategoryController(IIncomeCategoryService incomeCategoryServi
     [HttpGet]
     public IActionResult Create()
     {
-        return View(new IncomeCategoryUpsertViewModel());
+        return View(new ExpenseCategoryUpsertViewModel());
     }
 
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(IncomeCategoryUpsertViewModel model, CancellationToken ct)
+    public async Task<IActionResult> Create(ExpenseCategoryUpsertViewModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)
         {
@@ -42,9 +42,9 @@ public class IncomeCategoryController(IIncomeCategoryService incomeCategoryServi
 
         try
         {
-            await incomeCategoryService.AddAsync(model, ct);
+            await expenseCategoryService.AddAsync(model, ct);
 
-            TempData["Success"] = "Kategorie příjmů byla úspěšně přidána.";
+            TempData["Success"] = "Kategorie výdajů byla úspěšně přidána.";
             return RedirectToAction(nameof(Index));
         }
         catch (ConflictException ex)
@@ -59,8 +59,8 @@ public class IncomeCategoryController(IIncomeCategoryService incomeCategoryServi
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangeStatus(int id, CancellationToken ct)
     {
-        await incomeCategoryService.ChangeStatusAsync(id, ct);
-        TempData["Success"] = "Stav kategorie příjmu byla úspěšně změněna.";
+        await expenseCategoryService.ChangeStatusAsync(id, ct);
+        TempData["Success"] = "Stav výdajové kategorie byl úspěšně změněn.";
 
         return RedirectToAction(nameof(Index));
     }
@@ -69,14 +69,14 @@ public class IncomeCategoryController(IIncomeCategoryService incomeCategoryServi
     [HttpGet]
     public async Task<IActionResult> Update(int id, CancellationToken ct)
     {
-        var result = await incomeCategoryService.GetByIdAsync(id, ct);
+        var result = await expenseCategoryService.GetByIdAsync(id, ct);
         return View(result);
     }
 
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Update(int id, IncomeCategoryUpsertViewModel model, CancellationToken ct)
+    public async Task<IActionResult> Update(int id, ExpenseCategoryUpsertViewModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)
         {
@@ -85,8 +85,8 @@ public class IncomeCategoryController(IIncomeCategoryService incomeCategoryServi
 
         try
         {
-            await incomeCategoryService.UpdateAsync(id, model, ct);
-            TempData["Success"] = "Kategorie příjmu byla úspěšně upravena.";
+            await expenseCategoryService.UpdateAsync(id, model, ct);
+            TempData["Success"] = "Kategorie výdaje byla úspěšně upravena.";
 
             return RedirectToAction(nameof(Index));
         }

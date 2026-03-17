@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FinancialManagment.Application.Models.ExpenseCategory;
 using FinancialManagment.Application.Models.HouseholdMember;
 using FinancialManagment.Application.Models.IncomeCategory;
 using FinancialManagment.Domain.Entities;
@@ -11,6 +12,9 @@ public sealed class MappingProfile : Profile
     {
         CreateMap<IncomeCategory, IncomeCategoryViewModel>();
         CreateMap<IncomeCategory, IncomeCategoryUpsertViewModel>();
+
+        CreateMap<ExpenseCategory, ExpenseCategoryViewModel>();
+        CreateMap<ExpenseCategory, ExpenseCategoryUpsertViewModel>();
 
         CreateMap<HouseholdMember, HouseholdMemberViewModel>();
         CreateMap<HouseholdMemberUpsertViewModel, HouseholdMember>().ReverseMap();

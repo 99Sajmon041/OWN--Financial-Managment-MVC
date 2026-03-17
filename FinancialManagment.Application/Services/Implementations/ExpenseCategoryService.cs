@@ -70,13 +70,13 @@ public sealed class ExpenseCategoryService(
         logger.LogInformation("User with ID: {UserId} {Phrase} expense category with ID: {ExpenseCategoryId}.", userId, action, id);
     }
 
-    public async Task<PagedResult<ExpenseCategoryViewModel>> GetAllAsync(PagedRequest pagedRequest, CancellationToken ct)
+    public async Task<PagedResult<ExpenseCategoryViewModel>> GetAllAsync(PagedRequest pagedRequest, bool? isActive, CancellationToken ct)
     {
         var userId = currentUser.ValidatedUserId;
 
         pagedRequest = pagedRequest.Normalize();
 
-        var (items, totalItemsCount) = await unitOfWork.ExpenseCategoryRepository.GetAllAsync(userId, pagedRequest, ct);
+        var (items, totalItemsCount) = await unitOfWork.ExpenseCategoryRepository.GetAllAsync(userId, isActive, pagedRequest, ct);
 
         var expenseCategories = mapper.Map<List<ExpenseCategoryViewModel>>(items);
 

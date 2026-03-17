@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+
 (function () {
     function initFilters() {
         const form = document.getElementById("FilterForm");
@@ -27,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const sortSelect = document.getElementById("sortSelect");
         const descCheck = document.getElementById("descCheck");
         const pageSizeSelect = document.getElementById("pageSize");
+        const isActiveCheck = document.getElementById("isActiveCheck");
 
         if (searchInput && sessionStorage.getItem("restoreIncomeCategorySearchFocus") === "true") {
             searchInput.focus();
@@ -63,6 +65,12 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
+        if (isActiveCheck) {
+            isActiveCheck.addEventListener("change", function () {
+                form.submit();
+            });
+        }
+
         let timerId = null;
         if (searchInput) {
             searchInput.addEventListener("input", function () {
@@ -91,3 +99,5 @@ document.addEventListener("DOMContentLoaded", function () {
         initFilters();
     }
 })();
+
+
