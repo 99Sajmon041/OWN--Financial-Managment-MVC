@@ -70,20 +70,33 @@
                     </select>
                 </div>
 
-                <div class="col-12 col-md-3 col-lg-2">
-                    <div class="form-check mt-4">
-                        <input class="form-check-input"
-                               type="checkbox"
-                               name="Desc"
-                               value="true"
-                               id="descCheck"
-                               @(Model.Result.Desc ? "checked" : "") />
-                        <label class="form-check-label" for="descCheck">
-                            Sestupně
-                        </label>
+                <div class="col-12 col-lg-2">
+                    <div class="d-flex flex-wrap gap-3 align-items-center h-100 pt-4">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="Desc"
+                                   value="true"
+                                   id="descCheck"
+                                   @(Model.Result.Desc ? "checked" : "") />
+                            <label class="form-check-label" for="descCheck">
+                                Sestupně
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-0">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="isActive"
+                                   value="true"
+                                   id="isActiveCheck"
+                                   @(Context.Request.Query["isActive"] == "true" ? "checked" : "") />
+                            <label class="form-check-label" for="isActiveCheck">
+                                Pouze aktivní
+                            </label>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

@@ -17,7 +17,7 @@ public class IncomeCategoryController(IIncomeCategoryService incomeCategoryServi
         var model = new IncomeCategoryIndexViewModel
         {
             Result = await incomeCategoryService.GetAllAsync(request, isActive, ct),
-            SortOptions = OptionsBuilder.GetOptionsForCategory()
+            SortOptions = OptionsBuilder.GetCategoryOptions()
         };
 
         return View(model);

@@ -7,7 +7,5 @@ namespace FinancialManagment.Application.Models.IncomeCategory;
 public sealed class IncomeCategoryIndexViewModel
 {
     public PagedResult<IncomeCategoryViewModel> Result { get; set; } = default!;
-
-    [Display(Name = "Filtry")]
     public List<SelectListItem> SortOptions { get; set; } = [];
 }

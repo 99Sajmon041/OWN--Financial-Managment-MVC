@@ -17,7 +17,7 @@ public class ExpenseCategoryController(IExpenseCategoryService expenseCategorySe
         var model = new ExpenseCategoryIndexViewModel
         {
             Result = await expenseCategoryService.GetAllAsync(request, isActive, ct),
-            SortOptions = OptionsBuilder.GetOptionsForCategory()
+            SortOptions = OptionsBuilder.GetCategoryOptions()
         };
 
         return View(model);

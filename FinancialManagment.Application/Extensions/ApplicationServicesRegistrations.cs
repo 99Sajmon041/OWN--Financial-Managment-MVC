@@ -13,6 +13,8 @@ public static class ApplicationServicesRegistrations
         services.AddScoped<IIncomeCategoryService, IncomeCategoryService>();
         services.AddScoped<IHouseholdMemberService, HouseholdMemberService>();
         services.AddScoped<IExpenseCategoryService, ExpenseCategoryService>();
+        services.AddScoped<IIncomeService, IncomeService>();
+        services.AddScoped<IExpenseService, ExpenseService>();
 
         services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 
