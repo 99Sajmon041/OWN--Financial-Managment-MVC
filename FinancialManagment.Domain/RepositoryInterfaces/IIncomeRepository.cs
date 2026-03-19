@@ -13,7 +13,7 @@ public interface IIncomeRepository
         DateTime to,
         CancellationToken ct);
 
-    Task<Income?> GetByIdAsync(int id, int houseHoldMemberId, CancellationToken ct);
+    Task<Income?> GetByIdAsync(int id, string userId, CancellationToken ct);
     void Delete(Income income);
     void Add(Income income);
 }

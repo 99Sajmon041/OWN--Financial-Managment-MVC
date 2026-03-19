@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FinancialManagment.Application.Models.ExpenseCategory;
 using FinancialManagment.Application.Models.HouseholdMember;
+using FinancialManagment.Application.Models.Income;
 using FinancialManagment.Application.Models.IncomeCategory;
 using FinancialManagment.Domain.Entities;
 
@@ -18,5 +19,12 @@ public sealed class MappingProfile : Profile
 
         CreateMap<HouseholdMember, HouseholdMemberViewModel>();
         CreateMap<HouseholdMemberUpsertViewModel, HouseholdMember>().ReverseMap();
+
+        CreateMap<Income, IncomeViewModel>()
+            .ForMember(x => x.HouseholdMemberNickname, opt => opt.MapFrom(x => x.HouseholdMember.Nickname))
+            .ForMember(x => x.IncomeCategoryName, opt => opt.MapFrom(x => x.IncomeCategory.Name));
+
+        CreateMap<IncomeUpsertViewModel, Income>()
+            .ForMember(x => x.Id, opt => opt.Ignore());
     }
 }

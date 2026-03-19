@@ -44,4 +44,17 @@ public sealed class HouseholdMemberRepository(FinancialManagmentDbContext contex
             .Where(x => x.ApplicationUserId == userId)
             .CountAsync(ct);
     }
+
+    public async Task<List<HouseholdMember>> GetAllActiveAsync(string userId, CancellationToken ct)
+    {
+        return await context.HouseholdMembers
+            .AsNoTracking()
+            .Where(x => x.ApplicationUserId == userId && x.IsActive)
+            .ToListAsync(ct);
+    }
+
+    public async Task<bool> ExistsAnyActiveAsync(string userId, CancellationToken ct)
+    {
+        return await context.HouseholdMembers.AnyAsync(x => x.ApplicationUserId == userId && x.IsActive, ct);
+    }
 }

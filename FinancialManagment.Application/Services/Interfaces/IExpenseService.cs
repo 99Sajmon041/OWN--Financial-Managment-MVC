@@ -1,6 +1,6 @@
 ﻿namespace FinancialManagment.Application.Services.Interfaces;
 
-internal interface IExpenseService
+public interface IExpenseService
 {
 
 }

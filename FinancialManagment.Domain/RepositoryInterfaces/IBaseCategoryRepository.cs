@@ -10,4 +10,5 @@ public interface IBaseCategoryRepository<T> where T : BaseCategory
     Task<T?> GetByIdAsync(int id, string userId, CancellationToken ct);
     Task<bool> ExistsByNameAsync(string name, string userId, CancellationToken ct);
     Task<bool> ExistsByNameWithDifferentIdAsync(string name, int id, string userId, CancellationToken ct);
+    Task<List<T>> GetAllActiveAsync(string userId, CancellationToken ct);
 }

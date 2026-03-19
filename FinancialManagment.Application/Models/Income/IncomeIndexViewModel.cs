@@ -7,4 +7,6 @@ public sealed class IncomeIndexViewModel
 {
     public PagedResult<IncomeViewModel> Result { get; set; } = default!;
     public List<SelectListItem> SortOptions { get; set; } = [];
+    public List<SelectListItem> HouseholdMemberOptions { get; set; } = [];
+    public List<SelectListItem> IncomeCategoryOptions { get; set; } = [];
 }

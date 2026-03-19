@@ -69,9 +69,9 @@ public sealed class IncomeRepository(FinancialManagmentDbContext context) : IInc
         return (items, totalItemsCount);
     }
 
-    public async Task<Income?> GetByIdAsync(int id, int houseHoldMemberId, CancellationToken ct)
+    public async Task<Income?> GetByIdAsync(int id, string userId, CancellationToken ct)
     {
-        return await context.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.HouseholdMemberId == houseHoldMemberId, ct);
+        return await context.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.HouseholdMember.ApplicationUserId == userId, ct);
     }
 
     public void Add(Income income)
