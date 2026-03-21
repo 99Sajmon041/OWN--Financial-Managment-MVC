@@ -6,12 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinancialManagment.Infrastructure.Repositories;
 
-public sealed class IncomeRepository(FinancialManagmentDbContext context) : IIncomeRepository
+public sealed class IncomeRepository(FinancialManagementDbContext context) : IIncomeRepository
 {
     public async Task<(IReadOnlyList<Income>, int)> GetAllAsync(
         PagedRequest request, 
         int? householdMemberId,
-        int? incomeCategoryId, 
+        int? incomeCategoryId,
+        string userId,
         DateTime from, 
         DateTime to, 
         CancellationToken ct)
@@ -19,8 +20,9 @@ public sealed class IncomeRepository(FinancialManagmentDbContext context) : IInc
         var query = context.Incomes
             .AsNoTracking()
             .Include(x => x.HouseholdMember)
+            .ThenInclude(x => x.ApplicationUser)
             .Include(x => x.IncomeCategory)
-            .Where(x => x.Date >= from && x.Date <= to);
+            .Where(x => x.HouseholdMember.ApplicationUserId == userId && x.Date >= from && x.Date <= to);
 
         if (householdMemberId is not null)
             query = query.Where(x => x.HouseholdMemberId == householdMemberId);
@@ -53,8 +55,8 @@ public sealed class IncomeRepository(FinancialManagmentDbContext context) : IInc
             : query.OrderBy(x => x.Amount).ThenBy(x => x.Date),
 
             "Date" => request.Desc
-            ? query.OrderByDescending(x => x.Date).ThenByDescending(x => x.Date)
-            : query.OrderBy(x => x.Date).ThenBy(x => x.Date),
+            ? query.OrderByDescending(x => x.Date).ThenByDescending(x => x.Id)
+            : query.OrderBy(x => x.Date).ThenBy(x => x.Id),
 
             _ => request.Desc
             ? query.OrderByDescending(x => x.Date)
@@ -69,17 +71,21 @@ public sealed class IncomeRepository(FinancialManagmentDbContext context) : IInc
         return (items, totalItemsCount);
     }
 
-    public async Task<Income?> GetByIdAsync(int id, string userId, CancellationToken ct)
+    async Task<Income?> IIncomeRepository.GetByIdAsync(int id, string userId, CancellationToken ct)
     {
-        return await context.Incomes.FirstOrDefaultAsync(x => x.Id == id && x.HouseholdMember.ApplicationUserId == userId, ct);
+        return await context
+            .Incomes
+            .Include(x => x.HouseholdMember)
+            .Include(x => x.IncomeCategory)
+            .FirstOrDefaultAsync(x => x.Id == id && x.HouseholdMember.ApplicationUserId == userId, ct);
     }
 
-    public void Add(Income income)
+    void IIncomeRepository.Add(Income income)
     {
         context.Add(income);
     }
 
-    public void Delete(Income income)
+    void IIncomeRepository.Delete(Income income)
     {
         context.Remove(income);
     }

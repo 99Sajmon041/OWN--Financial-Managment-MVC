@@ -5,6 +5,8 @@ namespace FinancialManagment.Application.Models.Expense;
 
 public sealed class ExpenseIndexViewModel
 {
-    public PagedResult<ExpenseListItemViewModel> Result { get; set; } = default!;
+    public PagedResult<ExpenseViewModel> Result { get; set; } = default!;
     public List<SelectListItem> SortOptions { get; set; } = [];
+    public List<SelectListItem> HouseholdMemberOptions { get; set; } = [];
+    public List<SelectListItem> ExpenseCategoryOptions { get; set; } = [];
 }

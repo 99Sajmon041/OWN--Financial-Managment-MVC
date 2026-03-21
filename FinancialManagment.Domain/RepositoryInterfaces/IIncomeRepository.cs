@@ -9,10 +9,10 @@ public interface IIncomeRepository
         PagedRequest request,
         int? householdMemberId,
         int? incomeCategoryId,
+        string userId,
         DateTime from,
         DateTime to,
         CancellationToken ct);
-
     Task<Income?> GetByIdAsync(int id, string userId, CancellationToken ct);
     void Delete(Income income);
     void Add(Income income);

@@ -12,4 +12,5 @@ public interface IHouseholdMemberRepository
     Task<bool> ExistsByNameWithDifferentIdAsync(string nickname, int id, string userId, CancellationToken ct);
     Task<int> GetCountOfMembersAsync(string userId, CancellationToken ct);
     Task<bool> ExistsAnyActiveAsync(string userId, CancellationToken ct);
+    Task<bool> BelongsToUserAndIsActiveAsync(int id, string userId, CancellationToken ct);
 }

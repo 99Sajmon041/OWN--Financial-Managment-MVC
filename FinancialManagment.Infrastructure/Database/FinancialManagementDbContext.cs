@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinancialManagment.Infrastructure.Database;
 
-public sealed class FinancialManagmentDbContext(DbContextOptions options) : IdentityDbContext<ApplicationUser>(options)
+public sealed class FinancialManagementDbContext(DbContextOptions options) : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<Expense> Expenses { get; set; } = default!;
     public DbSet<Income> Incomes { get; set; } = default!;

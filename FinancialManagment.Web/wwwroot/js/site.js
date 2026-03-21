@@ -14,8 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 4000);
 });
 
-
-
 (function () {
     function initFilters() {
         const form = document.getElementById("FilterForm");
@@ -29,19 +27,23 @@ document.addEventListener("DOMContentLoaded", function () {
         const descCheck = document.getElementById("descCheck");
         const pageSizeSelect = document.getElementById("pageSize");
         const isActiveCheck = document.getElementById("isActiveCheck");
+        const incomeCategorySelect = document.getElementById("incomeCategorySelect");
+        const houseHoldMemberSelect = document.getElementById("houseHoldMemberSelect");
+        const fromInput = document.getElementById("fromInput");
+        const toInput = document.getElementById("toInput");
 
-        if (searchInput && sessionStorage.getItem("restoreIncomeCategorySearchFocus") === "true") {
+        if (searchInput && sessionStorage.getItem("restoreFilterSearchFocus") === "true") {
             searchInput.focus();
 
             const valueLength = searchInput.value.length;
             searchInput.setSelectionRange(valueLength, valueLength);
 
-            sessionStorage.removeItem("restoreIncomeCategorySearchFocus");
+            sessionStorage.removeItem("restoreFilterSearchFocus");
         }
 
         function submitFormWithFocusRestore() {
             if (searchInput === document.activeElement) {
-                sessionStorage.setItem("restoreIncomeCategorySearchFocus", "true");
+                sessionStorage.setItem("restoreFilterSearchFocus", "true");
             }
 
             form.submit();
@@ -71,6 +73,30 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
+        if (houseHoldMemberSelect) {
+            houseHoldMemberSelect.addEventListener("change", function () {
+                form.submit();
+            });
+        }
+
+        if (incomeCategorySelect) {
+            incomeCategorySelect.addEventListener("change", function () {
+                form.submit();
+            });
+        }
+
+        if (fromInput) {
+            fromInput.addEventListener("change", function () {
+                form.submit();
+            });
+        }
+
+        if (toInput) {
+            toInput.addEventListener("change", function () {
+                form.submit();
+            });
+        }
+
         let timerId = null;
         if (searchInput) {
             searchInput.addEventListener("input", function () {
@@ -87,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (clearBtn && searchInput) {
             clearBtn.addEventListener("click", function () {
                 searchInput.value = "";
-                sessionStorage.setItem("restoreIncomeCategorySearchFocus", "true");
+                sessionStorage.setItem("restoreFilterSearchFocus", "true");
                 form.submit();
             });
         }
@@ -100,4 +126,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 })();
 
+
+document.addEventListener("DOMContentLoaded", function () {
+    const deleteforms = document.querySelectorAll(".delete-form");
+
+    deleteforms.forEach(function (form) {
+        form.addEventListener("submit", function (e) {
+            const button = form.querySelector("button[type='submit']");
+            const message = button?.dataset.confirmMessage || "Opravdu chcete položku smazat ?";
+
+            if (!confirm(message)) {
+                e.preventDefault();
+            }
+        });
+    });
+});
 

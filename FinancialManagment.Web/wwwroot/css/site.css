@@ -244,7 +244,7 @@ body {
     }
 }
 
-.category-table-wrapper {
+.list-items-table-wrapper {
     background: #ffffff;
     border: 1px solid #dee2e6;
     border-radius: 0.75rem;
@@ -252,26 +252,26 @@ body {
     box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.06);
 }
 
-.category-table {
+.list-items-table {
     margin-bottom: 0;
 }
 
-    .category-table thead th {
+    .list-items-table thead th {
         background-color: #f8f9fa;
         font-weight: 600;
         border-bottom: 1px solid #dee2e6;
     }
 
-    .category-table tbody tr {
+    .list-items-table tbody tr {
         transition: background-color 0.18s ease-in-out;
     }
 
-        .category-table tbody tr:hover {
+        .list-items-table tbody tr:hover {
             background-color: #f3f7ff;
         }
 
-    .category-table td,
-    .category-table th {
+    .list-items-table td,
+    .list-items-table th {
         vertical-align: middle;
     }
 

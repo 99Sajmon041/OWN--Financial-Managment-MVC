@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinancialManagment.Infrastructure.Repositories;
 
-public sealed class HouseholdMemberRepository(FinancialManagmentDbContext context) : IHouseholdMemberRepository
+public sealed class HouseholdMemberRepository(FinancialManagementDbContext context) : IHouseholdMemberRepository
 {
     public void Add(HouseholdMember householdMember)
     {
@@ -56,5 +56,10 @@ public sealed class HouseholdMemberRepository(FinancialManagmentDbContext contex
     public async Task<bool> ExistsAnyActiveAsync(string userId, CancellationToken ct)
     {
         return await context.HouseholdMembers.AnyAsync(x => x.ApplicationUserId == userId && x.IsActive, ct);
+    }
+
+    public async Task<bool> BelongsToUserAndIsActiveAsync(int id, string userId, CancellationToken ct)
+    {
+        return await context.HouseholdMembers.AnyAsync(x => x.Id == id && x.ApplicationUserId == userId && x.IsActive, ct);
     }
 }

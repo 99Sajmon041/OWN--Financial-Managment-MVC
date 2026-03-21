@@ -4,4 +4,4 @@ using FinancialManagment.Infrastructure.Database;
 
 namespace FinancialManagment.Infrastructure.Repositories;
 
-public sealed class ExpenseCategoryRepository(FinancialManagmentDbContext context) : BaseCategoryRepository<ExpenseCategory>(context), IExpenseCategoryRepository { }
+public sealed class ExpenseCategoryRepository(FinancialManagementDbContext context) : BaseCategoryRepository<ExpenseCategory>(context), IExpenseCategoryRepository { }

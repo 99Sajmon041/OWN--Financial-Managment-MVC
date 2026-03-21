@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace FinancialManagment.Application.Models.Income;
+namespace FinancialManagment.Application.Models.Expense;
 
-public sealed class IncomeUpsertViewModel
+public sealed class ExpenseUpsertViewModel
 {
     [Display(Name = "ID")]
     public int Id { get; set; }
@@ -13,10 +14,10 @@ public sealed class IncomeUpsertViewModel
     [Range(1, int.MaxValue, ErrorMessage = "Člen domácnosti je povinný.")]
     public int HouseholdMemberId { get; set; }
 
-    [Display(Name = "Kategorie příjmu")]
-    [Required(ErrorMessage = "Kategorie příjmu je povinná.")]
-    [Range(1, int.MaxValue, ErrorMessage = "Kategorie příjmu je povinná.")]
-    public int IncomeCategoryId { get; set; }
+    [Display(Name = "Kategorie výdaje")]
+    [Required(ErrorMessage = "Kategorie výdaje je povinná.")]
+    [Range(1, int.MaxValue, ErrorMessage = "Kategorie výdaje je povinná.")]
+    public int ExpenseCategoryId { get; set; }
 
     [Display(Name = "Částka")]
     [Required(ErrorMessage = "Částka je povinná.")]
@@ -29,6 +30,12 @@ public sealed class IncomeUpsertViewModel
 
     [Display(Name = "Popis")]
     public string? Description { get; set; }
+
+    [Display(Name = "")]
+    [StringLength(200, ErrorMessage = "Počet znaků pro nahraný obrázek musí mít do 200 znaků.", MinimumLength = 4)]
+    public string? ReceiptFileName { get; set; }
+
+    public IFormFile? ReceiptFile { get; set; }
     public List<SelectListItem> HouseholdMembers { get; set; } = [];
-    public List<SelectListItem> IncomeCategories { get; set; } = [];
+    public List<SelectListItem> ExpenseCategories { get; set; } = [];
 }

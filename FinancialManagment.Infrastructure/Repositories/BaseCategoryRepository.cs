@@ -6,13 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinancialManagment.Infrastructure.Repositories;
 
-public abstract class BaseCategoryRepository<T>(FinancialManagmentDbContext context) : IBaseCategoryRepository<T> where T : BaseCategory
+public abstract class BaseCategoryRepository<T>(FinancialManagementDbContext context) : IBaseCategoryRepository<T> where T : BaseCategory
 {
     private readonly DbSet<T> db = context.Set<T>();
 
     public void Add(T entity)
     {
         db.Add(entity);
+    }
+
+    public async Task<bool> ExistsAnyActiveAsync(string userId, CancellationToken ct)
+    {
+        return await db.AnyAsync(x => x.ApplicationUserId == userId && x.IsActive, ct);
     }
 
     public async Task<bool> ExistsByNameAsync(string name, string userId, CancellationToken ct)
@@ -74,5 +79,10 @@ public abstract class BaseCategoryRepository<T>(FinancialManagmentDbContext cont
     public async Task<T?> GetByIdAsync(int id, string userId, CancellationToken ct)
     {
         return await db.FirstOrDefaultAsync(x => x.ApplicationUserId == userId && x.Id == id, ct);
+    }
+
+    public async Task<bool> BelongsToUserAndIsActiveAsync(int id, string userId, CancellationToken ct)
+    {
+        return await db.AnyAsync(x => x.ApplicationUserId == userId && x.Id == id && x.IsActive, ct);
     }
 }

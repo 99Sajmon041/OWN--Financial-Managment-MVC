@@ -1,4 +1,5 @@
-﻿using FinancialManagment.Application.Models.Income;
+﻿using FinancialManagment.Application.Exceptions;
+using FinancialManagment.Application.Models.Income;
 using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Shared.Pagination;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +13,7 @@ public class IncomeController(IIncomeService incomeService) : Controller
     [HttpGet]
     public async Task<IActionResult> Index(PagedRequest request, int? householdMemberId, int? incomeCategoryId, DateTime? from, DateTime? to, CancellationToken ct)
     {
-        var model = await incomeService.GetIndexAsync(request,  householdMemberId, incomeCategoryId, from, to, ct);
+        var model = await incomeService.GetIndexAsync(request, householdMemberId, incomeCategoryId, from, to, ct);
         return View(model);
     }
 
@@ -27,23 +28,74 @@ public class IncomeController(IIncomeService incomeService) : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    //[HttpGet]
-    //public async Task<IActionResult> Create(CancellationToken ct)
-    //{
-    //    var model = new IncomeUpsertViewModel
-    //    {
-    //        Date = DateTime.Now,
-    //        HouseholdMembers = [],
-    //        IncomeCategories = []
-    //    };
+    [HttpGet]
+    public async Task<IActionResult> Create(CancellationToken ct)
+    {
+        try
+        {
+            var model = await incomeService.GetForCreateAsync(ct);
+            return View(model);
+        }
+        catch (DomainException ex)
+        {
+            TempData["Success"] = ex.Message;
+            return RedirectToAction(nameof(Index));
+        }
 
-    //    return View(model);
-    //}
+    }
 
-    //[HttpPost]
-    //[ValidateAntiForgeryToken]
-    //public async Task<IActionResult> Create(IncomeUpsertViewModel model, CancellationToken ct)
-    //{
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(IncomeUpsertViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            await incomeService.FillSelectOptionsAsync(model, ct);
+            return View(model);
+        }
 
-    //}
+        try
+        {
+            await incomeService.AddAsync(model, ct);
+            TempData["Success"] = "Příjem úspěšně přidán.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DomainException ex)
+        {
+            await incomeService.FillSelectOptionsAsync(model, ct);
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Update(int id, CancellationToken ct)
+    {
+        var model = await incomeService.GetForUpdateAsync(id, ct);
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Update(int id, IncomeUpsertViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            await incomeService.FillSelectOptionsAsync(model, ct);
+            return View(model);
+        }
+
+        try
+        {
+            await incomeService.UpdateAsync(id, model, ct);
+            TempData["Success"] = "Příjem úspěšně upraven.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DomainException ex)
+        {
+            await incomeService.FillSelectOptionsAsync(model, ct);
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
+    }
 }

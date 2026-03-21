@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FinancialManagment.Infrastructure.Migrations
 {
-    [DbContext(typeof(FinancialManagmentDbContext))]
+    [DbContext(typeof(FinancialManagementDbContext))]
     [Migration("20260315152759_UpdateHouseholdMemberTable")]
     partial class UpdateHouseholdMemberTable
     {

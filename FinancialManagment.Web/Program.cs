@@ -7,6 +7,7 @@ using Serilog;
 using FinancialManagment.Web.MiddleWare;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Infrastructure.Identity;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,17 +36,26 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.SignIn.RequireConfirmedAccount = false;
     options.User.RequireUniqueEmail = true;
 })
-.AddEntityFrameworkStores<FinancialManagmentDbContext>()
+.AddEntityFrameworkStores<FinancialManagementDbContext>()
 .AddDefaultTokenProviders();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.Cookie.Name = "FinancialManagment.Auth";
+    options.Cookie.Name = "FinancialManagement.Prod.Auth";
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
 
     options.ExpireTimeSpan = TimeSpan.FromDays(14);
     options.SlidingExpiration = true;
+});
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\simon\Desktop\AppKeys\FinancialManagement_Prod"))
+    .SetApplicationName("FinancialManagement");
+
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.Name = "FinancialManagement.Prod.Antiforgery";
 });
 
 builder.Services.AddControllersWithViews();

@@ -26,5 +26,9 @@ public sealed class MappingProfile : Profile
 
         CreateMap<IncomeUpsertViewModel, Income>()
             .ForMember(x => x.Id, opt => opt.Ignore());
+
+        CreateMap<Income, IncomeUpsertViewModel>();
+
+        //dodělat expense mapping !!
     }
 }

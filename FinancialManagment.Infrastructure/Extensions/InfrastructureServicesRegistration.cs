@@ -14,7 +14,7 @@ public static class InfrastructureServicesRegistration
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<FinancialManagmentDbContext>(options =>
+        services.AddDbContext<FinancialManagementDbContext>(options =>
         {
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
         });

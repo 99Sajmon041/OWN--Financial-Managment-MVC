@@ -3,7 +3,7 @@ using FinancialManagment.Infrastructure.Database;
 
 namespace FinancialManagment.Infrastructure.Repositories;
 
-public sealed class UnitOfWork(FinancialManagmentDbContext context) : IUnitOfWork
+public sealed class UnitOfWork(FinancialManagementDbContext context) : IUnitOfWork
 {
     private IExpenseCategoryRepository? expenseCategoryRepository;
     private IExpenseRepository? expenseRepository;
