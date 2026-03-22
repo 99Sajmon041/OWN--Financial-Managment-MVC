@@ -6,7 +6,7 @@ using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
 using FinancialManagment.Domain.RepositoryInterfaces;
 using FinancialManagment.Shared.Pagination;
-using FinancialManagment.Web.Utilities;
+using FinancialManagment.Shared.Utilities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
@@ -29,10 +29,17 @@ public sealed class IncomeService(
         request = request.Normalize();
         var userId = currentUser.ValidatedUserId;
 
-        DateTime _from = from ?? DateTime.Now.AddYears(-1);
-        DateTime _to = to ?? DateTime.Now;
+        DateTime effectiveFrom = from ?? DateTime.Now.AddYears(-1);
+        DateTime effectiveTo = to ?? DateTime.Now;
 
-        var (incomes, totalItemsCount) = await unitOfWork.IncomeRepository.GetAllAsync(request, householdMemberId, incomeCategoryId, userId, _from, _to, ct);
+        var (incomes, totalItemsCount) = await unitOfWork.IncomeRepository.GetAllAsync(
+            request,
+            householdMemberId,
+            incomeCategoryId, 
+            userId, 
+            effectiveFrom,
+            effectiveTo,
+            ct);
 
         var items = mapper.Map<List<IncomeViewModel>>(incomes);
 

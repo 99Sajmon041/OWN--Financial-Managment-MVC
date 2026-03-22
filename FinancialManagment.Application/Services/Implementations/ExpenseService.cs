@@ -5,8 +5,8 @@ using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
 using FinancialManagment.Domain.RepositoryInterfaces;
+using FinancialManagment.Shared.Utilities;
 using FinancialManagment.Shared.Pagination;
-using FinancialManagment.Web.Utilities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
@@ -30,16 +30,22 @@ public sealed class ExpenseService(
         request = request.Normalize();
         var userId = currentUser.ValidatedUserId;
 
-        DateTime _from = from ?? DateTime.Now.AddYears(-1);
-        DateTime _to = to ?? DateTime.Now;
+        DateTime effectiveFrom = from ?? DateTime.Now.AddYears(-1);
+        DateTime effectiveTo  = to ?? DateTime.Now;
 
-        var (expenses, totalItemsCount) = await unitOfWork.ExpenseRepository.GetAllAsync(request, householdMemberId, expenseCategoryId, userId, _from, _to, ct);
+        var (expenses, totalItemsCount) = await unitOfWork.ExpenseRepository.GetAllAsync(
+            request,
+            householdMemberId,
+            expenseCategoryId, 
+            userId,
+            effectiveFrom,
+            effectiveTo,
+            ct);
 
         var items = mapper.Map<List<ExpenseViewModel>>(expenses);
 
         var result = new PagedResult<ExpenseViewModel>
-        {
-            Page = request.Page,
+        { 
             PageSize = request.PageSize,
             Search = request.Search,
             SortBy = request.SortBy,
@@ -83,22 +89,6 @@ public sealed class ExpenseService(
         logger.LogInformation("User with ID: {UserId} deleted expense with ID: {ExpenseId}.", userId, id);
     }
 
-    public async Task AddAsync(ExpenseUpsertViewModel model, CancellationToken ct)
-    {
-        var userId = currentUser.ValidatedUserId;
-
-        await EnsureCanCreateExpenseAsync(userId, ct);
-
-        var expense = mapper.Map<Expense>(model);
-
-        expense.ReceiptFileName = await imageService.SaveAsync(model.ReceiptFile, ct);
-
-        unitOfWork.ExpenseRepository.Add(expense);
-        await unitOfWork.SaveChangesAsync(ct);
-
-        logger.LogInformation("User with ID: {UserId} created expense for household member with ID: {HouseholdMemberId}.", userId, model.HouseholdMemberId);
-    }
-
     public async Task<ExpenseUpsertViewModel> GetForCreateAsync(CancellationToken ct)
     {
         var userId = currentUser.ValidatedUserId;
@@ -113,6 +103,22 @@ public sealed class ExpenseService(
             HouseholdMembers = householdMembersListItems,
             ExpenseCategories = expenseCategoriesListItems
         };
+    }
+
+    public async Task AddAsync(ExpenseUpsertViewModel model, CancellationToken ct)
+    {
+        var userId = currentUser.ValidatedUserId;
+
+        await EnsureCanCreateExpenseAsync(userId, ct);
+
+        var expense = mapper.Map<Expense>(model);
+
+        expense.ReceiptFileName = await imageService.SaveAsync(model.ReceiptFile, ct);
+
+        unitOfWork.ExpenseRepository.Add(expense);
+        await unitOfWork.SaveChangesAsync(ct);
+
+        logger.LogInformation("User with ID: {UserId} created expense for household member with ID: {HouseholdMemberId}.", userId, model.HouseholdMemberId);
     }
 
     public async Task FillSelectOptionsAsync(ExpenseUpsertViewModel model, CancellationToken ct)
@@ -216,7 +222,7 @@ public sealed class ExpenseService(
 
         if (model.ReceiptFile is not null)
         {
-            await imageService.DeleteAsync(model.ReceiptFileName, ct);
+            await imageService.DeleteAsync(expense.ReceiptFileName, ct);
             model.ReceiptFileName = await imageService.SaveAsync(model.ReceiptFile, ct);
         }
 

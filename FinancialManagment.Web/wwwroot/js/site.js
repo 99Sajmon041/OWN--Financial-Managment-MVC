@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const pageSizeSelect = document.getElementById("pageSize");
         const isActiveCheck = document.getElementById("isActiveCheck");
         const incomeCategorySelect = document.getElementById("incomeCategorySelect");
+        const expenseCategorySelect = document.getElementById("expenseCategorySelect");
         const houseHoldMemberSelect = document.getElementById("houseHoldMemberSelect");
         const fromInput = document.getElementById("fromInput");
         const toInput = document.getElementById("toInput");
@@ -81,6 +82,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (incomeCategorySelect) {
             incomeCategorySelect.addEventListener("change", function () {
+                form.submit();
+            });
+        }
+
+        if (expenseCategorySelect) {
+            expenseCategorySelect.addEventListener("change", function () {
                 form.submit();
             });
         }

@@ -1,11 +1,11 @@
-﻿@model IncomeIndexViewModel
+﻿@model ExpenseIndexViewModel
 
 @{
-    ViewData["Title"] = "Příjmy";
+    ViewData["Title"] = "Výdaje";
 }
 
 <div class="text-center mb-5">
-    <h1 class="display-6">Příjmy</h1>
+    <h1 class="display-6">Výdaje</h1>
 </div>
 
 <form method="get" class="mb-3" id="FilterForm">
@@ -19,11 +19,11 @@
                     <label class="form-label">Hledat</label>
                     <div class="input-group">
                         <input type="text"
-                                class="form-control"
-                                id="searchInput"
-                                name="search"
-                                value="@Model.Result.Search"
-                                placeholder="Kategorie, člen, popis..."/>
+                               class="form-control"
+                               id="searchInput"
+                               name="search"
+                               value="@Model.Result.Search"
+                               placeholder="Kategorie, člen, popis..." />
 
                         <button type="button"
                                 class="btn btn-outline-primary"
@@ -70,12 +70,12 @@
                 </div>
 
                 <div class="col-12 col-md-4">
-                    <label class="form-label">Typ příjmu</label>
-                    <select name="incomeCategoryId" class="form-select" id="incomeCategorySelect">
+                    <label class="form-label">Typ výdaje</label>
+                    <select name="expenseCategoryId" class="form-select" id="expenseCategorySelect">
                         <option value="">-- Všechny --</option>
-                        @foreach (var category in Model.IncomeCategoryOptions)
+                        @foreach (var category in Model.ExpenseCategoryOptions)
                         {
-                            if (Context.Request.Query["incomeCategoryId"] == category.Value)
+                            if (Context.Request.Query["expenseCategoryId"] == category.Value)
                             {
                                 <option value="@category.Value" selected>@category.Text</option>
                             }
@@ -127,8 +127,8 @@
                            id="fromInput"
                            name="from"
                            value="@(string.IsNullOrWhiteSpace(Context.Request.Query["from"])
-                                          ? DateTime.Now.AddYears(-1).ToString("yyyy-MM-dd")
-                                          : Context.Request.Query["from"])" />
+                                                                     ? DateTime.Now.AddYears(-1).ToString("yyyy-MM-dd")
+                                                                     : Context.Request.Query["from"])" />
                 </div>
 
                 <div class="col-12 col-md-3">
@@ -138,8 +138,8 @@
                            id="toInput"
                            name="to"
                            value="@(string.IsNullOrWhiteSpace(Context.Request.Query["to"])
-                                          ? DateTime.Now.ToString("yyyy-MM-dd")
-                                          : Context.Request.Query["to"])" />
+                                                                     ? DateTime.Now.ToString("yyyy-MM-dd")
+                                                                     : Context.Request.Query["to"])" />
                 </div>
 
             </div>
@@ -148,8 +148,8 @@
 </form>
 
 <div class="d-flex justify-content-end my-2">
-    <a asp-controller="Income" asp-action="Create" class="btn btn-primary mb-4">
-        Přidat příjem
+    <a asp-controller="Expense" asp-action="Create" class="btn btn-primary mb-4">
+        Přidat výdaj
     </a>
 </div>
 
@@ -163,6 +163,7 @@
                 <th>Částka</th>
                 <th>Datum</th>
                 <th>Popis</th>
+                <th>Obrázek</th>
                 <th>Akce</th>
             </tr>
         </thead>
@@ -174,21 +175,57 @@
                     <tr>
                         <td>@item.Id</td>
                         <td>@item.HouseholdMemberNickname</td>
-                        <td>@item.IncomeCategoryName</td>
+                        <td>@item.ExpenseCategoryName</td>
                         <td>@item.Amount.ToString("C2")</td>
                         <td>@item.Date.ToString("dd.MM.yyyy")</td>
                         <td>@(string.IsNullOrWhiteSpace(item.Description) ? "není k dispozici" : item.Description)</td>
-                        <td class="d-flex align-items-center gap-2">
-                            <a asp-controller="Income" asp-action="Update" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
-                                Upravit
-                            </a>
-                            <form method="post" asp-controller="Income" asp-action="Delete" asp-route-id="@item.Id" class="delete-form">
-                                @Html.AntiForgeryToken()
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(item.ReceiptFileName))
+                            {
+                                <img src="~/images/ExpenseReceipts/@item.ReceiptFileName"
+                                     asp-append-version="true"
+                                     alt="Účtenka"
+                                     class="expense-receipt-preview"
+                                     style="cursor:pointer"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#imageModal-@item.Id"/>
 
-                                <button type="submit" class="btn btn-sm btn-danger" data-confirm-message="Opravdu si přejete smazat tento příjem?">
-                                    Smazat
-                                </button>
-                            </form>
+                                <div class="modal fade" id="imageModal-@item.Id" tabindex="-1" aria-labelledby="imageModalLabel-@item.Id" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="imageModalLabel-@item.Id">Účtenka</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-center">
+                                                <img src="~/images/ExpenseReceipts/@item.ReceiptFileName"
+                                                     asp-append-version="true"
+                                                     alt="Účtenka velké zobrazení"
+                                                     class="img-fluid rounded modal-receipt-image" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Není</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <a asp-controller="Expense" asp-action="Update" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
+                                    Upravit
+                                </a>
+
+                                <form method="post" asp-controller="Expense" asp-action="Delete" asp-route-id="@item.Id" class="delete-form m-0">
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit" class="btn btn-sm btn-danger" data-confirm-message="Opravdu si přejete smazat tento výdaj?">
+                                        Smazat
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -196,9 +233,9 @@
             else
             {
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         <div class="alert alert-warning mb-0">
-                            Zatím žádné nemáte
+                            Zatím nemáte žádné výdaje.
                         </div>
                     </td>
                 </tr>
@@ -214,7 +251,7 @@
 
                     <li class="page-item @(Model.Result.HasPrevious ? "" : "disabled")">
                         <a class="page-link"
-                           asp-controller="Income"
+                           asp-controller="Expense"
                            asp-action="Index"
                            asp-route-Page="@(Model.Result.Page - 1)"
                            asp-route-PageSize="@Model.Result.PageSize"
@@ -222,7 +259,7 @@
                            asp-route-SortBy="@Model.Result.SortBy"
                            asp-route-Desc="@Model.Result.Desc"
                            asp-route-householdMemberId="@Context.Request.Query["householdMemberId"]"
-                           asp-route-incomeCategoryId="@Context.Request.Query["incomeCategoryId"]"
+                           asp-route-expenseCategoryId="@Context.Request.Query["expenseCategoryId"]"
                            asp-route-from="@Context.Request.Query["from"]"
                            asp-route-to="@Context.Request.Query["to"]">
                             Předchozí
@@ -233,7 +270,7 @@
                     {
                         <li class="page-item @(Model.Result.Page == i ? "active" : "")">
                             <a class="page-link"
-                               asp-controller="Income"
+                               asp-controller="Expense"
                                asp-action="Index"
                                asp-route-Page="@i"
                                asp-route-PageSize="@Model.Result.PageSize"
@@ -241,7 +278,7 @@
                                asp-route-SortBy="@Model.Result.SortBy"
                                asp-route-Desc="@Model.Result.Desc"
                                asp-route-householdMemberId="@Context.Request.Query["householdMemberId"]"
-                               asp-route-incomeCategoryId="@Context.Request.Query["incomeCategoryId"]"
+                               asp-route-expenseCategoryId="@Context.Request.Query["expenseCategoryId"]"
                                asp-route-from="@Context.Request.Query["from"]"
                                asp-route-to="@Context.Request.Query["to"]">
                                 @i
@@ -251,18 +288,18 @@
 
                     <li class="page-item @(Model.Result.HasNext ? "" : "disabled")">
                         <a class="page-link"
-                            asp-controller="Income"
-                            asp-action="Index"
-                            asp-route-Page="@(Model.Result.Page + 1)"
-                            asp-route-PageSize="@Model.Result.PageSize"
-                            asp-route-Search="@Model.Result.Search"
-                            asp-route-SortBy="@Model.Result.SortBy"
-                            asp-route-Desc="@Model.Result.Desc"
+                           asp-controller="Expense"
+                           asp-action="Index"
+                           asp-route-Page="@(Model.Result.Page + 1)"
+                           asp-route-PageSize="@Model.Result.PageSize"
+                           asp-route-Search="@Model.Result.Search"
+                           asp-route-SortBy="@Model.Result.SortBy"
+                           asp-route-Desc="@Model.Result.Desc"
                            asp-route-householdMemberId="@Context.Request.Query["householdMemberId"]"
-                           asp-route-incomeCategoryId="@Context.Request.Query["incomeCategoryId"]"
+                           asp-route-expenseCategoryId="@Context.Request.Query["expenseCategoryId"]"
                            asp-route-from="@Context.Request.Query["from"]"
                            asp-route-to="@Context.Request.Query["to"]">
-                             Další
+                            Další
                         </a>
                     </li>
 

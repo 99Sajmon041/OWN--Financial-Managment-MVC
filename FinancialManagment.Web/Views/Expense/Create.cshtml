@@ -1,14 +1,14 @@
-﻿@model IncomeUpsertViewModel
+﻿@model ExpenseUpsertViewModel
 
 @{
-    ViewData["Title"] = "Vytvoření příjmu";
+    ViewData["Title"] = "Vytvoření výdaje";
 }
 
 <div class="text-center mb-5">
-    <h1 class="display-6">Vytvoření příjmu</h1>
+    <h1 class="display-6">Vytvoření výdaje</h1>
 </div>
 
-<form asp-controller="Income" asp-action="Create" method="post">
+<form asp-controller="Expense" asp-action="Create" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
 
     <div class="row justify-content-center">
@@ -18,18 +18,18 @@
 
             <div class="mb-3">
                 <label asp-for="HouseholdMemberId" class="form-label"></label>
-                <select asp-for="HouseholdMemberId" class="form-select" asp-items="@Model.HouseholdMembers">
+                <select asp-for="HouseholdMemberId" asp-items="@Model.HouseholdMembers" class="form-select">
                     <option value="">--Vyberte člena--</option>
                 </select>
                 <span asp-validation-for="HouseholdMemberId" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="IncomeCategoryId" class="form-label"></label>
-                <select asp-for="IncomeCategoryId" class="form-select" asp-items="@Model.IncomeCategories">
+                <label asp-for="ExpenseCategoryId" class="form-label"></label>
+                <select asp-for="ExpenseCategoryId" class="form-select" asp-items="@Model.ExpenseCategories">
                     <option value="">--Vyberte kategorii--</option>
                 </select>
-                <span asp-validation-for="IncomeCategoryId" class="text-danger"></span>
+                <span asp-validation-for="ExpenseCategoryId" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
@@ -44,14 +44,20 @@
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-3">
                 <label asp-for="Description" class="form-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
+            <div class="mb-4">
+                <label asp-for="ReceiptFile" class="form-label"></label>
+                <input asp-for="ReceiptFile" type="file" class="form-control" />
+                <span asp-validation-for="ReceiptFile" class="text-danger"></span>
+            </div>
+
             <div class="d-flex justify-content-between flex-wrap gap-2">
-                <a asp-controller="Income" asp-action="Index" class="btn btn-outline-primary">
+                <a asp-controller="Expense" asp-action="Index" class="btn btn-outline-primary">
                     Zpět
                 </a>
 
@@ -60,9 +66,10 @@
                 </button>
             </div>
         </div>
-    </div>    
+    </div>
 </form>
 
-@section Scripts {
+
+@section Scripts{
     <partial name="_ValidationScriptsPartial" />
 }

@@ -1,8 +1,8 @@
 ﻿using FinancialManagment.Application.Exceptions;
 using FinancialManagment.Application.Models.IncomeCategory;
 using FinancialManagment.Application.Services.Interfaces;
+using FinancialManagment.Shared.Utilities;
 using FinancialManagment.Shared.Pagination;
-using FinancialManagment.Web.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

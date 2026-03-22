@@ -2,8 +2,8 @@
 using FinancialManagment.Application.Models.ExpenseCategory;
 using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Shared.Pagination;
-using FinancialManagment.Web.Utilities;
 using Microsoft.AspNetCore.Authorization;
+using FinancialManagment.Shared.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialManagment.Web.Controllers;

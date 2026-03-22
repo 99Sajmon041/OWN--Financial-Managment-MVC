@@ -11,7 +11,13 @@ namespace FinancialManagment.Web.Controllers;
 public class IncomeController(IIncomeService incomeService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index(PagedRequest request, int? householdMemberId, int? incomeCategoryId, DateTime? from, DateTime? to, CancellationToken ct)
+    public async Task<IActionResult> Index(
+        PagedRequest request,
+        int? householdMemberId,
+        int? incomeCategoryId, 
+        DateTime? from, 
+        DateTime? to,
+        CancellationToken ct)
     {
         var model = await incomeService.GetIndexAsync(request, householdMemberId, incomeCategoryId, from, to, ct);
         return View(model);
@@ -38,7 +44,7 @@ public class IncomeController(IIncomeService incomeService) : Controller
         }
         catch (DomainException ex)
         {
-            TempData["Success"] = ex.Message;
+            TempData["Error"] = ex.Message;
             return RedirectToAction(nameof(Index));
         }
 
@@ -57,12 +63,14 @@ public class IncomeController(IIncomeService incomeService) : Controller
         try
         {
             await incomeService.AddAsync(model, ct);
+
             TempData["Success"] = "Příjem úspěšně přidán.";
             return RedirectToAction(nameof(Index));
         }
         catch (DomainException ex)
         {
             await incomeService.FillSelectOptionsAsync(model, ct);
+
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
         }
@@ -88,12 +96,14 @@ public class IncomeController(IIncomeService incomeService) : Controller
         try
         {
             await incomeService.UpdateAsync(id, model, ct);
+
             TempData["Success"] = "Příjem úspěšně upraven.";
             return RedirectToAction(nameof(Index));
         }
         catch (DomainException ex)
         {
             await incomeService.FillSelectOptionsAsync(model, ct);
+
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
         }

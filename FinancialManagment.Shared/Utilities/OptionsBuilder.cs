@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace FinancialManagment.Web.Utilities;
+namespace FinancialManagment.Shared.Utilities;
+
 
 public static class OptionsBuilder
 {
@@ -40,4 +41,4 @@ public static class OptionsBuilder
 
         return options;
     }
-} 
+}
