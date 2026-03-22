@@ -31,7 +31,6 @@ public sealed class ExpenseUpsertViewModel
     [Display(Name = "Popis")]
     public string? Description { get; set; }
 
-    [Display(Name = "")]
     [StringLength(200, ErrorMessage = "Počet znaků pro nahraný obrázek musí mít do 200 znaků.", MinimumLength = 4)]
     public string? ReceiptFileName { get; set; }
 

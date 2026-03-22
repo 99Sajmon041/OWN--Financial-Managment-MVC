@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FinancialManagment.Application.Models.Expense;
 using FinancialManagment.Application.Models.ExpenseCategory;
 using FinancialManagment.Application.Models.HouseholdMember;
 using FinancialManagment.Application.Models.Income;
@@ -24,11 +25,19 @@ public sealed class MappingProfile : Profile
             .ForMember(x => x.HouseholdMemberNickname, opt => opt.MapFrom(x => x.HouseholdMember.Nickname))
             .ForMember(x => x.IncomeCategoryName, opt => opt.MapFrom(x => x.IncomeCategory.Name));
 
+        CreateMap<Income, IncomeUpsertViewModel>();
+
         CreateMap<IncomeUpsertViewModel, Income>()
             .ForMember(x => x.Id, opt => opt.Ignore());
 
-        CreateMap<Income, IncomeUpsertViewModel>();
+        CreateMap<Expense, ExpenseViewModel>()
+            .ForMember(x => x.HouseholdMemberNickname, opt => opt.MapFrom(x => x.HouseholdMember.Nickname))
+            .ForMember(x => x.ExpenseCategoryName, opt => opt.MapFrom(x => x.ExpenseCategory.Name));
 
-        //dodělat expense mapping !!
+        CreateMap<Expense, ExpenseUpsertViewModel>();
+
+        CreateMap<ExpenseUpsertViewModel, Expense>()
+            .ForMember(x => x.Id, opt => opt.Ignore())
+            .ForMember(x => x.ReceiptFileName, opt => opt.Ignore());
     }
 }

@@ -3,11 +3,11 @@ using FinancialManagment.Application.Extensions;
 using FinancialManagment.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using FinancialManagment.Infrastructure.Database;
-using Serilog;
 using FinancialManagment.Web.MiddleWare;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Infrastructure.Identity;
 using Microsoft.AspNetCore.DataProtection;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 

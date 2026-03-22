@@ -16,7 +16,8 @@ public sealed class ExpenseService(
     ILogger<ExpenseService> logger,
     IUnitOfWork unitOfWork,
     ICurrentUser currentUser,
-    IMapper mapper) : IExpenseService
+    IMapper mapper,
+    IImageService imageService) : IExpenseService
 {
     public async Task<ExpenseIndexViewModel> GetIndexAsync(
         PagedRequest request,
@@ -74,6 +75,8 @@ public sealed class ExpenseService(
             throw new NotFoundException("Výdaj nebyl nalezen.");
         }
 
+        await imageService.DeleteAsync(expense.ReceiptFileName, ct);
+
         unitOfWork.ExpenseRepository.Delete(expense);
         await unitOfWork.SaveChangesAsync(ct);
 
@@ -87,6 +90,8 @@ public sealed class ExpenseService(
         await EnsureCanCreateExpenseAsync(userId, ct);
 
         var expense = mapper.Map<Expense>(model);
+
+        expense.ReceiptFileName = await imageService.SaveAsync(model.ReceiptFile, ct);
 
         unitOfWork.ExpenseRepository.Add(expense);
         await unitOfWork.SaveChangesAsync(ct);
@@ -207,6 +212,12 @@ public sealed class ExpenseService(
                 model.ExpenseCategoryId);
 
             throw new DomainException("Vybraná kategorie výdaje není aktivní nebo nepatří aktuálnímu uživateli.");
+        }
+
+        if (model.ReceiptFile is not null)
+        {
+            await imageService.DeleteAsync(model.ReceiptFileName, ct);
+            model.ReceiptFileName = await imageService.SaveAsync(model.ReceiptFile, ct);
         }
 
         mapper.Map(model, expense);
