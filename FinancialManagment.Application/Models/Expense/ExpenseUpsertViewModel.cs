@@ -34,6 +34,7 @@ public sealed class ExpenseUpsertViewModel
     [StringLength(200, ErrorMessage = "Počet znaků pro nahraný obrázek musí mít do 200 znaků.", MinimumLength = 4)]
     public string? ReceiptFileName { get; set; }
 
+    [Display(Name = "Obrázek")]
     public IFormFile? ReceiptFile { get; set; }
     public List<SelectListItem> HouseholdMembers { get; set; } = [];
     public List<SelectListItem> ExpenseCategories { get; set; } = [];
