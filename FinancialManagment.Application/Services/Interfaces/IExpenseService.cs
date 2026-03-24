@@ -18,4 +18,5 @@ public interface IExpenseService
     Task<ExpenseUpsertViewModel> GetForUpdateAsync(int id, CancellationToken ct);
     Task FillSelectOptionsAsync(ExpenseUpsertViewModel model, CancellationToken ct);
     Task UpdateAsync(int id, ExpenseUpsertViewModel model, CancellationToken ct);
+    Task<(bool, string)> DeleteImageAsync(int id, CancellationToken ct);
 }

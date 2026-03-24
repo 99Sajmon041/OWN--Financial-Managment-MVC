@@ -135,12 +135,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    const deleteforms = document.querySelectorAll(".delete-form");
+    const deleteForms = document.querySelectorAll(".delete-form");
+    const confirmButtons = document.querySelectorAll("[data-confirm-message]");
 
-    deleteforms.forEach(function (form) {
+    deleteForms.forEach(function (form) {
         form.addEventListener("submit", function (e) {
             const button = form.querySelector("button[type='submit']");
-            const message = button?.dataset.confirmMessage || "Opravdu chcete položku smazat ?";
+            const message = button?.dataset.confirmMessage || "Opravdu chcete položku smazat?";
+
+            if (!confirm(message)) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    confirmButtons.forEach(function (button) {
+        if (button.closest(".delete-form")) {
+            return;
+        }
+
+        button.addEventListener("click", function (e) {
+            const message = button.dataset.confirmMessage || "Opravdu chcete položku smazat?";
 
             if (!confirm(message)) {
                 e.preventDefault();
@@ -148,4 +163,3 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
-

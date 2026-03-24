@@ -1,12 +1,14 @@
-using FinancialManagment.Infrastructure.Extensions;
 using FinancialManagment.Application.Extensions;
-using FinancialManagment.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
-using FinancialManagment.Infrastructure.Database;
-using FinancialManagment.Web.MiddleWare;
+using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Application.UserIdentity;
+using FinancialManagment.Domain.Entities;
+using FinancialManagment.Infrastructure.Database;
+using FinancialManagment.Infrastructure.Extensions;
 using FinancialManagment.Infrastructure.Identity;
+using FinancialManagment.Web.Image;
+using FinancialManagment.Web.MiddleWare;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

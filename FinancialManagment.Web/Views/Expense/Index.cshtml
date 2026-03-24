@@ -4,8 +4,11 @@
     ViewData["Title"] = "Výdaje";
 }
 
-<div class="text-center mb-5">
+<div class="text-center my-5">
     <h1 class="display-6">Výdaje</h1>
+    <div class="fs-2 fw-semibold text-danger">
+        -@Model.ExpenseSum.ToString("C2")
+    </div>
 </div>
 
 <form method="get" class="mb-3" id="FilterForm">

@@ -1,10 +1,8 @@
 ﻿using FinancialManagment.Application.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
 
-namespace FinancialManagment.Application.Services.Implementations;
+namespace FinancialManagment.Web.Image;
 
-public sealed class ImageService(IHostEnvironment environment) : IImageService
+public sealed class ImageService(IWebHostEnvironment environment) : IImageService
 {
     private const string Imagesfolder = "Images/ExpenseReceipts";
     public async Task<string?> SaveAsync(IFormFile? file, CancellationToken ct)
@@ -14,7 +12,7 @@ public sealed class ImageService(IHostEnvironment environment) : IImageService
             return null;
         }
 
-        var uploadsPath = Path.Combine(environment.ContentRootPath, Imagesfolder);
+        var uploadsPath = Path.Combine(environment.WebRootPath, Imagesfolder);
         Directory.CreateDirectory(uploadsPath);
 
         var extension = Path.GetExtension(file.FileName);
@@ -33,7 +31,7 @@ public sealed class ImageService(IHostEnvironment environment) : IImageService
             return Task.CompletedTask;
         }
 
-        var filePath = Path.Combine(environment.ContentRootPath, Imagesfolder, fileName);
+        var filePath = Path.Combine(environment.WebRootPath, Imagesfolder, fileName);
 
         if (File.Exists(filePath))
         {

@@ -33,7 +33,7 @@ public sealed class ExpenseService(
         DateTime effectiveFrom = from ?? DateTime.Now.AddYears(-1);
         DateTime effectiveTo  = to ?? DateTime.Now;
 
-        var (expenses, totalItemsCount) = await unitOfWork.ExpenseRepository.GetAllAsync(
+        var (expenses, totalItemsCount, totalExpenseSum) = await unitOfWork.ExpenseRepository.GetAllAsync(
             request,
             householdMemberId,
             expenseCategoryId, 
@@ -61,6 +61,7 @@ public sealed class ExpenseService(
         return new ExpenseIndexViewModel
         {
             Result = result,
+            ExpenseSum = totalExpenseSum,
             SortOptions = OptionsBuilder.GetExpenseOrIncomeOptions(true),
             HouseholdMemberOptions = houseHoldMembersListItems,
             ExpenseCategoryOptions = expenseCategoriesListItems
@@ -220,13 +221,13 @@ public sealed class ExpenseService(
             throw new DomainException("Vybraná kategorie výdaje není aktivní nebo nepatří aktuálnímu uživateli.");
         }
 
+        mapper.Map(model, expense);
+
         if (model.ReceiptFile is not null)
         {
             await imageService.DeleteAsync(expense.ReceiptFileName, ct);
-            model.ReceiptFileName = await imageService.SaveAsync(model.ReceiptFile, ct);
+            expense.ReceiptFileName = await imageService.SaveAsync(model.ReceiptFile, ct);
         }
-
-        mapper.Map(model, expense);
 
         await unitOfWork.SaveChangesAsync(ct);
 
@@ -270,7 +271,46 @@ public sealed class ExpenseService(
         if (!existsAnyActiveExpenseCategory)
         {
             logger.LogWarning("User with ID: {UserId} failed to create expense because no active expense category exists.", userId);
-            throw new DomainException("Není žádná aktivní kategorie výdaje, nejprve ji aktivujte nebo vytvořte.");
+            throw new DomainException("Není žádná aktivsní kategorie výdaje, nejprve ji aktivujte nebo vytvořte.");
+        }
+    }
+
+    public async Task<(bool, string)> DeleteImageAsync(int id, CancellationToken ct)
+    {
+        var userId = currentUser.ValidatedUserId;
+
+        var expense = await unitOfWork.ExpenseRepository.GetByIdAsync(id, userId, ct);
+        if (expense is null)
+        {
+            logger.LogWarning("User with ID: {UserId} failed to delete image of expense with ID: {ExpenseId}. " +
+                "Expense was not found or does not belong to the current user.",
+                userId,
+                id);
+
+            return (false, "Výdaj nebyl nalezen, nejde upravit obrázek.");
+        }
+
+        if (string.IsNullOrWhiteSpace(expense.ReceiptFileName))
+        {
+            return (false, "Obrázek nelze  odstranit, nebyl nalezen.");
+        }
+
+        try
+        {
+            await imageService.DeleteAsync(expense.ReceiptFileName, ct);
+            expense.ReceiptFileName = null;
+            await unitOfWork.SaveChangesAsync(ct);
+
+            return (true, "Obrázek úspěšně odstraněn.");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("User with ID: {UserId} failed to delete image of expense with ID: {ExpenseId}. Error: {Error}.",
+                userId,
+                id,
+                ex.Message);
+
+            return (false, "Nepodařilo se odstranit obrázek, kontaktujte administrátora webu.");
         }
     }
 }

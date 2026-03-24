@@ -59,6 +59,32 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
+            @if (!string.IsNullOrWhiteSpace(Model.ReceiptFileName))
+            {
+                <div class="mb-3">
+                    <label class="form-label d-block">Aktuální obrázek</label>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="border rounded-3 p-2 bg-body-tertiary">
+                            <img src="~/images/ExpenseReceipts/@Model.ReceiptFileName"
+                                 asp-append-version="true"
+                                 alt="Účtenka"
+                                 class="expense-receipt-preview" />
+                        </div>
+
+                        <button type="submit"
+                                formaction="@Url.Action("DeleteImage", "Expense", new { id = Model.Id })"
+                                formmethod="post"
+                                class="btn btn-danger btn-sm rounded-3 d-flex align-items-center justify-content-center"
+                                title="Odstranit obrázek"
+                                data-confirm-message="Opravdu si přejete odstranit obrázek natrvalo?"
+                                style="width: 38px; height: 38px;">
+                            🗑
+                        </button>
+                    </div>
+                </div>
+            }
+
             <div class="mb-4">
                 <label asp-for="ReceiptFile" class="form-label"></label>
                 <input asp-for="ReceiptFile" type="file" class="form-control" />

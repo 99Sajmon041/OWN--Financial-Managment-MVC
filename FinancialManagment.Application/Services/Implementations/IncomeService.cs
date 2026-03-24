@@ -32,7 +32,7 @@ public sealed class IncomeService(
         DateTime effectiveFrom = from ?? DateTime.Now.AddYears(-1);
         DateTime effectiveTo = to ?? DateTime.Now;
 
-        var (incomes, totalItemsCount) = await unitOfWork.IncomeRepository.GetAllAsync(
+        var (incomes, totalItemsCount, totalSum) = await unitOfWork.IncomeRepository.GetAllAsync(
             request,
             householdMemberId,
             incomeCategoryId, 
@@ -61,6 +61,7 @@ public sealed class IncomeService(
         return new IncomeIndexViewModel
         {
             Result = result,
+            IncomeSum = totalSum,
             SortOptions = OptionsBuilder.GetExpenseOrIncomeOptions(false),
             HouseholdMemberOptions = houseHoldMembersListItems,
             IncomeCategoryOptions = incomeCategoriesListItems

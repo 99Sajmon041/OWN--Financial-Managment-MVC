@@ -5,7 +5,7 @@ namespace FinancialManagment.Domain.RepositoryInterfaces;
 
 public interface IExpenseRepository
 {
-    Task<(IReadOnlyList<Expense>, int)> GetAllAsync(
+    Task<(IReadOnlyList<Expense>, int, decimal)> GetAllAsync(
         PagedRequest request,
         int? householdMemberId,
         int? expenseCategoryId,

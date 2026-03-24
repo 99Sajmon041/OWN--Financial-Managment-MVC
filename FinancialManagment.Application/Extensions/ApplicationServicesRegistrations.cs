@@ -15,7 +15,7 @@ public static class ApplicationServicesRegistrations
         services.AddScoped<IExpenseCategoryService, ExpenseCategoryService>();
         services.AddScoped<IIncomeService, IncomeService>();
         services.AddScoped<IExpenseService, ExpenseService>();
-        services.AddScoped<IImageService, ImageService>();
+        services.AddScoped<IStatisticsService, StatisticsService>();
 
         services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 

@@ -111,5 +111,23 @@ namespace FinancialManagment.Web.Controllers
                 return View(model);
             }
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteImage(int id, CancellationToken ct)
+        {
+            var (deleted, message) = await expenseService.DeleteImageAsync(id, ct);
+            if (deleted)
+            {
+                TempData["Success"] = message;
+                return RedirectToAction(nameof(Update), new { id });
+            }
+            else
+            {
+                TempData["Error"] = message;
+                return RedirectToAction(nameof(Update), new { id });
+            }
+        }
     }
 }

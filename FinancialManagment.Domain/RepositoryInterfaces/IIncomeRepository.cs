@@ -5,7 +5,7 @@ namespace FinancialManagment.Domain.RepositoryInterfaces;
 
 public interface IIncomeRepository
 {
-    Task<(IReadOnlyList<Income>, int)> GetAllAsync(
+    Task<(IReadOnlyList<Income>, int, decimal)> GetAllAsync(
         PagedRequest request,
         int? householdMemberId,
         int? incomeCategoryId,

@@ -9,4 +9,5 @@ public sealed class ExpenseIndexViewModel
     public List<SelectListItem> SortOptions { get; set; } = [];
     public List<SelectListItem> HouseholdMemberOptions { get; set; } = [];
     public List<SelectListItem> ExpenseCategoryOptions { get; set; } = [];
+    public decimal ExpenseSum { get; set; } = 0;
 }

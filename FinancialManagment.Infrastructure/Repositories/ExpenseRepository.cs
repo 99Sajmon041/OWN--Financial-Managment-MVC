@@ -8,7 +8,7 @@ namespace FinancialManagment.Infrastructure.Repositories;
 
 public sealed class ExpenseRepository(FinancialManagementDbContext context) : IExpenseRepository
 {
-    public async Task<(IReadOnlyList<Expense>, int)> GetAllAsync(
+    public async Task<(IReadOnlyList<Expense>, int, decimal)> GetAllAsync(
         PagedRequest request,
         int? householdMemberId,
         int? expenseCategoryId,
@@ -38,6 +38,7 @@ public sealed class ExpenseRepository(FinancialManagementDbContext context) : IE
             (x.Description != null && x.Description.Contains(request.Search)));
         }
 
+        var totalExpenseSum = await query.SumAsync(x => x.Amount, ct);
         var totalItemsCount = await query.CountAsync(ct);
 
         query = (request.SortBy) switch
@@ -68,7 +69,7 @@ public sealed class ExpenseRepository(FinancialManagementDbContext context) : IE
             .Take(request.PageSize)
             .ToListAsync(ct);
 
-        return (items, totalItemsCount);
+        return (items, totalItemsCount, totalExpenseSum);
     }
     public async Task<Expense?> GetByIdAsync(int id, string userId, CancellationToken ct)
     {

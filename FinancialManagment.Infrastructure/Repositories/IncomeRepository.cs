@@ -8,7 +8,7 @@ namespace FinancialManagment.Infrastructure.Repositories;
 
 public sealed class IncomeRepository(FinancialManagementDbContext context) : IIncomeRepository
 {
-    public async Task<(IReadOnlyList<Income>, int)> GetAllAsync(
+    public async Task<(IReadOnlyList<Income>, int, decimal)> GetAllAsync(
         PagedRequest request, 
         int? householdMemberId,
         int? incomeCategoryId,
@@ -39,6 +39,7 @@ public sealed class IncomeRepository(FinancialManagementDbContext context) : IIn
         }
 
         var totalItemsCount = await query.CountAsync(ct);
+        var totalIncomeSum = await query.SumAsync(x => x.Amount, ct);
 
         query = (request.SortBy) switch
         {
@@ -68,7 +69,7 @@ public sealed class IncomeRepository(FinancialManagementDbContext context) : IIn
             .Take(request.PageSize)
             .ToListAsync(ct);
 
-        return (items, totalItemsCount);
+        return (items, totalItemsCount, totalIncomeSum);
     }
 
     async Task<Income?> IIncomeRepository.GetByIdAsync(int id, string userId, CancellationToken ct)

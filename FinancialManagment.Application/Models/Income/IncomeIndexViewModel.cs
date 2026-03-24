@@ -9,4 +9,5 @@ public sealed class IncomeIndexViewModel
     public List<SelectListItem> SortOptions { get; set; } = [];
     public List<SelectListItem> HouseholdMemberOptions { get; set; } = [];
     public List<SelectListItem> IncomeCategoryOptions { get; set; } = [];
+    public decimal IncomeSum { get; set; } = 0;
 }
