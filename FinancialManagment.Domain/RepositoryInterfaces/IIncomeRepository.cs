@@ -16,4 +16,11 @@ public interface IIncomeRepository
     Task<Income?> GetByIdAsync(int id, string userId, CancellationToken ct);
     void Delete(Income income);
     void Add(Income income);
+    Task<List<Income>> GetForStatisticsAsync(
+    List<int> incomeCategories,
+    List<int> householdMemberIds,
+    int year,
+    int month,
+    string userId,
+    CancellationToken ct);
 }

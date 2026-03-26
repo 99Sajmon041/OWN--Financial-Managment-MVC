@@ -1,4 +1,5 @@
-﻿using FinancialManagment.Application.Services.Interfaces;
+﻿using FinancialManagment.Application.FilterModels;
+using FinancialManagment.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +9,10 @@ namespace FinancialManagment.Web.Controllers
     public class StatisticsController(IStatisticsService statisticsService) : Controller
     {
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index(StatisticsFilterModel filterModel, CancellationToken ct)
         {
-            return View();
+            var model = await statisticsService.GetStatisticsAsync(filterModel, ct);
+            return View(model);
         }
     }
 }

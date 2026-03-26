@@ -89,4 +89,32 @@ public sealed class ExpenseRepository(FinancialManagementDbContext context) : IE
     {
         context.Remove(expense);
     }
+
+    public async Task<List<Expense>> GetForStatisticsAsync(
+        List<int> expenseCategories,
+        List<int> householdMemberIds,
+        int year,
+        int month,
+        string userId,
+        CancellationToken ct)
+    {
+        var query = context.Expenses
+            .AsNoTracking()
+            .Include(x => x.ExpenseCategory)
+            .Include(x => x.HouseholdMember)
+            .Where(x => x.HouseholdMember.ApplicationUserId == userId);
+
+        if (expenseCategories.Count != 0)
+            query = query.Where(x => expenseCategories.Contains(x.ExpenseCategoryId));
+
+        if (householdMemberIds.Count != 0)
+            query = query.Where(x => householdMemberIds.Contains(x.HouseholdMemberId));
+
+        if (month == 0)
+            query = query.Where(x => x.Date.Year == year);
+        else
+            query = query.Where(x => x.Date.Year == year && x.Date.Month == month);
+
+        return await query.ToListAsync(ct);
+    }
 }

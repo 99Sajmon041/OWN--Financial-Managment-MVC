@@ -90,4 +90,32 @@ public sealed class IncomeRepository(FinancialManagementDbContext context) : IIn
     {
         context.Remove(income);
     }
+
+    public async Task<List<Income>> GetForStatisticsAsync(
+        List<int> incomeCategories,
+        List<int> householdMemberIds,
+        int year,
+        int month,
+        string userId,
+        CancellationToken ct)
+    {
+        var query = context.Incomes
+            .AsNoTracking()
+            .Include(x => x.IncomeCategory)
+            .Include(x => x.HouseholdMember)
+            .Where(x => x.HouseholdMember.ApplicationUserId == userId);
+
+        if (incomeCategories.Count != 0)
+            query = query.Where(x => incomeCategories.Contains(x.IncomeCategoryId));
+
+        if (householdMemberIds.Count != 0)
+            query = query.Where(x => householdMemberIds.Contains(x.HouseholdMemberId));
+
+        if (month == 0)
+            query = query.Where(x => x.Date.Year == year);
+        else
+            query = query.Where(x => x.Date.Year == year && x.Date.Month == month);
+
+        return await query.ToListAsync(ct);
+    }
 }

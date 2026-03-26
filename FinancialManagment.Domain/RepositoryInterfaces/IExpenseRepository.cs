@@ -16,5 +16,11 @@ public interface IExpenseRepository
     Task<Expense?> GetByIdAsync(int id, string userId, CancellationToken ct);
     void Delete(Expense expense);
     void Add(Expense expense);
-
+    Task<List<Expense>> GetForStatisticsAsync(
+        List<int> expenseCategories,
+        List<int> householdMemberIds,
+        int year,
+        int month,
+        string userId,
+        CancellationToken ct);
 }
