@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-
-namespace FinancialManagment.Application.FilterModels;
+﻿namespace FinancialManagment.Application.FilterModels;
 
 public sealed class StatisticsFilterModel
 {
