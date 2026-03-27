@@ -1,5 +1,5 @@
 --------------------------------------------
 simon9durak@gmail.com
 Durasi99
---------------------------------------------
-udělat verzi s JS na statistiky
+------------------------------------------------------
+udělat verzi s JS na statistiky + multiselecty

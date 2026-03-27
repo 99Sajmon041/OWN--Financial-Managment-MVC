@@ -7,4 +7,64 @@
 
 <div class="text-center mb-5">
     <h1 class="display-6">Statistiky / Přehled</h1>
+    <table class="table table-striped table-bordered table-sm table-responsive list-items-table-wrapper app-table-wrapper">
+        <thead>
+            <tr>
+                <th>Příjmy</th>
+                <th>Výdaje</th>
+                <th>Zůstatek</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.IncomeTotal.ToString("C2")</td>
+                <td>@Model.ExpenseTotal.ToString("C2")</td>
+                <td >
+                    <span class="fw-semibold @(Model.Balance >= 0 ? "text-success" : "text-danger")">
+                        @Model.Balance.ToString("C2")
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+ </div>
+
+
+<form method="get" asp-controller="Statistics" asp-action="Index">
+
+    <div class="card shadow-sm">
+        <div class="card-header p-0 text-center fw-bold py-2">
+            Filtr statistik
+        </div>
+
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="houseHoldMembers">Člen</label>
+                    <select class="form-select" id="houseHoldMembers" name="HouseholdMemberIds">
+                        <option value="">--Všichni--</option>
+                        @foreach (var item in Model.HouseholdMembers)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card-footer d-flex justify-content-end py-2">
+            <button type="submit" class="btn btn-primary">
+                Filtrovat
+            </button>
+        </div>
+    </div>
+
+</form>
+
+<div class="d-flex justify-content-start mt-3">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
+        Domů
+    </a>
 </div>

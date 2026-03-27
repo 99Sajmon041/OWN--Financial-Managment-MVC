@@ -66,19 +66,19 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Statistics" ? "active-pill" : "")"
-                                   asp-controller="Statistics"
-                                   asp-action="Index">
-                                    Statistiky
-                                </a>
-                            </li>
-
                             <li>
                                 <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "HouseholdMember" ? "active-pill" : "")"
                                    asp-controller="HouseholdMember"
                                    asp-action="Index">
                                     Členové domácnosti
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Statistics" ? "active-pill" : "")"
+                                   asp-controller="Statistics"
+                                   asp-action="Index">
+                                    Statistiky
                                 </a>
                             </li>
                         </ul>

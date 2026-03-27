@@ -14,5 +14,12 @@ namespace FinancialManagment.Web.Controllers
             var model = await statisticsService.GetStatisticsAsync(filterModel, ct);
             return View(model);
         }
+
+        [HttpGet("js-index")]
+        public async Task<IActionResult> JSIndex(StatisticsJSFilterModel filterModel, CancellationToken ct)
+        {
+            var model = await statisticsService.GetJSStatisticsAsync(filterModel, ct);
+            return View(model);
+        }
     }
 }

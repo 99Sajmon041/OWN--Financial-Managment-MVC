@@ -91,9 +91,9 @@ public sealed class IncomeRepository(FinancialManagementDbContext context) : IIn
         context.Remove(income);
     }
 
-    public async Task<List<Income>> GetForStatisticsAsync(
-        List<int> incomeCategories,
-        List<int> householdMemberIds,
+    public async Task<List<Income>> GetForJSStatisticsAsync(
+        List<int> incomeCategoriesId,
+        List<int> householdMembersId,
         int year,
         int month,
         string userId,
@@ -105,11 +105,39 @@ public sealed class IncomeRepository(FinancialManagementDbContext context) : IIn
             .Include(x => x.HouseholdMember)
             .Where(x => x.HouseholdMember.ApplicationUserId == userId);
 
-        if (incomeCategories.Count != 0)
-            query = query.Where(x => incomeCategories.Contains(x.IncomeCategoryId));
+        if (incomeCategoriesId.Count != 0)
+            query = query.Where(x => incomeCategoriesId.Contains(x.IncomeCategoryId));
 
-        if (householdMemberIds.Count != 0)
-            query = query.Where(x => householdMemberIds.Contains(x.HouseholdMemberId));
+        if (householdMembersId.Count != 0)
+            query = query.Where(x => householdMembersId.Contains(x.HouseholdMemberId));
+
+        if (month == 0)
+            query = query.Where(x => x.Date.Year == year);
+        else
+            query = query.Where(x => x.Date.Year == year && x.Date.Month == month);
+
+        return await query.ToListAsync(ct);
+    }
+
+    public async Task<List<Income>> GetForStatisticsAsync(
+    int incomeCategoryId,
+    int householdMemberId,
+    int year,
+    int month,
+    string userId,
+    CancellationToken ct)
+    {
+        var query = context.Incomes
+            .AsNoTracking()
+            .Include(x => x.IncomeCategory)
+            .Include(x => x.HouseholdMember)
+            .Where(x => x.HouseholdMember.ApplicationUserId == userId);
+
+        if (incomeCategoryId != 0)
+            query = query.Where(x => x.IncomeCategoryId == incomeCategoryId);
+
+        if (householdMemberId != 0)
+            query = query.Where(x => x.HouseholdMemberId == householdMemberId);
 
         if (month == 0)
             query = query.Where(x => x.Date.Year == year);
