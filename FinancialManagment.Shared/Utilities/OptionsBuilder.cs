@@ -5,8 +5,8 @@ namespace FinancialManagment.Shared.Utilities;
 
 public static class OptionsBuilder
 {
-    private static readonly string[] monthNames =
-        { "Všechny / celý rok", "Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec" };
+    private static readonly string[] MonthNames =
+        ["Všechny / celý rok", "Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"];
 
     public static List<SelectListItem> GetCategoryOptions()
     {
@@ -54,7 +54,7 @@ public static class OptionsBuilder
             months.Add(new SelectListItem
             {
                 Value = i.ToString(),
-                Text = monthNames[i],
+                Text = MonthNames[i],
                 Selected = i == selectedMonth
             });
         }

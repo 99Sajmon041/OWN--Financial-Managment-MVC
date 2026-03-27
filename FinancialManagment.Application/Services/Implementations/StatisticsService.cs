@@ -42,7 +42,7 @@ public sealed class StatisticsService(
 
         foreach (var houseHoldmember in houseHoldmembersListItems)
         {
-            if (model.HouseholdMemberId ==  int.Parse(houseHoldmember.Value))
+            if (model.HouseholdMemberId == int.Parse(houseHoldmember.Value))
             {
                 houseHoldmember.Selected = true;
                 break;
@@ -240,6 +240,11 @@ public sealed class StatisticsService(
         })
         .ToList();
 
+        houseHoldmembersListItems.Insert(0, new SelectListItem { Value = "0", Text = "Všichni" });
+        incomeCategoriesListItems.Insert(0, new SelectListItem { Value = "0", Text = "Všechny"});
+        expenseCategoriesListItems.Insert(0, new SelectListItem { Value = "0", Text = "Všechny" });
+
         return (houseHoldmembersListItems, incomeCategoriesListItems, expenseCategoriesListItems);
     }
 }
+

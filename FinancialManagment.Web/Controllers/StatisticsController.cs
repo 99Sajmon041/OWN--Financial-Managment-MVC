@@ -16,7 +16,7 @@ namespace FinancialManagment.Web.Controllers
         }
 
         [HttpGet("js-index")]
-        public async Task<IActionResult> JSIndex(StatisticsJSFilterModel filterModel, CancellationToken ct)
+        public async Task<IActionResult> JsIndex(StatisticsJSFilterModel filterModel, CancellationToken ct)
         {
             var model = await statisticsService.GetJSStatisticsAsync(filterModel, ct);
             return View(model);

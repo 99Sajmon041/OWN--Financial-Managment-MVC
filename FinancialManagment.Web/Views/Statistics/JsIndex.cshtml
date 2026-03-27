@@ -1,0 +1,30 @@
+﻿@model StatisticsViewModel
+
+@{
+    ViewData["title"] = "JS Statistiky / Přehled";
+}
+
+
+<div class="text-center mb-5">
+    <h1 class="display-6">JS Statistiky / Přehled</h1>
+    <table class="table table-striped table-bordered table-sm table-responsive list-items-table-wrapper app-table-wrapper">
+        <thead>
+            <tr>
+                <th>Příjmy</th>
+                <th>Výdaje</th>
+                <th>Zůstatek</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.IncomeTotal.ToString("C2")</td>
+                <td>@Model.ExpenseTotal.ToString("C2")</td>
+                <td>
+                    <span class="fw-semibold @(Model.Balance >= 0 ? "text-success" : "text-danger")">
+                        @Model.Balance.ToString("C2")
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
