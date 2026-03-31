@@ -1,8 +1,7 @@
 --------------------------------------------------------
 simon9durak@gmail.com
 Durasi99
---------------------------------------------------------------------------------------------------------------------
-Předělat vydaje, kategorie a cleny tak, aby Value="0" a text="Všichni" už vracely ze service, nikoli ručně ve View
-Tabulku udělat do Card jako v práci
-Udělat na Layoutu DropDown pro JS a normální statistiky
-udělat verzi s JS na statistiky + multiselecty
+--------------------------------------------------------
+pochopit paginaci
+udělat JS s možností multi-select
+udělat PF a spustit apl. na veřejce

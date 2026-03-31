@@ -35,10 +35,7 @@ public sealed class StatisticsService(
             userId,
             ct);
 
-        var incomeTotal = incomes.Sum(x => x.Amount);
-        var expenseTotal = expenses.Sum(x => x.Amount);
-
-        var(houseHoldmembersListItems, incomeCategoriesListItems, expenseCategoriesListItems) = await GetSelectListData(userId, ct);
+        var (houseHoldmembersListItems, incomeCategoriesListItems, expenseCategoriesListItems) = await GetSelectListData(userId, ct);
 
         foreach (var houseHoldmember in houseHoldmembersListItems)
         {
@@ -70,7 +67,33 @@ public sealed class StatisticsService(
         var months = OptionsBuilder.GetMonths(model.SelectedMonth);
         var years = OptionsBuilder.GetYears(model.SelectedYear);
 
-        var (incomeChart, expenseChart, balanceChart) = GetPeriodStatistics(model.SelectedYear, model.SelectedMonth, expenses, incomes);
+        DateTime periodStart;
+
+        if (model.SelectedMonth == 0)
+        {
+            periodStart = new DateTime(model.SelectedYear, 1, 1);
+        }
+        else
+        {
+            periodStart = new DateTime(model.SelectedYear, model.SelectedMonth, 1);
+        }
+
+        decimal incomeBalanceTotalToDate;
+        decimal expenseBalanceTotalToDate;
+
+        var incomesCtgIds = model.IncomeCategoryId != 0 ? new List<int> { model.IncomeCategoryId } : null;
+        var expensesCtgIds = model.ExpenseCategoryId != 0 ? new List<int> { model.ExpenseCategoryId } : null;
+        var houseHoldmembersIds = model.HouseholdMemberId != 0 ? new List<int> { model.HouseholdMemberId } : null;
+
+        incomeBalanceTotalToDate = await unitOfWork.IncomeRepository.GetTotalToDateAsync(incomesCtgIds, houseHoldmembersIds, periodStart, userId, ct);
+        expenseBalanceTotalToDate = await unitOfWork.ExpenseRepository.GetTotalToDateAsync(expensesCtgIds, houseHoldmembersIds, periodStart, userId, ct);
+
+        var (incomeChart, expenseChart, balanceChart, incomePeriodSum, expensePeriodSum) = GetPeriodStatistics(
+            model.SelectedYear,
+            model.SelectedMonth,
+            expenses, incomes,
+            incomeBalanceTotalToDate,
+            expenseBalanceTotalToDate);
 
         logger.LogInformation("Statistics loaded for user {UserId}. Year: {Year}, Month: {Month}, Incomes: {IncomeCount}, Expenses: {ExpenseCount}.",
             userId,
@@ -81,8 +104,8 @@ public sealed class StatisticsService(
 
         return new StatisticsViewModel
         {
-            IncomeTotal = incomeTotal,
-            ExpenseTotal = expenseTotal,
+            IncomeTotal = incomeBalanceTotalToDate + incomePeriodSum,
+            ExpenseTotal = expenseBalanceTotalToDate + expensePeriodSum,
             IncomeCategories = incomeCategoriesListItems,
             ExpenseCategories = expenseCategoriesListItems,
             HouseholdMembers = houseHoldmembersListItems,
@@ -96,122 +119,79 @@ public sealed class StatisticsService(
         };
     }
 
-    public async Task<StatisticsViewModel> GetJSStatisticsAsync(StatisticsJSFilterModel model, CancellationToken ct)
+    public async Task<StatisticsViewModel> GetJsStatisticsAsync(StatisticsJsFilterModel model, CancellationToken ct)
     {
-        var userId = currentUser.ValidatedUserId;
-
-        var incomes = await unitOfWork.IncomeRepository.GetForJSStatisticsAsync(
-            model.IncomeCategoriesId,
-            model.HouseholdMembersId,
-            model.SelectedYear,
-            model.SelectedMonth,
-            userId,
-            ct);
-
-        var expenses = await unitOfWork.ExpenseRepository.GetForJSStatisticsAsync(
-            model.ExpenseCategoriesId,
-            model.HouseholdMembersId,
-            model.SelectedYear,
-            model.SelectedMonth,
-            userId,
-            ct);
-
-        var incomeTotal = incomes.Sum(x => x.Amount);
-        var expenseTotal = expenses.Sum(x => x.Amount);
-
-        var (houseHoldmembersListItems, incomeCategoriesListItems, expenseCategoriesListItems) = await GetSelectListData(userId, ct);
-
-        var selectedHouseholdMembersIds = model.HouseholdMembersId.ToHashSet();
-        var incomeCategoriesId = model.IncomeCategoriesId.ToHashSet();
-        var expenseCategoriesId = model.ExpenseCategoriesId.ToHashSet();
-
-        foreach (var houseHoldmember in houseHoldmembersListItems)
-        {
-            if (selectedHouseholdMembersIds.Contains(int.Parse(houseHoldmember.Value)))
-                houseHoldmember.Selected = true;
-        }
-
-        foreach (var incomeCtg in incomeCategoriesListItems)
-        {
-            if (incomeCategoriesId.Contains(int.Parse(incomeCtg.Value)))
-                incomeCtg.Selected = true;
-        }
-
-        foreach (var expenseCtg in expenseCategoriesListItems)
-        {
-            if (expenseCategoriesId.Contains(int.Parse(expenseCtg.Value)))
-                expenseCtg.Selected = true;
-        }
-
-        var months = OptionsBuilder.GetMonths(model.SelectedMonth);
-        var years = OptionsBuilder.GetYears(model.SelectedYear);
-
-        var (incomeChart, expenseChart, balanceChart) = GetPeriodStatistics(model.SelectedYear, model.SelectedMonth, expenses, incomes);
-
-        logger.LogInformation("Statistics loaded for user {UserId}. Year: {Year}, Month: {Month}, Incomes: {IncomeCount}, Expenses: {ExpenseCount}.",
-            userId,
-            model.SelectedYear,
-            model.SelectedMonth == 0 ? "whole year" : model.SelectedMonth.ToString(),
-            incomes.Count,
-            expenses.Count);
-
-        return new StatisticsViewModel
-        {
-            IncomeTotal = incomeTotal,
-            ExpenseTotal = expenseTotal,
-            IncomeCategories = incomeCategoriesListItems,
-            ExpenseCategories = expenseCategoriesListItems,
-            HouseholdMembers = houseHoldmembersListItems,
-            Months = months,
-            Years = years,
-            SelectedYear = model.SelectedYear,
-            SelectedMonth = model.SelectedMonth,
-            IncomeChart = incomeChart,
-            ExpenseChart = expenseChart,
-            BalanceChart = balanceChart
-        };
+        throw new NotImplementedException();
     }
 
-    private static (Dictionary<string, decimal>, Dictionary<string, decimal>, Dictionary<string, decimal>) GetPeriodStatistics(
+    //private helper methods -----------------------------------------------------------------------------------------
+
+    private static (
+        Dictionary<string, decimal>,
+        Dictionary<string, decimal>,
+        Dictionary<string, decimal>,
+        decimal incomePeriodSum, 
+        decimal expensePeriodSum
+        ) GetPeriodStatistics(
         int year,
         int month,
         List<Expense> expenses,
-        List<Income> incomes)
+        List<Income> incomes,
+        decimal incomeBalanceTotal,
+        decimal expenseBalanceTotal)
     {
         var incomeChart = new Dictionary<string, decimal>();
         var expenseChart = new Dictionary<string, decimal>();
         var balanceChart = new Dictionary<string, decimal>();
+        decimal periodIncomeSum = 0;
+        decimal periodExpenseSum = 0;
 
         if (month == 0)
         {
-            incomeChart = Enumerable.Range(1, 12)
-                .ToDictionary(month => month.ToString(), month => incomes
-                .Where(x => x.Date.Month == month).Sum(x => x.Amount));
+            decimal tempIncomeSum = 0;
+            decimal tempExpenseSum = 0;
 
-            expenseChart = Enumerable.Range(1, 12)
-                .ToDictionary(month => month.ToString(), month => expenses
-                .Where(x => x.Date.Month == month).Sum(x => x.Amount));
+            for (int i = 1; i <= 12; i++)
+            {
+                incomeChart.Add(i.ToString(), incomes.Where(x => x.Date.Month == i).Sum(x => x.Amount));
+                expenseChart.Add(i.ToString(), expenses.Where(x => x.Date.Month == i).Sum(x => x.Amount));
 
-            balanceChart = Enumerable.Range(1, 12)
-                .ToDictionary(month => month.ToString(), month => incomeChart[month.ToString()] - expenseChart[month.ToString()]);
+                tempIncomeSum += incomeChart[i.ToString()];
+                tempExpenseSum += expenseChart[i.ToString()];
+
+                periodIncomeSum += incomeChart[i.ToString()];
+                periodExpenseSum += expenseChart[i.ToString()];
+
+                var balance = (incomeBalanceTotal + tempIncomeSum) - (expenseBalanceTotal + tempExpenseSum);
+
+                balanceChart.Add(i.ToString(), balance);
+            }
         }
         else
         {
             var daysInMonth = DateTime.DaysInMonth(year, month);
 
-            incomeChart = Enumerable.Range(1, daysInMonth)
-                .ToDictionary(day => day.ToString(), day => incomes
-                .Where(x => x.Date.Day == day).Sum(x => x.Amount));
+            decimal tempIncomeSum = 0;
+            decimal tempExpenseSum = 0;
 
-            expenseChart = Enumerable.Range(1, daysInMonth)
-                .ToDictionary(day => day.ToString(), day => expenses
-                .Where(x => x.Date.Day == day).Sum(x => x.Amount));
+            for (int i = 1; i <= daysInMonth; i++)
+            {
+                incomeChart.Add(i.ToString(), incomes.Where(x => x.Date.Day == i).Sum(x => x.Amount));
+                expenseChart.Add(i.ToString(), expenses.Where(x => x.Date.Day == i).Sum(x => x.Amount));
 
-            balanceChart = Enumerable.Range(1, daysInMonth)
-                .ToDictionary(day => day.ToString(), day => incomeChart[day.ToString()] - expenseChart[day.ToString()]);
+                tempIncomeSum += incomeChart[i.ToString()];
+                tempExpenseSum += expenseChart[i.ToString()];
+
+                periodIncomeSum += incomeChart[i.ToString()];
+                periodExpenseSum += expenseChart[i.ToString()];
+
+                var balance = (incomeBalanceTotal + tempIncomeSum) - (expenseBalanceTotal + tempExpenseSum);
+
+                balanceChart.Add(i.ToString(), balance);
+            }
         }
 
-        return (incomeChart, expenseChart, balanceChart);
+        return (incomeChart, expenseChart, balanceChart, periodIncomeSum, periodExpenseSum);
     }
 
     private async Task<(List<SelectListItem>, List<SelectListItem>, List<SelectListItem>)> GetSelectListData(string userId, CancellationToken ct)

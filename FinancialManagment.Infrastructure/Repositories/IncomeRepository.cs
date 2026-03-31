@@ -146,4 +146,26 @@ public sealed class IncomeRepository(FinancialManagementDbContext context) : IIn
 
         return await query.ToListAsync(ct);
     }
+
+    public async Task<decimal> GetTotalToDateAsync(
+        List<int>? incomeCategoriesId,
+        List<int>? householdMembersId,
+        DateTime periodStart,
+        string userId,
+        CancellationToken ct)
+    {
+        var query = context.Incomes
+            .AsNoTracking()
+            .Where(x => x.HouseholdMember.ApplicationUserId == userId && x.Date < periodStart);
+
+        if (incomeCategoriesId is not null && incomeCategoriesId.Count > 0)
+            query = query.Where(x => incomeCategoriesId.Contains(x.IncomeCategoryId));
+
+        if (householdMembersId is not null && householdMembersId.Count > 0)
+            query = query.Where(x => householdMembersId.Contains(x.HouseholdMemberId));
+
+        var result = await query.SumAsync(x => (decimal?)x.Amount, ct);
+
+        return result ?? 0;
+    }
 }

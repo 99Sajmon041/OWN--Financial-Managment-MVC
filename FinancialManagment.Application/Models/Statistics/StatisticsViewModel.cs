@@ -14,6 +14,7 @@ public sealed class StatisticsViewModel
     public List<SelectListItem> Years { get; set; } = [];
     public int SelectedYear { get; set; } = DateTime.Now.Year;
     public int SelectedMonth { get; set; } = DateTime.Now.Month; // 0 = whole year
+    public bool Yearly => SelectedMonth == 0;
     public Dictionary<string, decimal> IncomeChart { get; set; } = [];
     public Dictionary<string, decimal> ExpenseChart { get; set; } = [];
     public Dictionary<string, decimal> BalanceChart { get; set; } = [];

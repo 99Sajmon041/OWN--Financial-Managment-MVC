@@ -31,4 +31,11 @@ public interface IExpenseRepository
         int month,
         string userId,
         CancellationToken ct);
+
+    Task<decimal> GetTotalToDateAsync(
+        List<int>? expenseCategoriesId,
+        List<int>? householdMembersId,
+        DateTime periodStart,
+        string userId,
+        CancellationToken ct);
 }

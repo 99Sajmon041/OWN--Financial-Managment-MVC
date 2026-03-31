@@ -145,4 +145,26 @@ public sealed class ExpenseRepository(FinancialManagementDbContext context) : IE
 
         return await query.ToListAsync(ct);
     }
+
+    public async Task<decimal> GetTotalToDateAsync(
+        List<int>? expenseCategoriesId,
+        List<int>? householdMembersId,
+        DateTime periodStart,
+        string userId,
+        CancellationToken ct)
+    { 
+        var query = context.Expenses
+            .AsNoTracking()
+            .Where(x => x.HouseholdMember.ApplicationUserId == userId && x.Date < periodStart);
+
+        if (expenseCategoriesId is not null && expenseCategoriesId.Count > 0)
+            query = query.Where(x => expenseCategoriesId.Contains(x.ExpenseCategoryId));
+
+        if (householdMembersId is not null && householdMembersId.Count > 0)
+            query = query.Where(x => householdMembersId.Contains(x.HouseholdMemberId));
+
+        var result = await query.SumAsync(x => (decimal?)x.Amount, ct);
+
+        return result ?? 0;
+    }
 }

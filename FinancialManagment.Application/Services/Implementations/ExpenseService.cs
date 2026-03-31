@@ -46,6 +46,7 @@ public sealed class ExpenseService(
 
         var result = new PagedResult<ExpenseViewModel>
         { 
+            Page = request.Page,
             PageSize = request.PageSize,
             Search = request.Search,
             SortBy = request.SortBy,

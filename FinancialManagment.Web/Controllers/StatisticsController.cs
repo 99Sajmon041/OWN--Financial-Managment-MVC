@@ -15,10 +15,10 @@ namespace FinancialManagment.Web.Controllers
             return View(model);
         }
 
-        [HttpGet("js-index")]
-        public async Task<IActionResult> JsIndex(StatisticsJSFilterModel filterModel, CancellationToken ct)
+        [HttpGet]
+        public async Task<IActionResult> JsIndex(StatisticsJsFilterModel filterModel, CancellationToken ct)
         {
-            var model = await statisticsService.GetJSStatisticsAsync(filterModel, ct);
+            var model = await statisticsService.GetJsStatisticsAsync(filterModel, ct);
             return View(model);
         }
     }
