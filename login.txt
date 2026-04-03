@@ -2,6 +2,8 @@
 simon9durak@gmail.com
 Durasi99
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-pochopit paginaci
 Udělat partial View pro filtry...udělat také s TypeofProperty jako v práci - automaticky vybere selectlisty a taky možnost filtry skrýt - přes Dictionary, tam je mít uložené !!
 udělat PF a spustit apl. na veřejce
+
+
+

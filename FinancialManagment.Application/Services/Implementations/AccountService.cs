@@ -47,7 +47,8 @@ public sealed class AccountService(
         var houseHoldMember = new HouseholdMember
         {
             ApplicationUserId = newUser.Id,
-            Nickname = model.Nickname.Trim()
+            Nickname = model.Nickname.Trim(),
+            IsActive = true
         };
 
         try
