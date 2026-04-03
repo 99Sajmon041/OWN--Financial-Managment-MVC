@@ -44,7 +44,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.Cookie.Name = "FinancialManagement.Prod.Auth";
+    options.Cookie.Name = "FinancialManagement.Dev.Auth";
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
 
@@ -53,12 +53,12 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\simon\Desktop\FinancialManagment\AppKeys\FinancialManagement_Prod"))
-    .SetApplicationName("FinancialManagement");
+    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\simon\Desktop\FinancialManagment\AppKeys\FinancialManagement_Dev"))
+    .SetApplicationName("FinancialManagement.Dev");
 
 builder.Services.AddAntiforgery(options =>
 {
-    options.Cookie.Name = "FinancialManagement.Prod.Antiforgery";
+    options.Cookie.Name = "FinancialManagement.Dev.Antiforgery";
 });
 
 builder.Services.AddControllersWithViews();
