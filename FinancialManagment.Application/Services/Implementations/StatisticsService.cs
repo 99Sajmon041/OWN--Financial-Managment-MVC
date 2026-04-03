@@ -91,7 +91,8 @@ public sealed class StatisticsService(
         var (incomeChart, expenseChart, balanceChart, incomePeriodSum, expensePeriodSum) = GetPeriodStatistics(
             model.SelectedYear,
             model.SelectedMonth,
-            expenses, incomes,
+            expenses, 
+            incomes,
             incomeBalanceTotalToDate,
             expenseBalanceTotalToDate);
 
@@ -121,7 +122,136 @@ public sealed class StatisticsService(
 
     public async Task<StatisticsViewModel> GetJsStatisticsAsync(StatisticsJsFilterModel model, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var userId = currentUser.ValidatedUserId;
+        var (houseHoldmembersListItems, incomeCategoriesListItems, expenseCategoriesListItems) = await GetSelectListData(userId, ct);
+
+        List<int>? incomesCtgIds;
+        List<int>? expensesCtgIds;
+        List<int>? houseHoldmembersIds;
+
+        if (model.HouseholdMembersId.Contains(0) || model.HouseholdMembersId.Count == 0)
+        {
+            var item = houseHoldmembersListItems.First(x => x.Value == "0");
+            houseHoldmembersIds = null;
+            item.Selected = true;
+        }
+        else
+        {
+            foreach (var houseHoldmember in houseHoldmembersListItems.OrderBy(x => int.Parse(x.Value)))
+            {
+                if (model.HouseholdMembersId.Contains(int.Parse(houseHoldmember.Value)))
+                {
+                    houseHoldmember.Selected = true;
+                }
+            }
+
+            houseHoldmembersIds = model.HouseholdMembersId;
+        }
+
+        if (model.IncomeCategoriesId.Contains(0) || model.IncomeCategoriesId.Count == 0)
+        {
+            var item = incomeCategoriesListItems.First(x => x.Value == "0");
+            incomesCtgIds = null;
+            item.Selected = true;
+        }
+        else
+        {
+            foreach (var incomesCtg in incomeCategoriesListItems.OrderBy(x => int.Parse(x.Value)))
+            {
+                if (model.IncomeCategoriesId.Contains(int.Parse(incomesCtg.Value)))
+                {
+                    incomesCtg.Selected = true;
+                }
+            }
+
+            incomesCtgIds = model.IncomeCategoriesId;
+        }
+
+        if (model.ExpenseCategoriesId.Contains(0) || model.ExpenseCategoriesId.Count == 0)
+        {
+            var item = expenseCategoriesListItems.First(x => x.Value == "0");
+            expensesCtgIds = null;
+            item.Selected = true;
+        }
+        else
+        {
+            foreach (var expenseCtg in expenseCategoriesListItems.OrderBy(x => int.Parse(x.Value)))
+            {
+                if (model.ExpenseCategoriesId.Contains(int.Parse(expenseCtg.Value)))
+                {
+                    expenseCtg.Selected = true;
+                }
+            }
+
+            expensesCtgIds = model.ExpenseCategoriesId;
+        }
+
+        var incomes = await unitOfWork.IncomeRepository.GetForJsStatisticsAsync(
+            incomesCtgIds,
+            houseHoldmembersIds,
+            model.SelectedYear,
+            model.SelectedMonth,
+            userId,
+            ct);
+
+        var expenses = await unitOfWork.ExpenseRepository.GetForJsStatisticsAsync(
+            expensesCtgIds,
+            houseHoldmembersIds,
+            model.SelectedYear,
+            model.SelectedMonth,
+            userId,
+            ct);
+
+        var months = OptionsBuilder.GetMonths(model.SelectedMonth);
+        var years = OptionsBuilder.GetYears(model.SelectedYear);
+
+        DateTime periodStart;
+
+        if (model.SelectedMonth == 0)
+        {
+            periodStart = new DateTime(model.SelectedYear, 1, 1);
+        }
+        else
+        {
+            periodStart = new DateTime(model.SelectedYear, model.SelectedMonth, 1);
+        }
+
+        decimal incomeBalanceTotalToDate;
+        decimal expenseBalanceTotalToDate;
+
+        incomeBalanceTotalToDate = await unitOfWork.IncomeRepository.GetTotalToDateAsync(incomesCtgIds, houseHoldmembersIds, periodStart, userId, ct);
+        expenseBalanceTotalToDate = await unitOfWork.ExpenseRepository.GetTotalToDateAsync(expensesCtgIds, houseHoldmembersIds, periodStart, userId, ct);
+
+        var (incomeChart, expenseChart, balanceChart, incomePeriodSum, expensePeriodSum) = GetPeriodStatistics(
+            model.SelectedYear,
+            model.SelectedMonth,
+            expenses, 
+            incomes,
+            incomeBalanceTotalToDate,
+            expenseBalanceTotalToDate);
+
+        logger.LogInformation("Multi (JS) statistics loaded for user {UserId}. Year: {Year}, Month: {Month}, Incomes: {IncomeCount}, Expenses: {ExpenseCount}.",
+            userId,
+            model.SelectedYear,
+            model.SelectedMonth == 0 ? "whole year" : model.SelectedMonth.ToString(),
+            incomes.Count,
+            expenses.Count);
+
+        return new StatisticsViewModel
+        {
+            IncomeTotal = incomeBalanceTotalToDate + incomePeriodSum,
+            ExpenseTotal = expenseBalanceTotalToDate + expensePeriodSum,
+            IncomeCategories = incomeCategoriesListItems,
+            ExpenseCategories = expenseCategoriesListItems,
+            HouseholdMembers = houseHoldmembersListItems,
+            Months = months,
+            Years = years,
+            SelectedYear = model.SelectedYear,
+            SelectedMonth = model.SelectedMonth,
+            IncomeChart = incomeChart,
+            ExpenseChart = expenseChart,
+            BalanceChart = balanceChart
+        };
     }
 
     //private helper methods -----------------------------------------------------------------------------------------

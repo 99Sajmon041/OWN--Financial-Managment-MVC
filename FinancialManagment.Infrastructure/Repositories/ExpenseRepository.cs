@@ -90,34 +90,6 @@ public sealed class ExpenseRepository(FinancialManagementDbContext context) : IE
         context.Remove(expense);
     }
 
-    public async Task<List<Expense>> GetForJSStatisticsAsync(
-        List<int> expenseCategoriesId,
-        List<int> householdMembersId,
-        int year,
-        int month,
-        string userId,
-        CancellationToken ct)
-    {
-        var query = context.Expenses
-            .AsNoTracking()
-            .Include(x => x.ExpenseCategory)
-            .Include(x => x.HouseholdMember)
-            .Where(x => x.HouseholdMember.ApplicationUserId == userId);
-
-        if (expenseCategoriesId.Count != 0)
-            query = query.Where(x => expenseCategoriesId.Contains(x.ExpenseCategoryId));
-
-        if (householdMembersId.Count != 0)
-            query = query.Where(x => householdMembersId.Contains(x.HouseholdMemberId));
-
-        if (month == 0)
-            query = query.Where(x => x.Date.Year == year);
-        else
-            query = query.Where(x => x.Date.Year == year && x.Date.Month == month);
-
-        return await query.ToListAsync(ct);
-    }
-
     public async Task<List<Expense>> GetForStatisticsAsync(
         int expenseCategoryId,
         int householdMemberId,
@@ -128,8 +100,6 @@ public sealed class ExpenseRepository(FinancialManagementDbContext context) : IE
     {
         var query = context.Expenses
             .AsNoTracking()
-            .Include(x => x.ExpenseCategory)
-            .Include(x => x.HouseholdMember)
             .Where(x => x.HouseholdMember.ApplicationUserId == userId);
 
         if (expenseCategoryId != 0)
@@ -166,5 +136,31 @@ public sealed class ExpenseRepository(FinancialManagementDbContext context) : IE
         var result = await query.SumAsync(x => (decimal?)x.Amount, ct);
 
         return result ?? 0;
+    }
+
+    public async Task<List<Expense>> GetForJsStatisticsAsync(
+    List<int>? expenseCategoriesId,
+    List<int>? householdMembersId,
+    int year,
+    int month,
+    string userId,
+    CancellationToken ct)
+    {
+        var query = context.Expenses
+            .AsNoTracking()
+            .Where(x => x.HouseholdMember.ApplicationUserId == userId);
+
+        if (expenseCategoriesId is not null && expenseCategoriesId.Count > 0)
+            query = query.Where(x => expenseCategoriesId.Contains(x.ExpenseCategoryId));
+
+        if (householdMembersId is not null && householdMembersId.Count > 0)
+            query = query.Where(x => householdMembersId.Contains(x.HouseholdMemberId));
+
+        if (month == 0)
+            query = query.Where(x => x.Date.Year == year);
+        else
+            query = query.Where(x => x.Date.Year == year && x.Date.Month == month);
+
+        return await query.ToListAsync(ct);
     }
 }

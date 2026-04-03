@@ -353,3 +353,18 @@ body {
         padding: 0.5rem 0.75rem;
     }
 }
+
+.ts-wrapper.multi .ts-control {
+    min-height: 38px;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+}
+
+.ts-wrapper .ts-control > div {
+    border-radius: 0.375rem;
+}
+
+.ts-dropdown .no-results {
+    padding: 0.5rem 0.75rem;
+    color: #adb5bd;
+}

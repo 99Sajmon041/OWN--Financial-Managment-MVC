@@ -90,35 +90,6 @@ public sealed class IncomeRepository(FinancialManagementDbContext context) : IIn
     {
         context.Remove(income);
     }
-
-    public async Task<List<Income>> GetForJSStatisticsAsync(
-        List<int> incomeCategoriesId,
-        List<int> householdMembersId,
-        int year,
-        int month,
-        string userId,
-        CancellationToken ct)
-    {
-        var query = context.Incomes
-            .AsNoTracking()
-            .Include(x => x.IncomeCategory)
-            .Include(x => x.HouseholdMember)
-            .Where(x => x.HouseholdMember.ApplicationUserId == userId);
-
-        if (incomeCategoriesId.Count != 0)
-            query = query.Where(x => incomeCategoriesId.Contains(x.IncomeCategoryId));
-
-        if (householdMembersId.Count != 0)
-            query = query.Where(x => householdMembersId.Contains(x.HouseholdMemberId));
-
-        if (month == 0)
-            query = query.Where(x => x.Date.Year == year);
-        else
-            query = query.Where(x => x.Date.Year == year && x.Date.Month == month);
-
-        return await query.ToListAsync(ct);
-    }
-
     public async Task<List<Income>> GetForStatisticsAsync(
     int incomeCategoryId,
     int householdMemberId,
@@ -129,8 +100,6 @@ public sealed class IncomeRepository(FinancialManagementDbContext context) : IIn
     {
         var query = context.Incomes
             .AsNoTracking()
-            .Include(x => x.IncomeCategory)
-            .Include(x => x.HouseholdMember)
             .Where(x => x.HouseholdMember.ApplicationUserId == userId);
 
         if (incomeCategoryId != 0)
@@ -167,5 +136,31 @@ public sealed class IncomeRepository(FinancialManagementDbContext context) : IIn
         var result = await query.SumAsync(x => (decimal?)x.Amount, ct);
 
         return result ?? 0;
+    }
+
+    public async Task<List<Income>> GetForJsStatisticsAsync(
+        List<int>? incomeCategoriesId,
+        List<int>? householdMembersId,
+        int year,
+        int month,
+        string userId,
+        CancellationToken ct)
+    {
+        var query = context.Incomes
+            .AsNoTracking()
+            .Where(x => x.HouseholdMember.ApplicationUserId == userId);
+
+        if (incomeCategoriesId is not null && incomeCategoriesId.Count > 0)
+            query = query.Where(x => incomeCategoriesId.Contains(x.IncomeCategoryId));
+
+        if (householdMembersId is not null && householdMembersId.Count > 0)
+            query = query.Where(x => householdMembersId.Contains(x.HouseholdMemberId));
+
+        if (month == 0)
+            query = query.Where(x => x.Date.Year == year);
+        else
+            query = query.Where(x => x.Date.Year == year && x.Date.Month == month);
+
+        return await query.ToListAsync(ct);
     }
 }

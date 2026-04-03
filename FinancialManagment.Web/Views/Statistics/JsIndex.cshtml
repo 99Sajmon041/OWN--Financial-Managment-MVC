@@ -1,11 +1,11 @@
 ﻿@model StatisticsViewModel
 
 @{
-    ViewData["title"] = "Multi select - Statistiky / Přehled";
+    ViewData["title"] = "Multi výběr - Statistiky / Přehled";
 }
 
 <div class="text-center mb-4">
-    <h1 class="display-6">Multi select - Statistiky / Přehled</h1>
+    <h1 class="display-6">Multi výběr - Statistiky / Přehled</h1>
 </div>
 
 <div class="card shadow-sm mb-4">
@@ -25,10 +25,10 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>@Model.IncomeTotal.ToString("C2")</td>
-                        <td>@Model.ExpenseTotal.ToString("C2")</td>
+                        <td id="incomeTotal">@Model.IncomeTotal.ToString("C2")</td>
+                        <td id="expenseTotal">@Model.ExpenseTotal.ToString("C2")</td>
                         <td>
-                            <span class="fw-bold @(Model.Balance >= 0 ? "text-success" : "text-danger")">
+                            <span id="balanceTotal" class="fw-bold @(Model.Balance >= 0 ? "text-success" : "text-danger")">
                                 @Model.Balance.ToString("C2")
                             </span>
                         </td>
@@ -38,3 +38,80 @@
         </div>
     </div>
 </div>
+
+<div class="card shadow-sm">
+    <div class="card-header p-0 text-center fw-bold py-2">
+        Filtr statistik
+    </div>
+
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-bold" for="houseHoldMemberIds">Členové</label>
+                <select multiple class="form-select" id="houseHoldMemberIds" asp-items="@Model.HouseholdMembers"></select>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-bold" for="incomeCategoryIds">Příjmy</label>
+                <select multiple class="form-select" id="incomeCategoryIds" asp-items="@Model.IncomeCategories"></select>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-bold" for="expenseCategoryIds">Výdaje</label>
+                <select multiple class="form-select" id="expenseCategoryIds" asp-items="@Model.ExpenseCategories"></select>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-bold" for="selectedYear">Rok</label>
+                <select class="form-select" id="selectedYear" asp-items="@Model.Years"></select>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-bold" for="selectedMonth">Měsíc</label>
+                <select class="form-select" id="selectedMonth" asp-items="@Model.Months"></select>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <button type="button" class="btn btn-outline-primary" id="clearFiltersBtn">
+                    Vymazat filtry
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm my-3">
+    <div class="card-header fw-bold">
+        <span id="balanceMessage">
+            @(Model.Yearly
+                        ? $"Vývoj financí za rok {Model.SelectedYear}"
+                        : $"Vývoj financí za {Model.Months.FirstOrDefault(x => x.Value == Model.SelectedMonth.ToString())?.Text} / {Model.SelectedYear}")
+        </span>
+    </div>
+
+    <div class="card-body">
+        <canvas id="statisticsJsChart"></canvas>
+    </div>
+</div>
+
+<script>
+    window.statisticsJsInitialData = {
+        incomeTotal: @Html.Raw(JsonSerializer.Serialize(Model.IncomeTotal)),
+        expenseTotal: @Html.Raw(JsonSerializer.Serialize(Model.ExpenseTotal)),
+        balance: @Html.Raw(JsonSerializer.Serialize(Model.Balance)),
+        selectedYear: @Html.Raw(JsonSerializer.Serialize(Model.SelectedYear)),
+        selectedMonth: @Html.Raw(JsonSerializer.Serialize(Model.SelectedMonth)),
+        yearly: @Html.Raw(JsonSerializer.Serialize(Model.Yearly)),
+        months: @Html.Raw(JsonSerializer.Serialize(Model.Months)),
+        incomeChart: @Html.Raw(JsonSerializer.Serialize(Model.IncomeChart)),
+        expenseChart: @Html.Raw(JsonSerializer.Serialize(Model.ExpenseChart)),
+        balanceChart: @Html.Raw(JsonSerializer.Serialize(Model.BalanceChart)),
+        defaultSelectedYear: @Html.Raw(JsonSerializer.Serialize(Model.SelectedYear)),
+        defaultSelectedMonth: @Html.Raw(JsonSerializer.Serialize(Model.SelectedMonth))
+    };
+</script>
+
+<link href="~/lib/tom-select/tom-select.bootstrap5.min.css" rel="stylesheet">
+<script src="~/lib/tom-select/tom-select.complete.min.js"></script>
