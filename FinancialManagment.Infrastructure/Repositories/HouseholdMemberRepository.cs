@@ -62,4 +62,17 @@ public sealed class HouseholdMemberRepository(FinancialManagementDbContext conte
     {
         return await context.HouseholdMembers.AnyAsync(x => x.Id == id && x.ApplicationUserId == userId && x.IsActive, ct);
     }
+
+
+    /// <summary>
+    /// Method for retreiving queryable list of household members for a specific user.
+    /// </summary>
+    /// <param name="userId">ID of the user</param>
+    /// <returns>Returns query list of household members</returns>
+    public IQueryable<HouseholdMember> GetQueryable(string userId)
+    {
+        return context.HouseholdMembers
+            .AsNoTracking()
+            .Where(x => x.ApplicationUserId == userId);
+    }
 }

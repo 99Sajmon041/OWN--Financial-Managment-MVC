@@ -1,7 +1,192 @@
 --------------------------------------------------------
 simon9durak@gmail.com
 Durasi99
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-pochopit paginaci
-Udělat partial View pro filtry...udělat také s TypeofProperty jako v práci - automaticky vybere selectlisty a taky možnost filtry skrýt - přes Dictionary, tam je mít uložené !!
-udělat PF a spustit apl. na veřejce
+--------------------------------------------------------------------------------------------------------------------------
+Použít i enumy, Datetime - proste všechny typy + všechyn možnosti ==, !=, atd...a také ošetřil nullable stringy, atp..
+Předělat filter tak, aby uměl řadit i dle navigačních properties, ne jen dané vlastnosti Entity - zatím neumí
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+Přidat výdaj: 59,99,- kč - google 
+
+Fáze 1 — malý návrh architektury
+
+Nejdřív si potvrdíme přesně tyto stavební bloky:
+
+GridRequest
+PagedResult<T>
+Pager
+FilterExpressionBuilder
+QueryableFilterExtensions
+QueryableSortExtensions
+QueryablePagingExtensions
+
+a hlavně si řekneme:
+
+co patří do repository
+co do service
+co do controlleru
+co do shared partial view
+
+To bude krátké, ale důležité.
+
+Fáze 2 — backend kostra
+
+Pak začneme psát kód v tomto pořadí:
+
+GridRequest
+Pager
+PagedResult<T>
+FilterExpressionBuilder
+ApplyFilters
+ApplySorting
+ApplyPaging
+Fáze 3 — pilot na HouseholdMember
+
+Pak to napojíme na:
+
+IHouseholdMemberRepository
+HouseholdMemberRepository
+IHouseholdMemberService
+HouseholdMemberService
+HouseholdMemberController
+Fáze 4 — view
+
+Až backend poběží, uděláme:
+
+HouseholdMemberIndexViewModel nebo obecný page model
+Index.cshtml
+shared _Pager
+později shared _Filters
+
+Takže teď uděláme přesně tohle:
+nejdřív ti navrhnu finální kostru odpovědností, velmi stručně a konkrétně.
+
+Návrh odpovědností
+1. GridRequest
+
+Bude představovat vše, co přijde z query stringu pro grid.
+
+Bude mít:
+
+Dictionary<string, string> Filters
+int Page
+int PageSize
+string? SortOrder
+
+Použití:
+
+controller to přijme
+service s tím pracuje
+2. Pager
+
+Bude řešit jen stránkování.
+
+Bude mít:
+
+TotalItems
+CurrentPage
+PageSize
+TotalPages
+StartPage
+EndPage
+
+Nebude řešit filtry ani sort.
+
+3. PagedResult<T>
+
+Bude návratový objekt služby pro každou index stránku.
+
+Bude mít:
+
+IReadOnlyList<T> Items
+Pager Pager
+GridRequest Grid
+Type? FilterModelType
+
+Tohle pak view použije pro tabulku, filtry i pager.
+
+4. FilterExpressionBuilder
+
+Bude umět z Dictionary<string, string> a typu T vygenerovat seznam Expression<Func<T, bool>>.
+
+Bude řešit:
+
+string
+int
+decimal
+bool
+DateTime
+nullable varianty
+případně enumy
+
+To bude čistá backend logika, bez UI.
+
+5. QueryableFilterExtensions
+
+Bude mít metodu typu:
+
+ApplyFilters<T>(this IQueryable<T> query, Dictionary<string, string> filters)
+
+Uvnitř:
+
+zavolá FilterExpressionBuilder
+foreach přidá Where(...)
+6. QueryableSortExtensions
+
+Bude mít:
+
+ApplySorting<T>(this IQueryable<T> query, string? sortOrder)
+
+Formát třeba:
+
+asc_Nickname
+desc_Nickname
+
+Podobně jako v práci.
+
+7. QueryablePagingExtensions
+
+Bude mít něco jako:
+
+ApplyPaging<T>(this IQueryable<T> query, Pager pager)
+
+jen Skip/Take.
+
+8. Repository
+
+Repository nebude vědět nic o dynamických filtrech.
+
+Například u HouseholdMember jen:
+
+IQueryable<HouseholdMember> GetQueryable(string userId)
+
+Hotovo.
+
+9. Service
+
+Service udělá celou pipeline:
+
+vezme IQueryable
+aplikuje filtry
+spočítá totalItems
+vytvoří Pager
+aplikuje sort
+aplikuje paging
+načte data
+namapuje na VM
+vrátí PagedResult<TVm>
+
+To je přesně správné místo.
+
+10. Controller
+
+Controller bude jen předávat GridRequest do služby.
+
+Třeba:
+
+Index(GridRequest request, CancellationToken ct)
+
+a pošle model do view.
