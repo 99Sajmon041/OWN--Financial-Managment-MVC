@@ -2,6 +2,7 @@
 using FinancialManagment.Application.Models.HouseholdMember;
 using FinancialManagment.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using FinancialManagment.Shared.Grid;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialManagment.Web.Controllers;
@@ -94,5 +95,39 @@ public class HouseholdMemberController(IHouseholdMemberService householdMemberSe
             TempData["Error"] = ex.Message;
             return RedirectToAction(nameof(Index));
         }
+    }
+
+
+    [HttpGet]
+    public async Task<IActionResult> Grid(CancellationToken ct)
+    {
+        var query = Request.Query;
+
+        var gridRequest = new GridRequest();
+
+        if (int.TryParse(query["page"], out int page))
+        {
+            gridRequest.Page = page;
+        }
+        if (int.TryParse(query["pageSize"], out int pageSize))
+        {
+            gridRequest.PageSize = pageSize;
+        }
+
+        gridRequest.SortOrder = query["sortOrder"];
+
+        foreach (var item in query)
+        {
+            if (item.Key == "page" || item.Key == "pageSize" || item.Key == "sortOrder")
+            {
+                continue;
+            }
+
+            gridRequest.Filters[item.Key] = item.Value!;
+        }
+
+        var result = await householdMemberService.GetGridAsync(gridRequest, ct);
+
+        return View(result);
     }
 }

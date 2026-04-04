@@ -15,10 +15,6 @@ public interface IHouseholdMemberRepository
     Task<bool> BelongsToUserAndIsActiveAsync(int id, string userId, CancellationToken ct);
 
 
-    /// <summary>
-    /// Interface for method for retreiving queryable list of household members for a specific user.
-    /// </summary>
-    /// <param name="userId">ID of the user</param>
-    /// <returns>Returns query list of household members</returns>
+    //Interface method for retreiving queryable list of household members for a specific user.
     IQueryable<HouseholdMember> GetQueryable(string userId);
 }

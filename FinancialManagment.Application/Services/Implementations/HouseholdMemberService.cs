@@ -5,6 +5,9 @@ using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
 using FinancialManagment.Domain.RepositoryInterfaces;
+using FinancialManagment.Shared.Grid;
+using FinancialManagment.Shared.Pagination;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FinancialManagment.Application.Services.Implementations;
@@ -138,5 +141,44 @@ public sealed class HouseholdMemberService(
         await unitOfWork.SaveChangesAsync(ct);
 
         logger.LogInformation("User with ID: {UserId} {Phrase} household member with ID: {HouseHoldMemberId}.", userId, action, id);
+    }
+
+
+    //Service method for grid with dynamic filtering, sorting, and pagination
+    public async Task<PagedResultNew<HouseholdMemberViewModel>> GetGridAsync(GridRequest gridRequest, CancellationToken ct)
+    {
+        gridRequest.Normalize();
+
+        var userId = currentUser.ValidatedUserId;
+
+        IQueryable<HouseholdMember> query = unitOfWork.HouseholdMemberRepository.GetQueryable(userId);
+
+        query = query.ApplyFilters(gridRequest.Filters);
+
+        int totalItems = await query.CountAsync(ct);
+
+        var pager = new Pager(totalItems, gridRequest.Page, gridRequest.PageSize);
+
+        query = query.ApplySorting(gridRequest.SortOrder);
+        query = query.ApplyPaging(pager);
+
+        List<HouseholdMember> householdMembers = await query.ToListAsync(ct);
+
+        IReadOnlyList<HouseholdMemberViewModel> items = mapper.Map<List<HouseholdMemberViewModel>>(householdMembers);
+
+        logger.LogInformation("User with ID: {UserId} retrieved household members grid. Total items after filtering: {TotalItemsCount}. " +
+            "Current page: {CurrentPage}. Page size: {PageSize}.",
+            userId,
+            totalItems,
+            gridRequest.Page,
+            gridRequest.PageSize);
+
+        return new PagedResultNew<HouseholdMemberViewModel>
+        {
+            Items = items,
+            Pager = pager,
+            GridRequest = gridRequest,
+            FilterModelType = typeof(HouseholdMember)
+        };
     }
 }

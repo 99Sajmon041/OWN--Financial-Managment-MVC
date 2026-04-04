@@ -1,0 +1,76 @@
+﻿@model PagerPartialViewModel
+
+@if (Model.Pager.TotalPages > 1)
+{
+ <nav>
+     <ul class="pagination">
+         @if (Model.Pager.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                        asp-action="@Model.Action"
+                        asp-controller="@Model.Controller"
+                        asp-all-route-data="GetRouteValues(1)">
+                        První
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="@Model.Action"
+                       asp-controller="@Model.Controller"
+                       asp-all-route-data="GetRouteValues(Model.Pager.CurrentPage - 1)">
+                        Předchozí
+                    </a>
+                </li>
+
+                @for (int pageNumber = Model.Pager.StartPage; pageNumber <= Model.Pager.EndPage; pageNumber++)
+                {
+                    <li class="page-item @(pageNumber == Model.Pager.CurrentPage ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="@Model.Action"
+                           asp-controller="@Model.Controller"
+                           asp-all-route-data="GetRouteValues(pageNumber)">
+                            @pageNumber
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="@Model.Action"
+                       asp-controller="@Model.Controller"
+                       asp-all-route-data="GetRouteValues(Model.Pager.CurrentPage + 1)">
+                        Další
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="@Model.Action"
+                       asp-controller="@Model.Controller"
+                       asp-all-route-data="GetRouteValues(Model.Pager.TotalPages)">
+                        Last
+                    </a>
+                </li>
+            }
+        </ul>
+ </nav>   
+}
+
+@functions{
+    private Dictionary<string, string> GetRouteValues(int page)
+    {
+        Dictionary<string, string> routeValues = new Dictionary<string, string>(Model.Filters);
+
+        routeValues["page"] = page.ToString();
+        routeValues["pageSize"] = Model.PageSize.ToString();
+
+        if (!string.IsNullOrWhiteSpace(Model.SortOrder))
+        {
+            routeValues["sortOrder"] = Model.SortOrder;
+        }
+
+        return routeValues;
+    }
+}

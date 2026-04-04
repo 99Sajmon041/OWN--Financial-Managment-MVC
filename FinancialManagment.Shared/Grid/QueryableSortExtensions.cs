@@ -4,14 +4,14 @@ namespace FinancialManagment.Shared.Grid;
 
 public static class QueryableSortExtensions
 {
-    public static IQueryable<T> ApplySorting<T>(this IQueryable<T> query, string? sortorder)
+    public static IQueryable<T> ApplySorting<T>(this IQueryable<T> query, string? sortOrder)
     {
-        if (string.IsNullOrWhiteSpace(sortorder))
+        if (string.IsNullOrWhiteSpace(sortOrder))
         {
-            return query;
+            sortOrder = "asc_Id";
         }
 
-        string[] parts = sortorder.Split('_', 2, StringSplitOptions.RemoveEmptyEntries);
+        string[] parts = sortOrder.Split('_', 2, StringSplitOptions.RemoveEmptyEntries);
 
         if (parts.Length != 2)
         {
@@ -21,9 +21,9 @@ public static class QueryableSortExtensions
         string direction = parts[0].ToLowerInvariant();
         string propertyName = parts[1];
 
-        if (direction != "asc" || direction != "dsc")
+        if (direction != "asc" && direction != "desc")
         {
-            return query; 
+            return query;
         }
 
         var property = typeof(T).GetProperty(propertyName);
@@ -40,7 +40,7 @@ public static class QueryableSortExtensions
         string methodName = direction == "asc" ? "OrderBy" : "OrderByDescending";
 
         MethodCallExpression methodCallExpression = Expression.Call(
-            typeof(IQueryable),
+            typeof(Queryable),
             methodName,
             new[] { typeof(T), property.PropertyType },
             query.Expression,

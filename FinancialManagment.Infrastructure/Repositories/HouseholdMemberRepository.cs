@@ -64,11 +64,7 @@ public sealed class HouseholdMemberRepository(FinancialManagementDbContext conte
     }
 
 
-    /// <summary>
-    /// Method for retreiving queryable list of household members for a specific user.
-    /// </summary>
-    /// <param name="userId">ID of the user</param>
-    /// <returns>Returns query list of household members</returns>
+    //Method for retreiving queryable list of household members for a specific user.
     public IQueryable<HouseholdMember> GetQueryable(string userId)
     {
         return context.HouseholdMembers

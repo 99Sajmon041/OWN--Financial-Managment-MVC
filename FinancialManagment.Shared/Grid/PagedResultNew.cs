@@ -1,6 +1,6 @@
 ﻿namespace FinancialManagment.Shared.Grid;
 
-public sealed class PagedResult<T>
+public sealed class PagedResultNew<T>
 {
     public IReadOnlyList<T> Items { get; set; } = [];
     public Pager Pager { get; set; } = default!;
