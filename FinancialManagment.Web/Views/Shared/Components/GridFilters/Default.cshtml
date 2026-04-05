@@ -1,0 +1,58 @@
+﻿@model GridFiltersViewModel
+
+<form method="get" asp-action="@Model.Action" asp-controller="@Model.Controller" class="mb-4">
+    <div class="row g-3">
+
+        @foreach (var field in Model.Fields)
+        {
+            <div class="col-md-3">
+                <label class="form-label">@field.Label</label>
+
+                @switch (field.InputType)
+                {
+                    case FilterInputType.Text:
+                        <input type="text"
+                            name="@field.PropertyName"
+                            value="@field.Value"
+                            class="form-control"/>
+                            break;
+
+                    case FilterInputType.Number:
+                        <input type="number"
+                            name="@field.PropertyName"
+                            value="@field.Value"
+                            class="form-control"/>
+                        break;
+
+                    case FilterInputType.Date:
+                        <input type="date"
+                               name="@field.PropertyName"
+                               value="@field.Value"
+                               class="form-control" />
+                        break;
+
+                    case FilterInputType.Select:
+                        <select name="@field.PropertyName" class="form-select">
+                            <option value="">-- Vyberte --</option>
+                            <option value="true" selected="@(field.Value == "true")">Ano</option>
+                            <option value="false" selected="@(field.Value == "false")">Ne</option>
+                        </select>
+                        break;
+                }
+            </div>
+        }
+
+    </div>
+
+    <input type="hidden" name="pageSize" value="@Model.PageSize" />
+
+    @if (!string.IsNullOrWhiteSpace(Model.SortOrder))
+    {
+        <input type="hidden" name="sortOrder" value="@Model.SortOrder" />
+    }
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Filtrovat</button>
+        <a asp-action="@Model.Action" asp-controller="@Model.Controller" class="btn btn-outline-secondary">Vymazat</a>
+    </div>
+</form>
