@@ -1,4 +1,4 @@
-﻿namespace FinancialManagment.Shared.Grid;
+﻿namespace FinancialManagment.Shared.Grid.Common;
 
 public sealed class GridRequest
 {

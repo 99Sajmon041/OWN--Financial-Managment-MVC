@@ -1,5 +1,6 @@
 ﻿using FinancialManagment.Application.Models.HouseholdMember;
-using FinancialManagment.Shared.Grid;
+using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Shared.Grid.Paging;
 
 namespace FinancialManagment.Application.Services.Interfaces;
 

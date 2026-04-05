@@ -1,4 +1,4 @@
-﻿namespace FinancialManagment.Shared.Grid;
+﻿namespace FinancialManagment.Shared.Grid.Filtering;
 
 public sealed class GridFiltersViewModel
 {

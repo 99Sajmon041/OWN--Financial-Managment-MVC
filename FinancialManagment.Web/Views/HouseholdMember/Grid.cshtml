@@ -1,4 +1,5 @@
-﻿@model PagedResultNew<HouseholdMemberViewModel>
+﻿@using FinancialManagment.Shared.Grid.Paging
+@model PagedResultNew<HouseholdMemberViewModel>
 
 @{
     ViewData["Title"] = "Dynamické zobrazení členů domácnosti";
@@ -8,14 +9,14 @@
     <h1 class="display-6">Dynamické zobrazení členů domácnosti</h1>
 </div>
 
-@await Component.InvokeAsync("GridFilters", new
+@await Component.InvokeAsync("GridFilters", new GridFiltersComponentModel
 {
-    modelType = Model.FilterModelType,
-    filters = Model.GridRequest.Filters,
-    action = ViewContext.RouteData.Values["action"]?.ToString(),
-    controller = ViewContext.RouteData.Values["controller"]?.ToString(),
-    pageSize = Model.GridRequest.PageSize,
-    sortOrder = Model.GridRequest.SortOrder
+    ModelType = Model.FilterModelType!,
+    Filters = Model.GridRequest.Filters,
+    Action = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty,
+    Controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty,
+    PageSize = Model.GridRequest.PageSize,
+    SortOrder = Model.GridRequest.SortOrder
 })
 
 <div class="mb-3">
@@ -56,11 +57,11 @@
     </table>
 </div>
 
-@await Html.PartialAsync("_Pager", new PagerPartialViewModel
+@await Html.PartialAsync("Pager", new PagerPartialViewModel
 {
     Pager = Model.Pager,
-    Action = "Grid",
-    Controller = "HouseholdMember",
+    Action = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty,
+    Controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty,
     SortOrder = Model.GridRequest.SortOrder,
     PageSize = Model.GridRequest.PageSize,
     Filters = Model.GridRequest.Filters

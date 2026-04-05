@@ -1,4 +1,4 @@
-﻿namespace FinancialManagment.Shared.Grid;
+﻿namespace FinancialManagment.Shared.Grid.Paging;
 
 public sealed class PagerPartialViewModel
 {

@@ -1,4 +1,4 @@
-﻿using FinancialManagment.Shared.Grid;
+﻿using FinancialManagment.Shared.Grid.Paging;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialManagment.Web.ViewComponents;

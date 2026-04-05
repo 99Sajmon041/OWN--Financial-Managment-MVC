@@ -1,27 +1,22 @@
 ﻿using FinancialManagment.Shared.Grid;
+using FinancialManagment.Shared.Grid.Filtering;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialManagment.Web.ViewComponents;
 
 public class GridFiltersViewComponent : ViewComponent
 {
-    public IViewComponentResult Invoke(
-        Type modelType,
-        Dictionary<string, string> filters,
-        string action,
-        string controller,
-        int pageSize,
-        string? sortOrder)
+    public IViewComponentResult Invoke(GridFiltersComponentModel model)
     {
-        var fields = FilterDefinitionFactory.Create(modelType, filters);
+        var fields = FilterDefinitionFactory.Create(model.ModelType, model.Filters);
 
         var vm = new GridFiltersViewModel
         {
             Fields = fields,
-            Action = action,
-            Controller = controller,
-            PageSize = pageSize,
-            SortOrder = sortOrder
+            Action = model.Action,
+            Controller = model.Controller,
+            PageSize = model.PageSize,
+            SortOrder = model.SortOrder
         };
 
         return View(vm);

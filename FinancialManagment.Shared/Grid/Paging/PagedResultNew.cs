@@ -1,4 +1,6 @@
-﻿namespace FinancialManagment.Shared.Grid;
+﻿using FinancialManagment.Shared.Grid.Common;
+
+namespace FinancialManagment.Shared.Grid.Paging;
 
 public sealed class PagedResultNew<T>
 {

@@ -2,7 +2,7 @@
 using FinancialManagment.Application.Models.HouseholdMember;
 using FinancialManagment.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using FinancialManagment.Shared.Grid;
+using FinancialManagment.Shared.Grid.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialManagment.Web.Controllers;
