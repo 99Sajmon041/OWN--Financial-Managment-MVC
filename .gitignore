@@ -365,3 +365,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 wwwroot/images/
+/FinancialManagment.Web/wwwroot/lib/bootstrap-icons/icons
+/FinancialManagment.Web/wwwroot/lib/bootstrap-icons
