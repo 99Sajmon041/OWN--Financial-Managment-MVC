@@ -589,3 +589,26 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+//Collapse card filter and change URl to remember filter state in Statistics - Index views
+document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("filterCollapseToggle");
+
+    if (!toggle) {
+        return;
+    }
+
+    toggle.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const url = new URL(window.location.href);
+        const currentValue = url.searchParams.get("filtersCollapsed");
+        const isCollapsed = currentValue === "true";
+        const newValue = (!isCollapsed).toString();
+
+        url.searchParams.set("filtersCollapsed", newValue);
+
+        window.location.href = url.toString();
+    });
+});

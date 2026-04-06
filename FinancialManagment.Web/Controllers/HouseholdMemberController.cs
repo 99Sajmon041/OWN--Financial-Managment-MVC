@@ -1,8 +1,9 @@
 ﻿using FinancialManagment.Application.Exceptions;
 using FinancialManagment.Application.Models.HouseholdMember;
 using FinancialManagment.Application.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Web.RouteHelper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialManagment.Web.Controllers;
@@ -97,37 +98,16 @@ public class HouseholdMemberController(IHouseholdMemberService householdMemberSe
         }
     }
 
-
+    //Endpoint for retreiving list of HouseholdMembers for grid with pagination, sorting and filtering
     [HttpGet]
     public async Task<IActionResult> Grid(CancellationToken ct)
     {
-        var query = Request.Query;
-
-        var gridRequest = new GridRequest();
-
-        if (int.TryParse(query["page"], out int page))
-        {
-            gridRequest.Page = page;
-        }
-        if (int.TryParse(query["pageSize"], out int pageSize))
-        {
-            gridRequest.PageSize = pageSize;
-        }
-
-        gridRequest.SortOrder = query["sortOrder"];
-
-        foreach (var item in query)
-        {
-            if (item.Key == "page" || item.Key == "pageSize" || item.Key == "sortOrder")
-            {
-                continue;
-            }
-
-            gridRequest.Filters[item.Key] = item.Value!;
-        }
+        GridRequest gridRequest = GridRequestBuilder.GetFromRequest(Request);
 
         var result = await householdMemberService.GetGridAsync(gridRequest, ct);
 
         return View(result);
     }
 }
+
+

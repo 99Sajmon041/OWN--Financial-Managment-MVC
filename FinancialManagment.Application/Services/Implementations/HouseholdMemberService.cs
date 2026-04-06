@@ -5,10 +5,9 @@ using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
 using FinancialManagment.Domain.RepositoryInterfaces;
-using FinancialManagment.Shared.Grid;
+using FinancialManagment.Shared.Grid.Filtering;
 using FinancialManagment.Shared.Grid.Common;
 using FinancialManagment.Shared.Grid.Paging;
-using FinancialManagment.Shared.Pagination;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

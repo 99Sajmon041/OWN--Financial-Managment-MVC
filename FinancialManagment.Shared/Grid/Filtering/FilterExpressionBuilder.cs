@@ -1,8 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace FinancialManagment.Shared.Grid;
-
+namespace FinancialManagment.Shared.Grid.Filtering;
 public static class FilterExpressionBuilder
 {
     public static List<Expression<Func<T, bool>>> Build<T>(Dictionary<string, string> filters)

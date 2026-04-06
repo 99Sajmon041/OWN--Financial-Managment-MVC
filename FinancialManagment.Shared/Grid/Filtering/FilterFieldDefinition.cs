@@ -1,4 +1,4 @@
-﻿namespace FinancialManagment.Shared.Grid;
+﻿namespace FinancialManagment.Shared.Grid.Filtering;
 
 public sealed class FilterFieldDefinition
 {
@@ -7,4 +7,5 @@ public sealed class FilterFieldDefinition
     public Type PropertyType { get; set; } = default!;
     public FilterInputType InputType { get; set; }
     public string? Value { get; set; }
+    public int Order { get; set; } = int.MaxValue;
 }

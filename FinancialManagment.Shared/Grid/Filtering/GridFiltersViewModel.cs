@@ -7,4 +7,5 @@ public sealed class GridFiltersViewModel
     public string Controller { get; set; } = default!;
     public int PageSize { get; set; }
     public string? SortOrder { get; set; }
+    public bool FiltersCollapsed { get; set; }
 }

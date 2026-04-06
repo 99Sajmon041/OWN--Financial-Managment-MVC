@@ -8,4 +8,5 @@ public sealed class GridFiltersComponentModel
     public string Controller { get; set; } = string.Empty;
     public int PageSize { get; set; }
     public string? SortOrder { get; set; }
+    public bool FiltersCollapsed { get; set; }
 }

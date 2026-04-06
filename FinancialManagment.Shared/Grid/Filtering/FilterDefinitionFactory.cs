@@ -1,7 +1,7 @@
 ﻿using FinancialManagment.Shared.Attributes;
 using System.Reflection;
 
-namespace FinancialManagment.Shared.Grid;
+namespace FinancialManagment.Shared.Grid.Filtering;
 
 public static class FilterDefinitionFactory
 {
@@ -31,19 +31,27 @@ public static class FilterDefinitionFactory
                 value = filterValue;
             }
 
+            int order = property.GetCustomAttribute<FilterOrderAttribute>()?.Order ?? int.MaxValue;
+
+            FilterInputType inputType = property.GetCustomAttribute<FilterTypeAttribute>()?.InputType ?? ResolveInputType(property.PropertyType);
+
             var definition = new FilterFieldDefinition
             {
                 PropertyName = property.Name,
                 Label = label,
                 PropertyType = property.PropertyType,
                 InputType = ResolveInputType(property.PropertyType),
-                Value = value
+                Value = value,
+                Order = order
             };
 
             definitions.Add(definition);
         }
 
-        return definitions;
+        return definitions
+            .OrderBy(x => x.Order)
+            .ThenBy(x => x.PropertyName)
+            .ToList();
     }
 
     private static bool IsSupportedFilterType(Type propertyType)

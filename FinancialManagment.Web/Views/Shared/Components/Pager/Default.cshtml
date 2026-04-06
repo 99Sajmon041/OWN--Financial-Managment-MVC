@@ -1,29 +1,31 @@
-﻿@using FinancialManagment.Shared.Grid.Paging
-@model PagerPartialViewModel
+﻿@model PagerPartialViewModel
 
 @if (Model.Pager.TotalPages > 1)
 {
- <nav>
-     <ul class="pagination">
-         @if (Model.Pager.CurrentPage > 1)
-            {
-                <li class="page-item">
-                    <a class="page-link"
-                        asp-action="@Model.Action"
-                        asp-controller="@Model.Controller"
-                        asp-all-route-data="GetRouteValues(1)">
-                        První
-                    </a>
-                </li>
+    @if (Model.Pager.TotalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                @if (Model.Pager.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-action="@Model.Action"
+                           asp-controller="@Model.Controller"
+                           asp-all-route-data="GetRouteValues(1)">
+                            První
+                        </a>
+                    </li>
 
-                <li class="page-item">
-                    <a class="page-link"
-                       asp-action="@Model.Action"
-                       asp-controller="@Model.Controller"
-                       asp-all-route-data="GetRouteValues(Model.Pager.CurrentPage - 1)">
-                        Předchozí
-                    </a>
-                </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-action="@Model.Action"
+                           asp-controller="@Model.Controller"
+                           asp-all-route-data="GetRouteValues(Model.Pager.CurrentPage - 1)">
+                            Předchozí
+                        </a>
+                    </li>
+                }
 
                 @for (int pageNumber = Model.Pager.StartPage; pageNumber <= Model.Pager.EndPage; pageNumber++)
                 {
@@ -37,26 +39,29 @@
                     </li>
                 }
 
-                <li class="page-item">
-                    <a class="page-link"
-                       asp-action="@Model.Action"
-                       asp-controller="@Model.Controller"
-                       asp-all-route-data="GetRouteValues(Model.Pager.CurrentPage + 1)">
-                        Další
-                    </a>
-                </li>
+                @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-action="@Model.Action"
+                           asp-controller="@Model.Controller"
+                           asp-all-route-data="GetRouteValues(Model.Pager.CurrentPage + 1)">
+                            Další
+                        </a>
+                    </li>
 
-                <li class="page-item">
-                    <a class="page-link"
-                       asp-action="@Model.Action"
-                       asp-controller="@Model.Controller"
-                       asp-all-route-data="GetRouteValues(Model.Pager.TotalPages)">
-                        Last
-                    </a>
-                </li>
-            }
-        </ul>
- </nav>   
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-action="@Model.Action"
+                           asp-controller="@Model.Controller"
+                           asp-all-route-data="GetRouteValues(Model.Pager.TotalPages)">
+                            Poslední
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
 }
 
 @functions{
@@ -66,6 +71,7 @@
 
         routeValues["page"] = page.ToString();
         routeValues["pageSize"] = Model.PageSize.ToString();
+        routeValues["filtersCollapsed"] = Model.FiltersCollapsed.ToString();
 
         if (!string.IsNullOrWhiteSpace(Model.SortOrder))
         {

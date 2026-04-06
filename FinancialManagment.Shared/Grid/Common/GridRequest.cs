@@ -6,6 +6,7 @@ public sealed class GridRequest
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     public string? SortOrder { get; set; }
+    public bool FiltersCollapsed { get; set; }
     public void Normalize()
     {
         if (Page < 1)

@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace FinancialManagment.Shared.Grid;
+namespace FinancialManagment.Shared.Grid.Filtering;
 
 public static class QueryableFilterExtensions
 {

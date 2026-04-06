@@ -1,5 +1,4 @@
-﻿using FinancialManagment.Shared.Grid;
-using FinancialManagment.Shared.Grid.Filtering;
+﻿using FinancialManagment.Shared.Grid.Filtering;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialManagment.Web.ViewComponents;
@@ -16,7 +15,8 @@ public class GridFiltersViewComponent : ViewComponent
             Action = model.Action,
             Controller = model.Controller,
             PageSize = model.PageSize,
-            SortOrder = model.SortOrder
+            SortOrder = model.SortOrder,
+            FiltersCollapsed = model.FiltersCollapsed
         };
 
         return View(vm);
