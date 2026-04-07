@@ -1,68 +1,85 @@
 ﻿@model PagerPartialViewModel
 
-@if (Model.Pager.TotalPages > 1)
-{
+<div class="row align-items-center">
     @if (Model.Pager.TotalPages > 1)
     {
-        <nav>
-            <ul class="pagination">
-                @if (Model.Pager.CurrentPage > 1)
-                {
-                    <li class="page-item">
-                        <a class="page-link"
-                           asp-action="@Model.Action"
-                           asp-controller="@Model.Controller"
-                           asp-all-route-data="GetRouteValues(1)">
-                            První
-                        </a>
-                    </li>
+        <div class="col-md-6">
+            <nav>
+                <ul class="pagination mb-0">
+                    @if (Model.Pager.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                                asp-action="@Model.Action"
+                                asp-controller="@Model.Controller"
+                                asp-all-route-data="GetRouteValues(1)">
+                                První
+                            </a>
+                        </li>
 
-                    <li class="page-item">
-                        <a class="page-link"
-                           asp-action="@Model.Action"
-                           asp-controller="@Model.Controller"
-                           asp-all-route-data="GetRouteValues(Model.Pager.CurrentPage - 1)">
-                            Předchozí
-                        </a>
-                    </li>
-                }
+                        <li class="page-item">
+                            <a class="page-link"
+                                asp-action="@Model.Action"
+                                asp-controller="@Model.Controller"
+                                asp-all-route-data="GetRouteValues(Model.Pager.CurrentPage - 1)">
+                                Předchozí
+                            </a>
+                        </li>
+                    }
 
-                @for (int pageNumber = Model.Pager.StartPage; pageNumber <= Model.Pager.EndPage; pageNumber++)
-                {
-                    <li class="page-item @(pageNumber == Model.Pager.CurrentPage ? "active" : "")">
-                        <a class="page-link"
-                           asp-action="@Model.Action"
-                           asp-controller="@Model.Controller"
-                           asp-all-route-data="GetRouteValues(pageNumber)">
-                            @pageNumber
-                        </a>
-                    </li>
-                }
+                    @for (int pageNumber = Model.Pager.StartPage; pageNumber <= Model.Pager.EndPage; pageNumber++)
+                    {
+                        <li class="page-item @(pageNumber == Model.Pager.CurrentPage ? "active" : "")">
+                            <a class="page-link"
+                                asp-action="@Model.Action"
+                                asp-controller="@Model.Controller"
+                                asp-all-route-data="GetRouteValues(pageNumber)">
+                                @pageNumber
+                            </a>
+                        </li>
+                    }
 
-                @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
-                {
-                    <li class="page-item">
-                        <a class="page-link"
-                           asp-action="@Model.Action"
-                           asp-controller="@Model.Controller"
-                           asp-all-route-data="GetRouteValues(Model.Pager.CurrentPage + 1)">
-                            Další
-                        </a>
-                    </li>
+                    @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                                asp-action="@Model.Action"
+                                asp-controller="@Model.Controller"
+                                asp-all-route-data="GetRouteValues(Model.Pager.CurrentPage + 1)">
+                                Další
+                            </a>
+                        </li>
 
-                    <li class="page-item">
-                        <a class="page-link"
-                           asp-action="@Model.Action"
-                           asp-controller="@Model.Controller"
-                           asp-all-route-data="GetRouteValues(Model.Pager.TotalPages)">
-                            Poslední
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
+                        <li class="page-item">
+                            <a class="page-link"
+                                asp-action="@Model.Action"
+                                asp-controller="@Model.Controller"
+                                asp-all-route-data="GetRouteValues(Model.Pager.TotalPages)">
+                                Poslední
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
     }
-}
+    <div class="@(Model.Pager.TotalPages > 1 ? "col-md-6" : "col-md-12")  d-flex justify-content-md-end justify-content-end">
+        <select class="form-select form-select-sm w-auto d-inline-block" id="selectPager">
+            @foreach (var option in OptionsBuilder.GetPageSizeOptions())
+            {
+                if (option.Value == Model.PageSize.ToString())
+                {
+                    <option value="@option.Value" selected>@option.Text</option>
+                }
+                else
+                {
+                    <option value="@option.Value">@option.Text</option>
+                }
+            }
+        </select>
+    </div>
+</div>
+
 
 @functions{
     private Dictionary<string, string> GetRouteValues(int page)

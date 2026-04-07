@@ -591,7 +591,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-//Collapse card filter and change URl to remember filter state in Statistics - Index views
+// Toggle filter card state and persist it in URL
 document.addEventListener("DOMContentLoaded", function () {
     const toggle = document.getElementById("filterCollapseToggle");
 
@@ -608,6 +608,25 @@ document.addEventListener("DOMContentLoaded", function () {
         const newValue = (!isCollapsed).toString();
 
         url.searchParams.set("filtersCollapsed", newValue);
+
+        window.location.href = url.toString();
+    });
+});
+
+
+//Pager View - submit form on pageSize change
+document.addEventListener("DOMContentLoaded", function () {
+    const pageSizeSelect = document.getElementById("selectPager");
+
+    if (!pageSizeSelect) {
+        return;
+    }
+
+    pageSizeSelect.addEventListener("change", function () {
+        const url = new URL(window.location.href);
+
+        url.searchParams.set("pageSize", this.value);
+        url.searchParams.set("page", "1");
 
         window.location.href = url.toString();
     });

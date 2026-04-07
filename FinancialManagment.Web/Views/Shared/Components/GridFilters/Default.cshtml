@@ -12,7 +12,7 @@
            aria-controls="gridFiltersCollapse"
            class="text-decoration-none text-dark"
            id="filterCollapseToggle">
-            <i class="bi bi-chevron-up"></i>
+           <i class="bi bi-chevron-@(!Model.FiltersCollapsed ? "up" : "down")"></i>
         </a>
     </div>
 
@@ -63,7 +63,6 @@
                 </div>
 
                 <input type="hidden" name="pageSize" value="@Model.PageSize" />
-                <input type="hidden" name="filtersCollapsed" id="filtersCollapsedInput" value="@Model.FiltersCollapsed.ToString().ToLower()" />
 
                 @if (!string.IsNullOrWhiteSpace(Model.SortOrder))
                 {
@@ -78,16 +77,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const toggle = document.getElementById("filtersCollapseToggle");
-        const hiddenInput = document.getElementById("filtersCollapsedInput");
-
-        if (toggle && hiddenInput) {
-            toggle.addEventListener("click", function () {
-                hiddenInput.value = hiddenInput.value === "true" ? "false" : "true";
-            });
-        }
-    });
-</script>
