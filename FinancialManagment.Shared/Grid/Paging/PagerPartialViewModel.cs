@@ -1,4 +1,6 @@
-﻿namespace FinancialManagment.Shared.Grid.Paging;
+﻿using FinancialManagment.Shared.Grid.Filtering;
+
+namespace FinancialManagment.Shared.Grid.Paging;
 
 public sealed class PagerPartialViewModel
 {
@@ -8,5 +10,5 @@ public sealed class PagerPartialViewModel
     public string? SortOrder { get; set; }
     public int PageSize { get; set; }
     public bool FiltersCollapsed { get; set; }
-    public Dictionary<string, string> Filters { get; set; } = [];
+    public List<FilterItem> Filters { get; set; } = [];
 }

@@ -4,7 +4,7 @@ namespace FinancialManagment.Shared.Grid.Filtering;
 
 public static class QueryableFilterExtensions
 {
-    public static IQueryable<T> ApplyFilters<T>(this IQueryable<T> query, Dictionary<string, string> filters)
+    public static IQueryable<T> ApplyFilters<T>(this IQueryable<T> query, List<FilterItem> filters)
     {
         if (filters == null || filters.Count == 0)
         {

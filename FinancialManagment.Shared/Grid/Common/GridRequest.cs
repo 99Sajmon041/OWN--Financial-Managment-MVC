@@ -1,8 +1,10 @@
-﻿namespace FinancialManagment.Shared.Grid.Common;
+﻿using FinancialManagment.Shared.Grid.Filtering;
+
+namespace FinancialManagment.Shared.Grid.Common;
 
 public sealed class GridRequest
 {
-    public Dictionary<string, string> Filters = [];
+    public List<FilterItem> Filters { get; set; } = [];
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     public string? SortOrder { get; set; }

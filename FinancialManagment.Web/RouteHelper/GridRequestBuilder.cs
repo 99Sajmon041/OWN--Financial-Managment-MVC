@@ -1,4 +1,5 @@
 ﻿using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Shared.Grid.Filtering;
 
 namespace FinancialManagment.Web.RouteHelper;
 
@@ -6,13 +7,24 @@ public static class GridRequestBuilder
 {
     public static Dictionary<string, string> GetRouteValues(GridRequest gridRequest, string sortValue)
     {
-        Dictionary<string, string> routeValues = new(gridRequest.Filters)
+        Dictionary<string, string> routeValues = new()
         {
             ["page"] = "1",
             ["pageSize"] = gridRequest.PageSize.ToString(),
             ["filtersCollapsed"] = gridRequest.FiltersCollapsed.ToString().ToLower(),
             ["sortOrder"] = sortValue
         };
+
+        foreach (var filter in gridRequest.Filters)
+        {
+            if (string.IsNullOrWhiteSpace(filter.Value))
+            {
+                continue;
+            }
+
+            routeValues[filter.PropertyName] = filter.Value;
+            routeValues[$"{filter.PropertyName}_Operator"] = filter.Operator.ToString();
+        }
 
         return routeValues;
     }
@@ -39,12 +51,33 @@ public static class GridRequestBuilder
 
         foreach (var item in request.Query)
         {
-            if (item.Key == "page" || item.Key == "pageSize" || item.Key == "sortOrder" || item.Key == "filtersCollapsed")
+            if (item.Key == "page" || 
+                item.Key == "pageSize" ||
+                item.Key == "sortOrder" || 
+                item.Key == "filtersCollapsed" ||
+                item.Key.EndsWith("_operator"))
             {
                 continue;
             }
 
-            gridRequest.Filters[item.Key] = item.Value!;
+            string propertyName = item.Key;
+            string value = item.Value!;
+            string operatorKey = $"{propertyName}_operator";
+
+            FilterOperator filterOperator = FilterOperator.Equal;
+
+            if (Enum.TryParse(request.Query[operatorKey], out FilterOperator parsedOperator))
+            {
+                filterOperator = parsedOperator;
+            }
+
+            gridRequest.Filters.Add(new FilterItem
+            {
+                PropertyName = propertyName,
+                Value = value,
+                Operator = filterOperator
+            });
+
         }
 
         return gridRequest;

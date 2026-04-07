@@ -4,7 +4,7 @@ using System.Reflection;
 namespace FinancialManagment.Shared.Grid.Filtering;
 public static class FilterExpressionBuilder
 {
-    public static List<Expression<Func<T, bool>>> Build<T>(Dictionary<string, string> filters)
+    public static List<Expression<Func<T, bool>>> Build<T>(List<FilterItem> filters)
     {
         List<Expression<Func<T, bool>>> expressions = [];
 
@@ -15,7 +15,7 @@ public static class FilterExpressionBuilder
                 continue;
             }
 
-            PropertyInfo? property = typeof(T).GetProperty(filter.Key);
+            PropertyInfo? property = typeof(T).GetProperty(filter.PropertyName);
 
             if (property == null)
             {

@@ -84,15 +84,26 @@
 @functions{
     private Dictionary<string, string> GetRouteValues(int page)
     {
-        Dictionary<string, string> routeValues = new Dictionary<string, string>(Model.Filters);
+        Dictionary<string, string> routeValues = new();
 
         routeValues["page"] = page.ToString();
         routeValues["pageSize"] = Model.PageSize.ToString();
-        routeValues["filtersCollapsed"] = Model.FiltersCollapsed.ToString();
+        routeValues["filtersCollapsed"] = Model.FiltersCollapsed.ToString().ToLower();
 
         if (!string.IsNullOrWhiteSpace(Model.SortOrder))
         {
             routeValues["sortOrder"] = Model.SortOrder;
+        }
+
+        foreach (var filter in Model.Filters)
+        {
+            if (string.IsNullOrWhiteSpace(filter.Value))
+            {
+                continue;
+            }
+
+            routeValues[filter.PropertyName] = filter.Value;
+            routeValues[$"{filter.PropertyName}_Operator"] = filter.Operator.ToString();
         }
 
         return routeValues;

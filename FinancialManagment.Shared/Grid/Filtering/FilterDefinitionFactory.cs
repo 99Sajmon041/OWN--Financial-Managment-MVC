@@ -5,7 +5,7 @@ namespace FinancialManagment.Shared.Grid.Filtering;
 
 public static class FilterDefinitionFactory
 {
-    public static List<FilterFieldDefinition> Create(Type modelType, Dictionary<string, string> filters)
+    public static List<FilterFieldDefinition> Create(Type modelType, List<FilterItem> filters)
     {
         List<FilterFieldDefinition> definitions = [];
 
@@ -26,9 +26,17 @@ public static class FilterDefinitionFactory
             string label = property.GetCustomAttribute<FilterLabelAttribute>()?.Label ?? property.Name;
             string? value = null;
 
-            if (filters.TryGetValue(property.Name, out string? filterValue))
+            Type underlyingType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+            FilterOperator filterOperator = ResolveDefaultOperator(underlyingType);
+
+            foreach (var filter in filters)
             {
-                value = filterValue;
+                if (filter.PropertyName == property.Name)
+                { 
+                    value = filter.Value;
+                    filterOperator = filter.Operator;
+                    break;
+                }
             }
 
             int order = property.GetCustomAttribute<FilterOrderAttribute>()?.Order ?? int.MaxValue;
@@ -38,9 +46,13 @@ public static class FilterDefinitionFactory
             var definition = new FilterFieldDefinition
             {
                 PropertyName = property.Name,
+                PropertyPath = property.Name,
                 Label = label,
                 PropertyType = property.PropertyType,
-                InputType = ResolveInputType(property.PropertyType),
+                UnderlyingType = underlyingType,
+                InputType = inputType,
+                AllowedOperators = ResolveAllowedOperators(underlyingType),
+                SelectedOperator = filterOperator,
                 Value = value,
                 Order = order
             };
@@ -54,6 +66,52 @@ public static class FilterDefinitionFactory
             .ToList();
     }
 
+    private static FilterOperator ResolveDefaultOperator(Type underlyingType)
+    {
+        if (underlyingType == typeof(string))
+        {
+            return FilterOperator.Contains;
+        }
+        else
+        {
+            return FilterOperator.Equal;
+        }
+    }
+
+    private static List<FilterOperator> ResolveAllowedOperators(Type underlyingType)
+    {
+        List<FilterOperator> operators = [];
+
+        if (underlyingType == typeof(string))
+        {
+            operators.Add(FilterOperator.Contains);
+            operators.Add(FilterOperator.Equal);
+            operators.Add(FilterOperator.NotEqual);
+            operators.Add(FilterOperator.StartsWith);
+        }
+        else if (underlyingType == typeof(bool))
+        {
+            operators.Add(FilterOperator.Equal);
+            operators.Add(FilterOperator.NotEqual);
+        }
+        else if (underlyingType == typeof(int) || underlyingType == typeof(decimal) || underlyingType == typeof(DateTime))
+        {
+            operators.Add(FilterOperator.Equal);
+            operators.Add(FilterOperator.NotEqual);
+            operators.Add(FilterOperator.LessThanOrEqual);
+            operators.Add(FilterOperator.LessThan);
+            operators.Add(FilterOperator.GreaterThan);
+            operators.Add(FilterOperator.GreaterThanOrEqual);
+        }
+        else if (underlyingType.IsEnum)
+        {
+                operators.Add(FilterOperator.Equal);
+                operators.Add(FilterOperator.NotEqual);
+        }
+
+        return operators;
+    }
+
     private static bool IsSupportedFilterType(Type propertyType)
     {
         Type underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
@@ -62,7 +120,8 @@ public static class FilterDefinitionFactory
             || underlyingType == typeof(bool)
             || underlyingType == typeof(int)
             || underlyingType == typeof(decimal)
-            || underlyingType == typeof(DateTime);
+            || underlyingType == typeof(DateTime)
+            || underlyingType.IsEnum;
     }
 
     private static FilterInputType ResolveInputType(Type propertyType)
@@ -82,6 +141,11 @@ public static class FilterDefinitionFactory
         if (underlyingType == typeof(DateTime))
         {
             return FilterInputType.Date;
+        }
+
+        if (underlyingType.IsEnum)
+        {
+            return FilterInputType.Select;
         }
 
         return FilterInputType.Text;
