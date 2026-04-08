@@ -55,14 +55,14 @@ public static class GridRequestBuilder
                 item.Key == "pageSize" ||
                 item.Key == "sortOrder" || 
                 item.Key == "filtersCollapsed" ||
-                item.Key.EndsWith("_operator"))
+                item.Key.EndsWith("_Operator"))
             {
                 continue;
             }
 
             string propertyName = item.Key;
             string value = item.Value!;
-            string operatorKey = $"{propertyName}_operator";
+            string operatorKey = $"{propertyName}_Operator";
 
             FilterOperator filterOperator = FilterOperator.Equal;
 
