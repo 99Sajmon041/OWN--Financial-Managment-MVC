@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FinancialManagment.Shared.Attributes;
+using Microsoft.AspNetCore.Identity;
 
 namespace FinancialManagment.Domain.Entities;
 

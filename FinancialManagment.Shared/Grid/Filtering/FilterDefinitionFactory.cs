@@ -86,8 +86,8 @@ public static class FilterDefinitionFactory
         {
             operators.Add(FilterOperator.Contains);
             operators.Add(FilterOperator.Equal);
-            operators.Add(FilterOperator.NotEqual);
             operators.Add(FilterOperator.StartsWith);
+            operators.Add(FilterOperator.EndsWith);
         }
         else if (underlyingType == typeof(bool))
         {

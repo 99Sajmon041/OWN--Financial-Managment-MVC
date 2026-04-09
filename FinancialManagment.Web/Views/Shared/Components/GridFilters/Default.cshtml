@@ -25,22 +25,19 @@
                         <div class="col-md-3">
                             <label class="form-label">@field.Label</label>
 
-                            @if (field.InputType != FilterInputType.Select)
-                            {
-                                <select name="@(field.PropertyName + "_Operator")" class="form-select mb-2">
-                                    @foreach (var opt in field.AllowedOperators)
+                            <select name="@(field.PropertyName + "_Operator")" class="form-select mb-2">
+                                @foreach (var opt in field.AllowedOperators)
+                                {
+                                    if (opt == field.SelectedOperator)
                                     {
-                                        if (opt == field.SelectedOperator)
-                                        {
-                                            <option value="@opt" selected>@opt</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@opt">@opt</option>
-                                        }
+                                        <option value="@opt" selected>@opt</option>
                                     }
-                                </select>
-                            }
+                                    else
+                                    {
+                                        <option value="@opt">@opt</option>
+                                    }
+                                }
+                            </select>
 
                             @switch (field.InputType)
                             {

@@ -6,8 +6,9 @@ public enum FilterOperator
     NotEqual = 1,
     Contains = 2,
     StartsWith = 3,
-    LessThan = 4,
-    GreaterThan = 5,
-    LessThanOrEqual = 6,
-    GreaterThanOrEqual = 7
+    EndsWith = 4,
+    LessThan = 5,
+    GreaterThan = 6,
+    LessThanOrEqual = 7,
+    GreaterThanOrEqual = 8
 }
