@@ -30,11 +30,11 @@
                                 {
                                     if (opt == field.SelectedOperator)
                                     {
-                                        <option value="@opt" selected>@opt</option>
+                                        <option value="@opt" selected>@opt.GetDisplayName()</option>
                                     }
                                     else
                                     {
-                                        <option value="@opt">@opt</option>
+                                        <option value="@opt">@opt.GetDisplayName()</option>
                                     }
                                 }
                             </select>
@@ -78,13 +78,15 @@
 
                                             @foreach (var enumValue in Enum.GetValues(field.UnderlyingType))
                                             {
+                                                var enumItem = (Enum)enumValue;
+
                                                 if (field.Value == enumValue.ToString())
                                                 {
-                                                    <option value="@enumValue" selected>@enumValue</option>
+                                                    <option value="@enumValue" selected>@enumItem.GetDisplayName()</option>
                                                 }
                                                 else
                                                 {
-                                                    <option value="@enumValue">@enumValue</option>
+                                                    <option value="@enumValue">@enumItem.GetDisplayName()</option>
                                                 }
                                             }
                                         </select>

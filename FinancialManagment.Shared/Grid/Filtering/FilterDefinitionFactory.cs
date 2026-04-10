@@ -80,7 +80,10 @@ public static class FilterDefinitionFactory
 
     private static List<FilterOperator> ResolveAllowedOperators(Type underlyingType)
     {
-        List<FilterOperator> operators = [];
+        List<FilterOperator> operators =
+        [
+            FilterOperator.None
+        ];
 
         if (underlyingType == typeof(string))
         {

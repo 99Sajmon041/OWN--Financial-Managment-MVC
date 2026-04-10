@@ -4,7 +4,7 @@ namespace FinancialManagment.Domain.Entities;
 
 public sealed class HouseholdMember
 {
-    [FilterLabel("ID")]
+    [FilterLabel("ID člena")]
     [FilterOrder(3)]
     public int Id { get; set; }
 
@@ -13,11 +13,11 @@ public sealed class HouseholdMember
     [NotFilterable]
     public string ApplicationUserId { get; set; } = default!;
 
-    [FilterLabel("Přezdívka")]
+    [FilterLabel("Přezdívka člena")]
     [FilterOrder(1)]
     public string Nickname { get; set; } = default!;
 
-    [FilterLabel("Aktivní")]
+    [FilterLabel("Aktivní člen")]
     [FilterOrder(2)]
     public bool IsActive { get; set; }
 

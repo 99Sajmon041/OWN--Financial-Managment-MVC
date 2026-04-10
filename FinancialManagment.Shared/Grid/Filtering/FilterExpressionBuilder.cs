@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 
 namespace FinancialManagment.Shared.Grid.Filtering;
 public static class FilterExpressionBuilder
@@ -12,6 +11,11 @@ public static class FilterExpressionBuilder
         foreach (var filter in filters)
         {
             if (string.IsNullOrWhiteSpace(filter.Value))
+            {
+                continue;
+            }
+
+            if (filter.Operator == FilterOperator.None)
             {
                 continue;
             }
