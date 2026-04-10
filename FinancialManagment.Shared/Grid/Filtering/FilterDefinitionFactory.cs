@@ -11,28 +11,36 @@ public static class FilterDefinitionFactory
 
         PropertyInfo[] properties = modelType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
+        var groupName = modelType.GetCustomAttribute<FilterGroupAttribute>()?.GroupName ?? modelType.ToString();
+
         foreach (PropertyInfo property in properties)
         {
-            if (Attribute.IsDefined(property, typeof(NotFilterableAttribute)))
+            if (IsFilterNavigationType(property.PropertyType))
+            {
+                AddDefinitionsForType(property.PropertyType, property.Name, filters, definitions);
+                continue;
+            }
+
+            if (!IsFilterConfigured(property))
             {
                 continue;
             }
 
             if (!IsSupportedFilterType(property.PropertyType))
             {
-                continue;    
+                continue;
             }
 
             string label = property.GetCustomAttribute<FilterLabelAttribute>()?.Label ?? property.Name;
             string? value = null;
 
             Type underlyingType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
-            FilterOperator filterOperator = ResolveDefaultOperator(underlyingType);
+            FilterOperator filterOperator = FilterOperator.None;
 
             foreach (var filter in filters)
             {
                 if (filter.PropertyName == property.Name)
-                { 
+                {
                     value = filter.Value;
                     filterOperator = filter.Operator;
                     break;
@@ -54,7 +62,8 @@ public static class FilterDefinitionFactory
                 AllowedOperators = ResolveAllowedOperators(underlyingType),
                 SelectedOperator = filterOperator,
                 Value = value,
-                Order = order
+                Order = order,
+                GroupName = groupName
             };
 
             definitions.Add(definition);
@@ -66,15 +75,70 @@ public static class FilterDefinitionFactory
             .ToList();
     }
 
-    private static FilterOperator ResolveDefaultOperator(Type underlyingType)
+    private static void AddDefinitionsForType(Type currentType, string pathPrefix, List<FilterItem> filters, List<FilterFieldDefinition> definitions)
     {
-        if (underlyingType == typeof(string))
+        var navEntity = currentType.GetCustomAttribute<FilterGroupAttribute>()?.GroupName ?? string.Empty;
+
+        if (string.IsNullOrEmpty(navEntity))
         {
-            return FilterOperator.Contains;
+            return;
         }
-        else
+
+        PropertyInfo[] properties = currentType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        var groupName = currentType.GetCustomAttribute<FilterGroupAttribute>()?.GroupName ?? currentType.ToString();
+
+        foreach (PropertyInfo property in properties)
         {
-            return FilterOperator.Equal;
+            if (!IsFilterConfigured(property))
+            {
+                continue;
+            }
+
+            if (!IsSupportedFilterType(property.PropertyType))
+            {
+                continue;
+            }
+
+            string propertyName = $"{pathPrefix}_{property.Name}";
+            string propertyPath = $"{pathPrefix}.{property.Name}";
+
+            string label = property.GetCustomAttribute<FilterLabelAttribute>()?.Label ?? property.Name;
+            string? value = null;
+
+            Type underlyingType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+            FilterOperator filterOperator = FilterOperator.None;
+
+            foreach (var filter in filters)
+            {
+                if (filter.PropertyName == propertyName)
+                {
+                    value = filter.Value;
+                    filterOperator = filter.Operator;
+                    break;
+                }
+            }
+
+            int order = property.GetCustomAttribute<FilterOrderAttribute>()?.Order ?? int.MaxValue;
+
+            FilterInputType inputType = property.GetCustomAttribute<FilterTypeAttribute>()?.InputType ?? ResolveInputType(property.PropertyType);
+
+            var definition = new FilterFieldDefinition
+            {
+                PropertyName = propertyName,
+                PropertyPath = propertyPath,
+                Label = label,
+                PropertyType = property.PropertyType,
+                UnderlyingType = underlyingType,
+                InputType = inputType,
+                AllowedOperators = ResolveAllowedOperators(underlyingType),
+                SelectedOperator = filterOperator,
+                Value = value,
+                Order = order,
+                GroupName = groupName
+            };
+
+            definitions.Add(definition);
         }
     }
 
@@ -152,5 +216,15 @@ public static class FilterDefinitionFactory
         }
 
         return FilterInputType.Text;
+    }
+
+    private static bool IsFilterConfigured(PropertyInfo property)
+    {
+        return property.IsDefined(typeof(FilterLabelAttribute), true) || property.IsDefined(typeof(FilterOrderAttribute), true);
+    }
+
+    private static bool IsFilterNavigationType(Type type)
+    {
+        return type.GetCustomAttribute<FilterGroupAttribute>() != null;
     }
 }

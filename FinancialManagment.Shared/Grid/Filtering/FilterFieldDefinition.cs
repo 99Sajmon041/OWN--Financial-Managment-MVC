@@ -12,4 +12,5 @@ public sealed class FilterFieldDefinition
     public FilterOperator SelectedOperator { get; set; }
     public string? Value { get; set; }
     public int Order { get; set; } = int.MaxValue;
+    public string GroupName { get; set; } = string.Empty;
 }

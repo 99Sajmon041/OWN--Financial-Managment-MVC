@@ -2,6 +2,7 @@
 
 namespace FinancialManagment.Domain.Entities;
 
+[FilterGroup("Člen domácnosti")]
 public sealed class HouseholdMember
 {
     [FilterLabel("ID člena")]

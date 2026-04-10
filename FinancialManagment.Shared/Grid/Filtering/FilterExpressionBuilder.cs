@@ -20,7 +20,7 @@ public static class FilterExpressionBuilder
                 continue;
             }
 
-            PropertyInfo? property = typeof(T).GetProperty(filter.PropertyName);
+            PropertyInfo? property = typeof(T).GetProperty(filter.PropertyName); // pokračování dál - neumí pracovat s navigačními entitami !
 
             if (property == null)
             {

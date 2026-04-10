@@ -1,5 +1,8 @@
-﻿namespace FinancialManagment.Domain.Entities;
+﻿using FinancialManagment.Shared.Attributes;
 
+namespace FinancialManagment.Domain.Entities;
+
+[FilterGroup("Příjem")]
 public sealed class Income
 {
     public int Id { get; set; }

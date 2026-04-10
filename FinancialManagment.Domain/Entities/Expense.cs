@@ -1,5 +1,8 @@
-﻿namespace FinancialManagment.Domain.Entities;
+﻿using FinancialManagment.Shared.Attributes;
 
+namespace FinancialManagment.Domain.Entities;
+
+[FilterGroup("Výdaj")]
 public sealed class Expense
 {
     public int Id { get; set; }
