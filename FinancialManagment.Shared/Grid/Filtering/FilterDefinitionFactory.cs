@@ -70,20 +70,14 @@ public static class FilterDefinitionFactory
         }
 
         return definitions
-            .OrderBy(x => x.Order)
+            .OrderBy(x => x.GroupName)
+            .ThenBy(x => x.Order)
             .ThenBy(x => x.PropertyName)
             .ToList();
     }
 
     private static void AddDefinitionsForType(Type currentType, string pathPrefix, List<FilterItem> filters, List<FilterFieldDefinition> definitions)
     {
-        var navEntity = currentType.GetCustomAttribute<FilterGroupAttribute>()?.GroupName ?? string.Empty;
-
-        if (string.IsNullOrEmpty(navEntity))
-        {
-            return;
-        }
-
         PropertyInfo[] properties = currentType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
         var groupName = currentType.GetCustomAttribute<FilterGroupAttribute>()?.GroupName ?? currentType.ToString();

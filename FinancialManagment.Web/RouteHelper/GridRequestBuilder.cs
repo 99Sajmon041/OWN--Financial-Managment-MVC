@@ -74,10 +74,10 @@ public static class GridRequestBuilder
             gridRequest.Filters.Add(new FilterItem
             {
                 PropertyName = propertyName,
+                PropertyPath = propertyName.Contains('_') ? propertyName.Replace('_', '.') : propertyName,
                 Value = value,
                 Operator = filterOperator
             });
-
         }
 
         return gridRequest;

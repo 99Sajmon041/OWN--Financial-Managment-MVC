@@ -11,7 +11,5 @@ public interface IHouseholdMemberService
     Task UpdateAsync(int id, HouseholdMemberUpsertViewModel model, CancellationToken ct);
     Task<HouseholdMemberUpsertViewModel?> GetByIdAsync(int id, CancellationToken ct);
     Task ChangeStatusAsync(int id, CancellationToken ct);
-
-    //Service method interface for grid with dynamic filtering, sorting, and pagination
     Task<PagedResultNew<HouseholdMemberViewModel>> GetGridAsync(GridRequest gridRequest, CancellationToken ct);
 }

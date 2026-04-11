@@ -2,6 +2,7 @@
 using System.Reflection;
 
 namespace FinancialManagment.Shared.Grid.Filtering;
+
 public static class FilterExpressionBuilder
 {
     public static List<Expression<Func<T, bool>>> Build<T>(List<FilterItem> filters)
@@ -20,14 +21,7 @@ public static class FilterExpressionBuilder
                 continue;
             }
 
-            PropertyInfo? property = typeof(T).GetProperty(filter.PropertyName); // pokračování dál - neumí pracovat s navigačními entitami !
-
-            if (property == null)
-            {
-                continue;
-            }
-
-            Expression<Func<T, bool>>? expression = BuildExpression<T>(property, filter.Value, filter.Operator);
+            Expression<Func<T, bool>>? expression = BuildExpression<T>(filter.PropertyPath, filter.Value, filter.Operator);
 
             if (expression != null)
             {
@@ -38,11 +32,19 @@ public static class FilterExpressionBuilder
         return expressions;
     }
 
-    private static Expression<Func<T, bool>>? BuildExpression<T>(PropertyInfo property, string value, FilterOperator filterOperator)
+    private static Expression<Func<T, bool>>? BuildExpression<T>(string propertyPath, string value, FilterOperator filterOperator)
     {
         ParameterExpression parameter = Expression.Parameter(typeof(T), "x");
-        MemberExpression propertyExpression = Expression.Property(parameter, property);
-        Type underlyingType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+
+        Expression? propertyExpression = BuildPropertyExpression(parameter, propertyPath);
+
+        if (propertyExpression == null)
+        {
+            return null;
+        }
+
+        Type propertyType = propertyExpression.Type;
+        Type underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
 
         if (underlyingType == typeof(string))
         {
@@ -52,6 +54,10 @@ public static class FilterExpressionBuilder
             if (filterOperator == FilterOperator.Equal)
             {
                 body = Expression.Equal(propertyExpression, constant);
+            }
+            else if (filterOperator == FilterOperator.NotEqual)
+            {
+                body = Expression.NotEqual(propertyExpression, constant);
             }
             else
             {
@@ -83,7 +89,7 @@ public static class FilterExpressionBuilder
             ConstantExpression constant;
             BinaryExpression comparisonExpression;
 
-            if (property.PropertyType == typeof(bool?))
+            if (propertyType == typeof(bool?))
             {
                 constant = Expression.Constant((bool?)parsedValue, typeof(bool?));
             }
@@ -114,7 +120,7 @@ public static class FilterExpressionBuilder
             ConstantExpression constant;
             BinaryExpression comparisonExpression;
 
-            if (property.PropertyType == typeof(int?))
+            if (propertyType == typeof(int?))
             {
                 constant = Expression.Constant((int?)parsedValue, typeof(int?));
             }
@@ -146,7 +152,7 @@ public static class FilterExpressionBuilder
             ConstantExpression constant;
             BinaryExpression comparisonExpression;
 
-            if (property.PropertyType == typeof(decimal?))
+            if (propertyType == typeof(decimal?))
             {
                 constant = Expression.Constant((decimal?)parsedValue, typeof(decimal?));
             }
@@ -178,7 +184,7 @@ public static class FilterExpressionBuilder
             ConstantExpression constant;
             BinaryExpression comparisonExpression;
 
-            if (property.PropertyType == typeof(DateTime?))
+            if (propertyType == typeof(DateTime?))
             {
                 constant = Expression.Constant((DateTime?)parsedValue, typeof(DateTime?));
             }
@@ -214,11 +220,12 @@ public static class FilterExpressionBuilder
             }
 
             ConstantExpression constant;
-            BinaryExpression comparsionExpression;
+            BinaryExpression comparisonExpression;
 
-            if (Nullable.GetUnderlyingType(property.PropertyType) != null)
+            if (Nullable.GetUnderlyingType(propertyType) != null)
             {
-                constant = Expression.Constant(parsedValue, property.PropertyType);
+                object nullableEnumValue = Activator.CreateInstance(propertyType, parsedValue)!;
+                constant = Expression.Constant(nullableEnumValue, propertyType);
             }
             else
             {
@@ -227,16 +234,36 @@ public static class FilterExpressionBuilder
 
             if (filterOperator == FilterOperator.NotEqual)
             {
-                comparsionExpression = Expression.NotEqual(propertyExpression, constant);
+                comparisonExpression = Expression.NotEqual(propertyExpression, constant);
             }
             else
             {
-                comparsionExpression = Expression.Equal(propertyExpression, constant);
+                comparisonExpression = Expression.Equal(propertyExpression, constant);
             }
 
-            return Expression.Lambda<Func<T, bool>>(comparsionExpression, parameter);
+            return Expression.Lambda<Func<T, bool>>(comparisonExpression, parameter);
         }
 
         return null;
+    }
+
+    private static Expression? BuildPropertyExpression(Expression parameter, string propertyPath)
+    {
+        string[] pathParts = propertyPath.Split('.');
+        Expression currentExpression = parameter;
+
+        foreach (string part in pathParts)
+        {
+            PropertyInfo? property = currentExpression.Type.GetProperty(part);
+
+            if (property == null)
+            {
+                return null;
+            }
+
+            currentExpression = Expression.Property(currentExpression, property);
+        }
+
+        return currentExpression;
     }
 }

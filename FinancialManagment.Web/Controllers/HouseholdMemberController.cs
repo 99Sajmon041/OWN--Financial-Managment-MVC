@@ -98,7 +98,6 @@ public class HouseholdMemberController(IHouseholdMemberService householdMemberSe
         }
     }
 
-    //Endpoint for retreiving list of HouseholdMembers for grid with pagination, sorting and filtering
     [HttpGet]
     public async Task<IActionResult> Grid(CancellationToken ct)
     {

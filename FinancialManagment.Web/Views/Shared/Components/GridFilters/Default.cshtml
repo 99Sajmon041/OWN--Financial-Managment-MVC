@@ -25,7 +25,7 @@
                         <div class="col-md-3">
                             <label class="form-label">@field.Label</label>
 
-                            <select name="@(field.PropertyName + "_Operator")" class="form-select mb-2">
+                            <select name="@(field.PropertyName + "_Operator")" class="form-select mb-2 filter-operator" data-filter-name="@field.PropertyName">
                                 @foreach (var opt in field.AllowedOperators)
                                 {
                                     if (opt == field.SelectedOperator)
@@ -45,27 +45,30 @@
                                     <input type="text"
                                            name="@field.PropertyName"
                                            value="@field.Value"
-                                           class="form-control" />
+                                           class="form-control filter-value"
+                                           data-filter-name="@field.PropertyName" />
                                     break;
 
                                 case FilterInputType.Number:
                                     <input type="number"
                                            name="@field.PropertyName"
                                            value="@field.Value"
-                                           class="form-control" />
+                                           class="form-control filter-value"
+                                           data-filter-name="@field.PropertyName" />
                                     break;
 
                                 case FilterInputType.Date:
                                     <input type="date"
                                            name="@field.PropertyName"
                                            value="@field.Value"
-                                           class="form-control" />
+                                           class="form-control filter-value"
+                                           data-filter-name="@field.PropertyName" />
                                     break;
 
                                 case FilterInputType.Select:
                                     if (field.UnderlyingType == typeof(bool))
                                     {
-                                        <select name="@field.PropertyName" class="form-select">
+                                        <select name="@field.PropertyName" class="form-select filter-value" data-filter-name="@field.PropertyName">
                                             <option value="">-- Vyberte --</option>
                                             <option value="true" selected="@(field.Value == "true")">Ano</option>
                                             <option value="false" selected="@(field.Value == "false")">Ne</option>
@@ -73,7 +76,7 @@
                                     }
                                     else if (field.UnderlyingType.IsEnum)
                                     {
-                                        <select name="@field.PropertyName" class="form-select">
+                                        <select name="@field.PropertyName" class="form-select filter-value" data-filter-name="@field.PropertyName">
                                             <option value="">-- Vyberte --</option>
 
                                             @foreach (var enumValue in Enum.GetValues(field.UnderlyingType))

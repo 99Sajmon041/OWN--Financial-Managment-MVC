@@ -631,3 +631,35 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = url.toString();
     });
 });
+
+
+//remove value form dropdown- filter element when value is equal to "-- Vyberte --". Visually looks better for end user
+document.addEventListener("DOMContentLoaded", function () {
+    const operatorSelects = document.querySelectorAll(".filter-operator");
+
+    function syncFilterValue(operatorSelect) {
+        const filterName = operatorSelect.dataset.filterName;
+        const valueField = document.querySelector('.filter-value[data-filter-name="' + filterName + '"]');
+
+        if (!valueField) {
+            return;
+        }
+
+        const isNone = operatorSelect.value === "None";
+
+        if (isNone) {
+            valueField.value = "";
+            valueField.disabled = true;
+        } else {
+            valueField.disabled = false;
+        }
+    }
+
+    operatorSelects.forEach(function (operatorSelect) {
+        syncFilterValue(operatorSelect);
+
+        operatorSelect.addEventListener("change", function () {
+            syncFilterValue(operatorSelect);
+        });
+    });
+});

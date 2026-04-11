@@ -145,7 +145,6 @@ public sealed class HouseholdMemberService(
     }
 
 
-    //Service method for grid with dynamic filtering, sorting, and pagination
     public async Task<PagedResultNew<HouseholdMemberViewModel>> GetGridAsync(GridRequest gridRequest, CancellationToken ct)
     {
         gridRequest.Normalize();
