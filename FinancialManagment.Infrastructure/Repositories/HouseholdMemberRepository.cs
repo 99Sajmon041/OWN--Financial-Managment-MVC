@@ -12,14 +12,11 @@ public sealed class HouseholdMemberRepository(FinancialManagementDbContext conte
         context.Add(householdMember);
     }
 
-    public async Task<List<HouseholdMember>> GetAllAsync(string userId, CancellationToken ct)
+    public IQueryable<HouseholdMember> GetQueryable(string userId)
     {
-        return await context
-            .HouseholdMembers
+        return context.HouseholdMembers
             .AsNoTracking()
-            .Where(x => x.ApplicationUserId == userId)
-            .OrderBy(x => x.Nickname)
-            .ToListAsync(ct);
+            .Where(x => x.ApplicationUserId == userId);
     }
 
     public async Task<bool> ExistsByNameAsync(string userId, string nickName, CancellationToken ct)
@@ -61,14 +58,5 @@ public sealed class HouseholdMemberRepository(FinancialManagementDbContext conte
     public async Task<bool> BelongsToUserAndIsActiveAsync(int id, string userId, CancellationToken ct)
     {
         return await context.HouseholdMembers.AnyAsync(x => x.Id == id && x.ApplicationUserId == userId && x.IsActive, ct);
-    }
-
-
-    //Method for retreiving queryable list of household members for a specific user.
-    public IQueryable<HouseholdMember> GetQueryable(string userId)
-    {
-        return context.HouseholdMembers
-            .AsNoTracking()
-            .Where(x => x.ApplicationUserId == userId);
     }
 }

@@ -11,10 +11,13 @@ namespace FinancialManagment.Web.Controllers;
 [Authorize]
 public class HouseholdMemberController(IHouseholdMemberService householdMemberService) : Controller
 {
+
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken ct)
     {
-        var result = await householdMemberService.GetAllAsync(ct);
+        GridRequest gridRequest = GridRequestBuilder.GetFromRequest(Request);
+
+        var result = await householdMemberService.GetAllAsync(gridRequest, ct);
 
         return View(result);
     }
@@ -96,16 +99,6 @@ public class HouseholdMemberController(IHouseholdMemberService householdMemberSe
             TempData["Error"] = ex.Message;
             return RedirectToAction(nameof(Index));
         }
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Grid(CancellationToken ct)
-    {
-        GridRequest gridRequest = GridRequestBuilder.GetFromRequest(Request);
-
-        var result = await householdMemberService.GetGridAsync(gridRequest, ct);
-
-        return View(result);
     }
 }
 

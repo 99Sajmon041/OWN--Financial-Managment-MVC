@@ -633,7 +633,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-//remove value form dropdown- filter element when value is equal to "-- Vyberte --". Visually looks better for end user
+//remove value form dropdown-filter element when value is equal to "--Vyberte--". Visually looks better for end user
 document.addEventListener("DOMContentLoaded", function () {
     const operatorSelects = document.querySelectorAll(".filter-operator");
 

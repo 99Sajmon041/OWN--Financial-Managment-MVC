@@ -6,10 +6,9 @@ namespace FinancialManagment.Application.Services.Interfaces;
 
 public interface IHouseholdMemberService
 {
-    Task<List<HouseholdMemberViewModel>> GetAllAsync(CancellationToken ct);
+    Task<PagedResultNew<HouseholdMemberViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct);
     Task AddAsync(HouseholdMemberUpsertViewModel model, CancellationToken ct);
     Task UpdateAsync(int id, HouseholdMemberUpsertViewModel model, CancellationToken ct);
     Task<HouseholdMemberUpsertViewModel?> GetByIdAsync(int id, CancellationToken ct);
     Task ChangeStatusAsync(int id, CancellationToken ct);
-    Task<PagedResultNew<HouseholdMemberViewModel>> GetGridAsync(GridRequest gridRequest, CancellationToken ct);
 }
