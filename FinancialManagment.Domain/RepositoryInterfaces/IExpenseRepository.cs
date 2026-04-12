@@ -5,7 +5,7 @@ namespace FinancialManagment.Domain.RepositoryInterfaces;
 
 public interface IExpenseRepository
 {
-    Task<(IReadOnlyList<Expense>, int, decimal)> GetAllAsync(
+    Task<(IReadOnlyList<Expense>, int, decimal)> GetQueryable(
         PagedRequest request,
         int? householdMemberId,
         int? expenseCategoryId,
@@ -19,14 +19,6 @@ public interface IExpenseRepository
     Task<List<Expense>> GetForJsStatisticsAsync(
         List<int>? expenseCategoriesId,
         List<int>? householdMembersId,
-        int year,
-        int month,
-        string userId,
-        CancellationToken ct);
-
-    Task<List<Expense>> GetForStatisticsAsync(
-        int expenseCategoryId,
-        int householdMemberId,
         int year,
         int month,
         string userId,

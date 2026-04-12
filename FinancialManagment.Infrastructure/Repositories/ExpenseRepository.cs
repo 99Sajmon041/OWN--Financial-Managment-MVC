@@ -8,7 +8,7 @@ namespace FinancialManagment.Infrastructure.Repositories;
 
 public sealed class ExpenseRepository(FinancialManagementDbContext context) : IExpenseRepository
 {
-    public async Task<(IReadOnlyList<Expense>, int, decimal)> GetAllAsync(
+    public async Task<(IReadOnlyList<Expense>, int, decimal)> GetQueryable(
         PagedRequest request,
         int? householdMemberId,
         int? expenseCategoryId,
@@ -88,32 +88,6 @@ public sealed class ExpenseRepository(FinancialManagementDbContext context) : IE
     public void Delete(Expense expense)
     {
         context.Remove(expense);
-    }
-
-    public async Task<List<Expense>> GetForStatisticsAsync(
-        int expenseCategoryId,
-        int householdMemberId,
-        int year,
-        int month,
-        string userId,
-        CancellationToken ct)
-    {
-        var query = context.Expenses
-            .AsNoTracking()
-            .Where(x => x.HouseholdMember.ApplicationUserId == userId);
-
-        if (expenseCategoryId != 0)
-            query = query.Where(x => x.ExpenseCategoryId == expenseCategoryId);
-
-        if (householdMemberId != 0)
-            query = query.Where(x => x.HouseholdMemberId == householdMemberId);
-
-        if (month == 0)
-            query = query.Where(x => x.Date.Year == year);
-        else
-            query = query.Where(x => x.Date.Year == year && x.Date.Month == month);
-
-        return await query.ToListAsync(ct);
     }
 
     public async Task<decimal> GetTotalToDateAsync(

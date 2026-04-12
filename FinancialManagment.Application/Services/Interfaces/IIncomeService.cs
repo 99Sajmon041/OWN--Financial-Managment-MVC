@@ -1,17 +1,12 @@
 ﻿using FinancialManagment.Application.Models.Income;
-using FinancialManagment.Shared.Pagination;
+using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Shared.Grid.Paging;
 
 namespace FinancialManagment.Application.Services.Interfaces;
 
 public interface IIncomeService
 {
-    Task<IncomeIndexViewModel> GetIndexAsync(
-    PagedRequest request,
-    int? householdMemberId,
-    int? incomeCategoryId,
-    DateTime? from,
-    DateTime? to,
-    CancellationToken ct);
+    Task<(PagedResultNew<IncomeViewModel>, decimal)> GetAllAsync(GridRequest gridRequest, CancellationToken ct);
     Task DeleteAsync(int id, CancellationToken ct);
     Task AddAsync(IncomeUpsertViewModel model, CancellationToken ct);
     Task<IncomeUpsertViewModel> GetForCreateAsync(CancellationToken ct);

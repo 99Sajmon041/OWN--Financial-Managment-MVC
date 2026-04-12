@@ -15,6 +15,11 @@ public static class FilterDefinitionFactory
 
         foreach (PropertyInfo property in properties)
         {
+            if (IsFilterNotConfigured(property))
+            {
+                continue;
+            }
+
             if (IsFilterNavigationType(property.PropertyType))
             {
                 AddDefinitionsForType(property.PropertyType, property.Name, filters, definitions);
@@ -214,7 +219,12 @@ public static class FilterDefinitionFactory
 
     private static bool IsFilterConfigured(PropertyInfo property)
     {
-        return property.IsDefined(typeof(FilterLabelAttribute), true) || property.IsDefined(typeof(FilterOrderAttribute), true);
+        return  property.IsDefined(typeof(FilterLabelAttribute), true) || property.IsDefined(typeof(FilterOrderAttribute), true);
+    }
+
+    private static bool IsFilterNotConfigured(PropertyInfo property)
+    {
+        return property.GetCustomAttribute<NotFilterableAttribute>() != null;
     }
 
     private static bool IsFilterNavigationType(Type type)

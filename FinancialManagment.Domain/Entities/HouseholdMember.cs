@@ -9,6 +9,7 @@ public sealed class HouseholdMember
     [FilterOrder(3)]
     public int Id { get; set; }
 
+    [NotFilterable]
     public ApplicationUser ApplicationUser { get; set; } = default!;
 
     [NotFilterable]

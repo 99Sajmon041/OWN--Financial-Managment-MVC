@@ -1,8 +1,8 @@
 ﻿using FinancialManagment.Application.Exceptions;
 using FinancialManagment.Application.Models.IncomeCategory;
 using FinancialManagment.Application.Services.Interfaces;
-using FinancialManagment.Shared.Utilities;
-using FinancialManagment.Shared.Pagination;
+using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Web.RouteHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,17 +12,13 @@ namespace FinancialManagment.Web.Controllers;
 public class IncomeCategoryController(IIncomeCategoryService incomeCategoryService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index(PagedRequest request, bool? isActive, CancellationToken ct)
+    public async Task<IActionResult> Index(CancellationToken ct)
     {
-        var model = new IncomeCategoryIndexViewModel
-        {
-            Result = await incomeCategoryService.GetAllAsync(request, isActive, ct),
-            SortOptions = OptionsBuilder.GetCategoryOptions()
-        };
+        GridRequest gridRequest = GridRequestBuilder.GetFromRequest(Request);
 
-        return View(model);
+        var result = await incomeCategoryService.GetAllAsync(gridRequest, ct);
+        return View(result);
     }
-
 
     [HttpGet]
     public IActionResult Create()

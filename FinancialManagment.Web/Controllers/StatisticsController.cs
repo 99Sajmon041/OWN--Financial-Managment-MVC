@@ -8,22 +8,16 @@ namespace FinancialManagment.Web.Controllers
     [Authorize]
     public class StatisticsController(IStatisticsService statisticsService) : Controller
     {
-        [HttpGet]
-        public async Task<IActionResult> Index(StatisticsFilterModel filterModel, CancellationToken ct)
-        {
-            var model = await statisticsService.GetStatisticsAsync(filterModel, ct);
-            return View(model);
-        }
 
         [HttpGet]
-        public async Task<IActionResult> JsIndex(StatisticsJsFilterModel filterModel, CancellationToken ct)
+        public async Task<IActionResult> Index(StatisticsJsFilterModel filterModel, CancellationToken ct)
         {
             var model = await statisticsService.GetJsStatisticsAsync(filterModel, ct);
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> JsIndexData([FromBody] StatisticsJsFilterModel filterModel, CancellationToken ct)
+        public async Task<IActionResult> IndexData([FromBody] StatisticsJsFilterModel filterModel, CancellationToken ct)
         {
             var model = await statisticsService.GetJsStatisticsAsync(filterModel, ct);
             return Json(model);

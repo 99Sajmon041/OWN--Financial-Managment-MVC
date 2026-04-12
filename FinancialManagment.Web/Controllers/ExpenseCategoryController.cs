@@ -1,10 +1,10 @@
 ﻿using FinancialManagment.Application.Exceptions;
 using FinancialManagment.Application.Models.ExpenseCategory;
 using FinancialManagment.Application.Services.Interfaces;
-using FinancialManagment.Shared.Pagination;
 using Microsoft.AspNetCore.Authorization;
-using FinancialManagment.Shared.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Web.RouteHelper;
 
 namespace FinancialManagment.Web.Controllers;
 
@@ -12,15 +12,13 @@ namespace FinancialManagment.Web.Controllers;
 public class ExpenseCategoryController(IExpenseCategoryService expenseCategoryService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index(PagedRequest request, bool? isActive, CancellationToken ct)
+    public async Task<IActionResult> Index(CancellationToken ct)
     {
-        var model = new ExpenseCategoryIndexViewModel
-        {
-            Result = await expenseCategoryService.GetAllAsync(request, isActive, ct),
-            SortOptions = OptionsBuilder.GetCategoryOptions()
-        };
+        GridRequest gridRequest = GridRequestBuilder.GetFromRequest(Request);
 
-        return View(model);
+        var result = await expenseCategoryService.GetAllAsync(gridRequest, ct);
+
+        return View(result);
     }
 
 

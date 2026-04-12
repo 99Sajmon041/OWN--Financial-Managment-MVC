@@ -2,7 +2,7 @@
 
 namespace FinancialManagment.Application.Models.Statistics;
 
-public sealed class StatisticsViewModel
+public sealed class StatisticsJsViewModel
 {
     public decimal IncomeTotal { get; set; }
     public decimal ExpenseTotal { get; set; }

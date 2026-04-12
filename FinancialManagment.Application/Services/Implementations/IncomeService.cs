@@ -5,9 +5,11 @@ using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
 using FinancialManagment.Domain.RepositoryInterfaces;
-using FinancialManagment.Shared.Pagination;
-using FinancialManagment.Shared.Utilities;
+using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Shared.Grid.Filtering;
+using FinancialManagment.Shared.Grid.Paging;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FinancialManagment.Application.Services.Implementations;
@@ -18,54 +20,46 @@ public sealed class IncomeService(
     ICurrentUser currentUser,
     IMapper mapper) : IIncomeService
 {
-    public async Task<IncomeIndexViewModel> GetIndexAsync(
-        PagedRequest request,
-        int? householdMemberId,
-        int? incomeCategoryId,
-        DateTime? from, 
-        DateTime? to, 
-        CancellationToken ct)
+    public async Task<(PagedResultNew<IncomeViewModel>, decimal)> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
     {
-        request = request.Normalize();
+        gridRequest.Normalize();
+
         var userId = currentUser.ValidatedUserId;
 
-        DateTime effectiveFrom = from ?? DateTime.Now.AddYears(-1);
-        DateTime effectiveTo = to ?? DateTime.Now;
+        IQueryable<Income> query = unitOfWork.IncomeRepository.GetQueryable(userId);
 
-        var (incomes, totalItemsCount, totalSum) = await unitOfWork.IncomeRepository.GetAllAsync(
-            request,
-            householdMemberId,
-            incomeCategoryId, 
-            userId, 
-            effectiveFrom,
-            effectiveTo,
-            ct);
+        query = query.ApplyFilters(gridRequest.Filters);
 
-        var items = mapper.Map<List<IncomeViewModel>>(incomes);
+        int totalItems = await query.CountAsync(ct);
 
-        var result = new PagedResult<IncomeViewModel>
+        var pager = new Pager(totalItems, gridRequest.Page, gridRequest.PageSize);
+
+        decimal totalAmount = await query
+            .Select(x => (decimal?)x.Amount)
+            .SumAsync(ct) ?? 0m;
+
+        query = query.ApplySorting(gridRequest.SortOrder);
+        query = query.ApplyPaging(pager); 
+
+        List<Income> incomes = await query.ToListAsync(ct);
+
+        IReadOnlyList<IncomeViewModel> items = mapper.Map<List<IncomeViewModel>>(incomes);
+
+        logger.LogInformation("User with ID: {UserId} retrieved incomes grid. Total items after filtering: {TotalItemsCount}. " +
+            "Current page: {CurrentPage}. Page size: {PageSize}.",
+            userId,
+            totalItems,
+            gridRequest.Page,
+            gridRequest.PageSize);
+
+        return (new PagedResultNew<IncomeViewModel>
         {
-            Page = request.Page,
-            PageSize = request.PageSize,
-            Search = request.Search,
-            SortBy = request.SortBy,
-            Desc = request.Desc,
             Items = items,
-            TotalItemsCount = totalItemsCount
-        };
-
-        var (houseHoldMembersListItems, incomeCategoriesListItems) = await GetSelectOptionsAsync(userId, ct);
-
-        logger.LogInformation("User with ID: {UserId} retrieved incomes list. Total items: {TotalItemsCount}.", userId, totalItemsCount);
-
-        return new IncomeIndexViewModel
-        {
-            Result = result,
-            IncomeSum = totalSum,
-            SortOptions = OptionsBuilder.GetExpenseOrIncomeOptions(false),
-            HouseholdMemberOptions = houseHoldMembersListItems,
-            IncomeCategoryOptions = incomeCategoriesListItems
-        };
+            Pager = pager,
+            GridRequest = gridRequest,
+            FilterModelType = typeof(Income)
+        },
+        totalAmount);
     }
 
     public async Task DeleteAsync(int id, CancellationToken ct)

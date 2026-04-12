@@ -5,7 +5,10 @@ using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
 using FinancialManagment.Domain.RepositoryInterfaces;
-using FinancialManagment.Shared.Pagination;
+using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Shared.Grid.Filtering;
+using FinancialManagment.Shared.Grid.Paging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FinancialManagment.Application.Services.Implementations;
@@ -16,6 +19,43 @@ public sealed class IncomeCategoryService(
     ICurrentUser currentUser,
     IMapper mapper) : IIncomeCategoryService
 {
+    public async Task<PagedResultNew<IncomeCategoryViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
+    {
+        gridRequest.Normalize();
+
+        var userId = currentUser.ValidatedUserId;
+
+        IQueryable<IncomeCategory> query = unitOfWork.IncomeCategoryRepository.GetQueryable(userId);
+
+        query = query.ApplyFilters(gridRequest.Filters);
+
+        int totalItems = await query.CountAsync(ct);
+
+        var pager = new Pager(totalItems, gridRequest.Page, gridRequest.PageSize);
+
+        query = query.ApplySorting(gridRequest.SortOrder);
+        query = query.ApplyPaging(pager);
+
+        List<IncomeCategory> incomeCategories = await query.ToListAsync(ct);
+
+        IReadOnlyList<IncomeCategoryViewModel> items = mapper.Map<List<IncomeCategoryViewModel>>(incomeCategories);
+
+        logger.LogInformation("User with ID: {UserId} retrieved income categories grid. Total items after filtering: {TotalItemsCount}. " +
+            "Current page: {CurrentPage}. Page size: {PageSize}.",
+            userId,
+            totalItems,
+            gridRequest.Page,
+            gridRequest.PageSize);
+
+        return new PagedResultNew<IncomeCategoryViewModel>
+        {
+            Items = items,
+            Pager = pager,
+            GridRequest = gridRequest,
+            FilterModelType = typeof(IncomeCategory)
+        };
+    }
+
     public async Task AddAsync(IncomeCategoryUpsertViewModel model, CancellationToken ct)
     {
         var userId = currentUser.ValidatedUserId;
@@ -99,30 +139,6 @@ public sealed class IncomeCategoryService(
         await unitOfWork.SaveChangesAsync(ct);
 
         logger.LogInformation("User with ID: {UserId} {Phrase} income category with ID: {IncomeCategoryId}.", userId, action, id);
-    }
-
-    public async Task<PagedResult<IncomeCategoryViewModel>> GetAllAsync(PagedRequest pagedRequest, bool? isActive, CancellationToken ct)
-    {
-        var userId = currentUser.ValidatedUserId;
-
-        pagedRequest = pagedRequest.Normalize();
-
-        var (items, totalItemsCount) = await unitOfWork.IncomeCategoryRepository.GetAllAsync(userId, isActive, pagedRequest, ct);
-
-        var incomeCategories = mapper.Map<List<IncomeCategoryViewModel>>(items);
-
-        logger.LogInformation("User with ID: {UserId} retrieved income categories list. Total items: {TotalItemsCount}.", userId, totalItemsCount);
-
-        return new PagedResult<IncomeCategoryViewModel>
-        {
-            Page = pagedRequest.Page,
-            PageSize = pagedRequest.PageSize,
-            Search = pagedRequest.Search,
-            SortBy = pagedRequest.SortBy,
-            Desc = pagedRequest.Desc,
-            TotalItemsCount = totalItemsCount,
-            Items = incomeCategories
-        };
     }
 
     public async Task<IncomeCategoryUpsertViewModel?> GetByIdAsync(int id, CancellationToken ct)

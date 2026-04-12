@@ -13,6 +13,8 @@ public sealed class Income
     [NotFilterable]
     public int HouseholdMemberId { get; set; }
     public IncomeCategory IncomeCategory { get; set; } = default!;
+
+    [NotFilterable]
     public int IncomeCategoryId { get; set; }
 
     [FilterOrder(3)]

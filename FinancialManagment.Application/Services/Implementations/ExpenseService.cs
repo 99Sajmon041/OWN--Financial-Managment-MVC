@@ -33,7 +33,7 @@ public sealed class ExpenseService(
         DateTime effectiveFrom = from ?? DateTime.Now.AddYears(-1);
         DateTime effectiveTo  = to ?? DateTime.Now;
 
-        var (expenses, totalItemsCount, totalExpenseSum) = await unitOfWork.ExpenseRepository.GetAllAsync(
+        var (expenses, totalItemsCount, totalExpenseSum) = await unitOfWork.ExpenseRepository.GetQueryable(
             request,
             householdMemberId,
             expenseCategoryId, 

@@ -75,31 +75,12 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item dropdown">
-                                <a class="nav-link nav-pill dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "Statistics" ? "active-pill" : "")"
-                                   href="#"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
+                            <li class="nav-item">
+                                <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "Statistics" ? "active-pill" : "")"
+                                   asp-controller="Statistics"
+                                   asp-action="Index">
                                     Statistiky
                                 </a>
-
-                                <ul class="dropdown-menu shadow-sm border-0 mt-2">
-                                    <li>
-                                        <a class="dropdown-item"
-                                           asp-controller="Statistics"
-                                           asp-action="Index">
-                                            Single statistiky
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item"
-                                           asp-controller="Statistics"
-                                           asp-action="JsIndex">
-                                            Multi statistiky
-                                        </a>
-                                    </li>
-                                </ul>
                             </li>
                         </ul>
                     }

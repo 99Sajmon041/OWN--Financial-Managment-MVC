@@ -5,7 +5,10 @@ using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
 using FinancialManagment.Domain.RepositoryInterfaces;
-using FinancialManagment.Shared.Pagination;
+using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Shared.Grid.Filtering;
+using FinancialManagment.Shared.Grid.Paging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FinancialManagment.Application.Services.Implementations;
@@ -16,6 +19,43 @@ public sealed class ExpenseCategoryService(
     ICurrentUser currentUser,
     IMapper mapper) : IExpenseCategoryService
 {
+    public async Task<PagedResultNew<ExpenseCategoryViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
+    {
+        gridRequest.Normalize();
+
+        var userId = currentUser.ValidatedUserId;
+
+        IQueryable<ExpenseCategory> query = unitOfWork.ExpenseCategoryRepository.GetQueryable(userId);
+
+        query = query.ApplyFilters(gridRequest.Filters);
+
+        int totalItems = await query.CountAsync(ct);
+
+        var pager = new Pager(totalItems, gridRequest.Page, gridRequest.PageSize);
+
+        query = query.ApplySorting(gridRequest.SortOrder);
+        query = query.ApplyPaging(pager);
+
+        List<ExpenseCategory> expenseCategories = await query.ToListAsync(ct);
+
+        IReadOnlyList<ExpenseCategoryViewModel> items = mapper.Map<List<ExpenseCategoryViewModel>>(expenseCategories);
+
+        logger.LogInformation("User with ID: {UserId} retrieved expense categories grid. Total items after filtering: {TotalItemsCount}. " +
+            "Current page: {CurrentPage}. Page size: {PageSize}.",
+            userId,
+            totalItems,
+            gridRequest.Page,
+            gridRequest.PageSize);
+
+        return new PagedResultNew<ExpenseCategoryViewModel>
+        {
+            Items = items,
+            Pager = pager,
+            GridRequest = gridRequest,
+            FilterModelType = typeof(ExpenseCategory)
+        };
+    }
+
     public async Task AddAsync(ExpenseCategoryUpsertViewModel model, CancellationToken ct)
     {
         var userId = currentUser.ValidatedUserId;
@@ -68,30 +108,6 @@ public sealed class ExpenseCategoryService(
         await unitOfWork.SaveChangesAsync(ct);
 
         logger.LogInformation("User with ID: {UserId} {Phrase} expense category with ID: {ExpenseCategoryId}.", userId, action, id);
-    }
-
-    public async Task<PagedResult<ExpenseCategoryViewModel>> GetAllAsync(PagedRequest pagedRequest, bool? isActive, CancellationToken ct)
-    {
-        var userId = currentUser.ValidatedUserId;
-
-        pagedRequest = pagedRequest.Normalize();
-
-        var (items, totalItemsCount) = await unitOfWork.ExpenseCategoryRepository.GetAllAsync(userId, isActive, pagedRequest, ct);
-
-        var expenseCategories = mapper.Map<List<ExpenseCategoryViewModel>>(items);
-
-        logger.LogInformation("User with ID: {UserId} retrieved expense categories list. Total items: {TotalItemsCount}.", userId, totalItemsCount);
-
-        return new PagedResult<ExpenseCategoryViewModel>
-        {
-            Page = pagedRequest.Page,
-            PageSize = pagedRequest.PageSize,
-            Search = pagedRequest.Search,
-            SortBy = pagedRequest.SortBy,
-            Desc = pagedRequest.Desc,
-            TotalItemsCount = totalItemsCount,
-            Items = expenseCategories
-        };
     }
 
     public async Task<ExpenseCategoryUpsertViewModel?> GetByIdAsync(int id, CancellationToken ct)
