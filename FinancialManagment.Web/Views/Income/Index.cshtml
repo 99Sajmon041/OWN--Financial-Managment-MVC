@@ -19,7 +19,8 @@
     Controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty,
     PageSize = Model.GridRequest.PageSize,
     SortOrder = Model.GridRequest.SortOrder,
-    FiltersCollapsed = Model.GridRequest.FiltersCollapsed
+    FiltersCollapsed = Model.GridRequest.FiltersCollapsed,
+    CustomFilters = Model.CustomFilters
 })
 
 <div class="d-flex justify-content-end my-3">

@@ -13,4 +13,5 @@ public sealed class FilterFieldDefinition
     public string? Value { get; set; }
     public int Order { get; set; } = int.MaxValue;
     public string GroupName { get; set; } = string.Empty;
+    public List<FilterOptionItem> Options { get; set; } = [];
 }

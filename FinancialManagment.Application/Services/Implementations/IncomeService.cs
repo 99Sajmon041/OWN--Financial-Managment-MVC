@@ -45,6 +45,13 @@ public sealed class IncomeService(
 
         IReadOnlyList<IncomeViewModel> items = mapper.Map<List<IncomeViewModel>>(incomes);
 
+
+        // dodat  sem incomecategories - měla by být v Repu !
+        var categoryFilter = new FilterFieldDefinition
+        {
+
+        };
+
         logger.LogInformation("User with ID: {UserId} retrieved incomes grid. Total items after filtering: {TotalItemsCount}. " +
             "Current page: {CurrentPage}. Page size: {PageSize}.",
             userId,
@@ -57,7 +64,8 @@ public sealed class IncomeService(
             Items = items,
             Pager = pager,
             GridRequest = gridRequest,
-            FilterModelType = typeof(Income)
+            FilterModelType = typeof(Income),
+            CustomFilters = new List<FilterFieldDefinition> { categoryFilter }
         },
         totalAmount);
     }

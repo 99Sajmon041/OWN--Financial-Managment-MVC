@@ -62,11 +62,29 @@
                                            name="@field.PropertyName"
                                            value="@field.Value"
                                            class="form-control filter-value"
-                                           data-filter-name="@field.PropertyName" />
+                                    data-filter-name="@field.PropertyName" />
                                     break;
 
                                 case FilterInputType.Select:
-                                    if (field.UnderlyingType == typeof(bool))
+                                    if (field.Options.Count > 0)
+                                    {
+                                        <select name="@field.PropertyName" class="form-select filter-value" data-filter-name="@field.PropertyName">
+                                            <option value="">--Vyberte--</option>
+
+                                            @foreach (var option in field.Options)
+                                            {
+                                                if (field.Value == option.Value)
+                                                {
+                                                    <option value="@option.Value" selected>@option.Text</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@option.Value">@option.Text</option>
+                                                }
+                                            }
+                                        </select>
+                                    }
+                                    else if (field.UnderlyingType == typeof(bool))
                                     {
                                         <select name="@field.PropertyName" class="form-select filter-value" data-filter-name="@field.PropertyName">
                                             <option value="">--Vyberte--</option>

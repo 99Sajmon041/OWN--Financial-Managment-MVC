@@ -9,4 +9,5 @@ public sealed class GridFiltersComponentModel
     public int PageSize { get; set; }
     public string? SortOrder { get; set; }
     public bool FiltersCollapsed { get; set; }
+    public List<FilterFieldDefinition> CustomFilters { get; set; } = [];
 }
