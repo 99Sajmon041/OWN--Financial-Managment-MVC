@@ -5,8 +5,7 @@ namespace FinancialManagment.Domain.Entities;
 [FilterGroup("Příjem")]
 public sealed class Income
 {
-    [FilterOrder(1)]
-    [FilterLabel("ID příjmu")]
+    [NotFilterable]
     public int Id { get; set; }
     public HouseholdMember HouseholdMember { get; set; } = default!;
 

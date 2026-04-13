@@ -5,8 +5,7 @@ namespace FinancialManagment.Domain.Entities;
 [FilterGroup("Výdaj")]
 public sealed class Expense
 {
-    [FilterOrder(1)]
-    [FilterLabel("ID výdaje")]
+    [NotFilterable]
     public int Id { get; set; }
     public HouseholdMember HouseholdMember { get; set; } = default!;
 
