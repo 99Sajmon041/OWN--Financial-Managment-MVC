@@ -19,7 +19,7 @@ public sealed class IncomeCategoryService(
     ICurrentUser currentUser,
     IMapper mapper) : IIncomeCategoryService
 {
-    public async Task<PagedResultNew<IncomeCategoryViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
+    public async Task<PagedResult<IncomeCategoryViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
     {
         gridRequest.Normalize();
 
@@ -47,7 +47,7 @@ public sealed class IncomeCategoryService(
             gridRequest.Page,
             gridRequest.PageSize);
 
-        return new PagedResultNew<IncomeCategoryViewModel>
+        return new PagedResult<IncomeCategoryViewModel>
         {
             Items = items,
             Pager = pager,

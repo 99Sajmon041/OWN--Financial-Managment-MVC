@@ -19,7 +19,7 @@ public sealed class HouseholdMemberService(
     ICurrentUser currentUser,
     IMapper mapper) : IHouseholdMemberService
 {
-    public async Task<PagedResultNew<HouseholdMemberViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
+    public async Task<PagedResult<HouseholdMemberViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
     {
         gridRequest.Normalize();
 
@@ -47,7 +47,7 @@ public sealed class HouseholdMemberService(
             gridRequest.Page,
             gridRequest.PageSize);
 
-        return new PagedResultNew<HouseholdMemberViewModel>
+        return new PagedResult<HouseholdMemberViewModel>
         {
             Items = items,
             Pager = pager,

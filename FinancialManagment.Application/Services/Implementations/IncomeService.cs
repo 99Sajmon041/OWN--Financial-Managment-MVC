@@ -20,7 +20,7 @@ public sealed class IncomeService(
     ICurrentUser currentUser,
     IMapper mapper) : IIncomeService
 {
-    public async Task<(PagedResultNew<IncomeViewModel>, decimal)> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
+    public async Task<(PagedResult<IncomeViewModel>, decimal)> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
     {
         gridRequest.Normalize();
 
@@ -45,12 +45,64 @@ public sealed class IncomeService(
 
         IReadOnlyList<IncomeViewModel> items = mapper.Map<List<IncomeViewModel>>(incomes);
 
+        var incomeCategories = await unitOfWork.IncomeCategoryRepository.GetAllCategoriesAsync(userId, ct);
+        var householdMembers = await unitOfWork.HouseholdMemberRepository.GetAllAsync(userId, ct);
+        var customFilters = new List<FilterFieldDefinition>();
 
-        // dodat  sem incomecategories - měla by být v Repu !
         var categoryFilter = new FilterFieldDefinition
         {
-
+            PropertyName = "IncomeCategory_Name",
+            PropertyPath = "IncomeCategory.Name",
+            Label = "Kategorie příjmu",
+            PropertyType = typeof(string),
+            UnderlyingType = typeof(string),
+            InputType = FilterInputType.Select,
+            AllowedOperators =
+            [
+                FilterOperator.None,
+                FilterOperator.Equal,
+                FilterOperator.NotEqual
+            ],
+            SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "IncomeCategory_Name"),
+            Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "IncomeCategory_Name"),
+            Order = 1,
+            GroupName = "Kategorie příjmů",
+            Options = incomeCategories.Select(x => new FilterOptionItem
+            {
+                Text = x.Name,
+                Value = x.Name
+            })
+            .ToList()
         };
+
+        var houseHoldmemberFilter = new FilterFieldDefinition
+        {
+            PropertyName = "HouseholdMember_Nickname",
+            PropertyPath = "HouseholdMember.Nickname",
+            Label = "Člen domácnosti",
+            PropertyType = typeof(string),
+            UnderlyingType = typeof(string),
+            InputType = FilterInputType.Select,
+            AllowedOperators =
+            [
+                FilterOperator.None,
+                FilterOperator.Equal,
+                FilterOperator.NotEqual
+            ],
+            SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "HouseholdMember_Nickname"),
+            Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "HouseholdMember_Nickname"),
+            Order = 2,
+            GroupName = "Člen domácnosti",
+            Options = householdMembers.Select(x => new FilterOptionItem
+            {
+                Text = x.Nickname,
+                Value = x.Nickname
+            })
+            .ToList()
+        };
+
+        customFilters.Add(categoryFilter);
+        customFilters.Add(houseHoldmemberFilter);
 
         logger.LogInformation("User with ID: {UserId} retrieved incomes grid. Total items after filtering: {TotalItemsCount}. " +
             "Current page: {CurrentPage}. Page size: {PageSize}.",
@@ -59,13 +111,13 @@ public sealed class IncomeService(
             gridRequest.Page,
             gridRequest.PageSize);
 
-        return (new PagedResultNew<IncomeViewModel>
+        return (new PagedResult<IncomeViewModel>
         {
             Items = items,
             Pager = pager,
             GridRequest = gridRequest,
             FilterModelType = typeof(Income),
-            CustomFilters = new List<FilterFieldDefinition> { categoryFilter }
+            CustomFilters = customFilters
         },
         totalAmount);
     }

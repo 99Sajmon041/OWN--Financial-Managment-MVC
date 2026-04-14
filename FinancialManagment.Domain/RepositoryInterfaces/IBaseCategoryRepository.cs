@@ -1,5 +1,4 @@
 ﻿using FinancialManagment.Domain.EntityInterface;
-using FinancialManagment.Shared.Pagination;
 
 namespace FinancialManagment.Domain.RepositoryInterfaces;
 
@@ -13,4 +12,5 @@ public interface IBaseCategoryRepository<T> where T : BaseCategory
     Task<List<T>> GetAllActiveAsync(string userId, CancellationToken ct);
     Task<bool> ExistsAnyActiveAsync(string userId, CancellationToken ct);
     Task<bool> BelongsToUserAndIsActiveAsync(int id, string userId, CancellationToken ct);
+    Task<IReadOnlyList<T>> GetAllCategoriesAsync(string userId, CancellationToken ct);
 }

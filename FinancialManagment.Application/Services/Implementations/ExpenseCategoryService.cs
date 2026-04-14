@@ -19,7 +19,7 @@ public sealed class ExpenseCategoryService(
     ICurrentUser currentUser,
     IMapper mapper) : IExpenseCategoryService
 {
-    public async Task<PagedResultNew<ExpenseCategoryViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
+    public async Task<PagedResult<ExpenseCategoryViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
     {
         gridRequest.Normalize();
 
@@ -47,7 +47,7 @@ public sealed class ExpenseCategoryService(
             gridRequest.Page,
             gridRequest.PageSize);
 
-        return new PagedResultNew<ExpenseCategoryViewModel>
+        return new PagedResult<ExpenseCategoryViewModel>
         {
             Items = items,
             Pager = pager,

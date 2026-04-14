@@ -57,7 +57,7 @@ public sealed class IncomeRepository(FinancialManagementDbContext context) : IIn
         return result ?? 0;
     }
 
-    public async Task<List<Income>> GetForJsStatisticsAsync(
+    public async Task<List<Income>> GetForStatisticsAsync(
         List<int>? incomeCategoriesId,
         List<int>? householdMembersId,
         int year,

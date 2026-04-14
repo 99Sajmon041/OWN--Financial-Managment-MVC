@@ -23,7 +23,7 @@
                     @foreach (var field in Model.Fields)
                     {
                         <div class="col-md-3">
-                            <label class="form-label">@field.Label</label>
+                            <label class="form-label fw-bold">@field.Label</label>
 
                             <select name="@(field.PropertyName + "_Operator")" class="form-select mb-2 filter-operator" data-filter-name="@field.PropertyName">
                                 @foreach (var opt in field.AllowedOperators)

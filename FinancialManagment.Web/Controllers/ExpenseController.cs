@@ -1,7 +1,8 @@
 ﻿using FinancialManagment.Application.Exceptions;
 using FinancialManagment.Application.Models.Expense;
 using FinancialManagment.Application.Services.Interfaces;
-using FinancialManagment.Shared.Pagination;
+using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Web.RouteHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,16 +12,14 @@ namespace FinancialManagment.Web.Controllers
     public class ExpenseController(IExpenseService expenseService) : Controller
     {
         [HttpGet]
-        public async Task<IActionResult> Index(
-            PagedRequest request,
-            int? householdMemberId,
-            int? expenseCategoryId,
-            DateTime? from,
-            DateTime? to,
-            CancellationToken ct)
+        public async Task<IActionResult> Index(CancellationToken ct)
         {
-            var model = await expenseService.GetIndexAsync(request, householdMemberId, expenseCategoryId, from, to, ct);
-            return View(model);
+            GridRequest gridRequest = GridRequestBuilder.GetFromRequest(Request);
+
+            var (result, totalAmount) = await expenseService.GetAllAsync(gridRequest, ct);
+
+            ViewBag.TotalAmount = totalAmount;
+            return View(result);
         }
 
 

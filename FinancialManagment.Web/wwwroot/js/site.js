@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-//Dynamic filtering in Statistics JS (Multiple) Index view
+//Dynamic filtering in Statistics - Index view
 document.addEventListener("DOMContentLoaded", function () {
     const houseHoldMemberIdsElement = document.getElementById("houseHoldMemberIds");
     const incomeCategoryIdsElement = document.getElementById("incomeCategoryIds");
@@ -353,121 +353,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.statisticsJsInitialData) {
         createStatisticsJsChart(window.statisticsJsInitialData);
     }
-});
-
-
-//Get chart data for Statistics (Single) Index view
-document.addEventListener("DOMContentLoaded", function () {
-    const statisticsChartElement = document.getElementById("statisticsChart");
-
-    if (!statisticsChartElement || !window.statisticsInitialData) {
-        return;
-    }
-
-    const incomeChart = window.statisticsInitialData.incomeChart;
-    const expenseChart = window.statisticsInitialData.expenseChart;
-    const balanceChart = window.statisticsInitialData.balanceChart;
-
-    const labels = Object.keys(balanceChart);
-
-    const incomeValues = labels.map(function (label) {
-        return incomeChart[label] ?? 0;
-    });
-
-    const expenseValues = labels.map(function (label) {
-        return expenseChart[label] ?? 0;
-    });
-
-    const balanceValues = labels.map(function (label) {
-        return balanceChart[label] ?? 0;
-    });
-
-    const allValues = incomeValues.concat(expenseValues, balanceValues);
-
-    const maxValue = Math.max(...allValues, 0);
-    const minValue = Math.min(...allValues, 0);
-
-    const suggestedMax = maxValue > 0 ? maxValue * 1.2 : 100;
-    const suggestedMin = minValue < 0 ? minValue * 1.2 : 0;
-
-    new Chart(statisticsChartElement, {
-        type: "line",
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: "Zůstatek",
-                    data: balanceValues,
-                    borderColor: "rgba(108, 117, 125, 0.35)",
-                    backgroundColor: "rgba(108, 117, 125, 0.08)",
-                    fill: true,
-                    tension: 0.35,
-                    pointRadius: 1,
-                    pointHoverRadius: 3,
-                    borderWidth: 1.5
-                },
-                {
-                    label: "Příjmy",
-                    data: incomeValues,
-                    borderColor: "rgba(25, 135, 84, 1)",
-                    backgroundColor: "rgba(25, 135, 84, 0)",
-                    fill: false,
-                    tension: 0,
-                    cubicInterpolationMode: "monotone",
-                    pointRadius: 3,
-                    pointHoverRadius: 5,
-                    borderWidth: 3
-                },
-                {
-                    label: "Výdaje",
-                    data: expenseValues,
-                    borderColor: "rgba(220, 53, 69, 1)",
-                    backgroundColor: "rgba(220, 53, 69, 0)",
-                    fill: false,
-                    tension: 0,
-                    cubicInterpolationMode: "monotone",
-                    pointRadius: 3,
-                    pointHoverRadius: 5,
-                    borderWidth: 3
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            interaction: {
-                mode: "index",
-                intersect: false
-            },
-            plugins: {
-                legend: {
-                    position: "top"
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return `${context.dataset.label}: ${context.raw.toLocaleString("cs-CZ", {
-                                style: "currency",
-                                currency: "CZK"
-                            })}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    suggestedMin: suggestedMin,
-                    suggestedMax: suggestedMax,
-                    ticks: {
-                        callback: function (value) {
-                            return value.toLocaleString("cs-CZ") + " Kč";
-                        }
-                    }
-                }
-            }
-        }
-    });
 });
 
 

@@ -1,17 +1,12 @@
 ﻿using FinancialManagment.Application.Models.Expense;
-using FinancialManagment.Shared.Pagination;
+using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Shared.Grid.Paging;
 
 namespace FinancialManagment.Application.Services.Interfaces;
 
 public interface IExpenseService
 {
-    Task<ExpenseIndexViewModel> GetIndexAsync(
-        PagedRequest request,
-        int? householdMemberId,
-        int? expenseCategoryId,
-        DateTime? from,
-        DateTime? to,
-        CancellationToken ct);
+    Task<(PagedResult<ExpenseViewModel>, decimal)> GetAllAsync(GridRequest gridRequest, CancellationToken ct);
     Task DeleteAsync(int id, CancellationToken ct);
     Task AddAsync(ExpenseUpsertViewModel model, CancellationToken ct);
     Task<ExpenseUpsertViewModel> GetForCreateAsync(CancellationToken ct);

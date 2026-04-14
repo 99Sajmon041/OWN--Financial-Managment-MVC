@@ -81,7 +81,7 @@ public sealed class StatisticsService(
             expensesCtgIds = model.ExpenseCategoriesId;
         }
 
-        var incomes = await unitOfWork.IncomeRepository.GetForJsStatisticsAsync(
+        var incomes = await unitOfWork.IncomeRepository.GetForStatisticsAsync(
             incomesCtgIds,
             houseHoldmembersIds,
             model.SelectedYear,
@@ -89,7 +89,7 @@ public sealed class StatisticsService(
             userId,
             ct);
 
-        var expenses = await unitOfWork.ExpenseRepository.GetForJsStatisticsAsync(
+        var expenses = await unitOfWork.ExpenseRepository.GetForStatisticsAsync(
             expensesCtgIds,
             houseHoldmembersIds,
             model.SelectedYear,

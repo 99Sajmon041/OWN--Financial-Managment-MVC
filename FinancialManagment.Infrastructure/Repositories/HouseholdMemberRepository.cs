@@ -59,4 +59,12 @@ public sealed class HouseholdMemberRepository(FinancialManagementDbContext conte
     {
         return await context.HouseholdMembers.AnyAsync(x => x.Id == id && x.ApplicationUserId == userId && x.IsActive, ct);
     }
+
+    public async Task<List<HouseholdMember>> GetAllAsync(string userId, CancellationToken ct)
+    {
+        return await context.HouseholdMembers
+            .AsNoTracking()
+            .Where(x => x.ApplicationUserId == userId)
+            .ToListAsync(ct);
+    }
 }

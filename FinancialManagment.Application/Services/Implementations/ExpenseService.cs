@@ -5,9 +5,11 @@ using FinancialManagment.Application.Services.Interfaces;
 using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
 using FinancialManagment.Domain.RepositoryInterfaces;
-using FinancialManagment.Shared.Utilities;
-using FinancialManagment.Shared.Pagination;
+using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Shared.Grid.Filtering;
+using FinancialManagment.Shared.Grid.Paging;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FinancialManagment.Application.Services.Implementations;
@@ -19,54 +21,106 @@ public sealed class ExpenseService(
     IMapper mapper,
     IImageService imageService) : IExpenseService
 {
-    public async Task<ExpenseIndexViewModel> GetIndexAsync(
-        PagedRequest request,
-        int? householdMemberId,
-        int? expenseCategoryId,
-        DateTime? from,
-        DateTime? to,
-        CancellationToken ct)
+    public async Task<(PagedResult<ExpenseViewModel>, decimal)> GetAllAsync(GridRequest gridRequest, CancellationToken ct)
     {
-        request = request.Normalize();
+        gridRequest.Normalize();
+
         var userId = currentUser.ValidatedUserId;
 
-        DateTime effectiveFrom = from ?? DateTime.Now.AddYears(-1);
-        DateTime effectiveTo  = to ?? DateTime.Now;
+        IQueryable<Expense> query = unitOfWork.ExpenseRepository.GetQueryable(userId);
 
-        var (expenses, totalItemsCount, totalExpenseSum) = await unitOfWork.ExpenseRepository.GetQueryable(
-            request,
-            householdMemberId,
-            expenseCategoryId, 
-            userId,
-            effectiveFrom,
-            effectiveTo,
-            ct);
+        query = query.ApplyFilters(gridRequest.Filters);
 
-        var items = mapper.Map<List<ExpenseViewModel>>(expenses);
+        int totalItems = await query.CountAsync(ct);
 
-        var result = new PagedResult<ExpenseViewModel>
-        { 
-            Page = request.Page,
-            PageSize = request.PageSize,
-            Search = request.Search,
-            SortBy = request.SortBy,
-            Desc = request.Desc,
-            Items = items,
-            TotalItemsCount = totalItemsCount
-        };
+        var pager = new Pager(totalItems, gridRequest.Page, gridRequest.PageSize);
 
-        var (houseHoldMembersListItems, expenseCategoriesListItems) = await GetSelectOptionsAsync(userId, ct);
+        decimal totalAmount = await query
+            .Select(x => (decimal?)x.Amount)
+            .SumAsync(ct) ?? 0m;
 
-        logger.LogInformation("User with ID: {UserId} retrieved expenses list. Total items: {TotalItemsCount}.", userId, totalItemsCount);
+        query = query.ApplySorting(gridRequest.SortOrder);
+        query = query.ApplyPaging(pager);
 
-        return new ExpenseIndexViewModel
+        List<Expense> expenses = await query.ToListAsync(ct);
+
+        IReadOnlyList<ExpenseViewModel> items = mapper.Map<List<ExpenseViewModel>>(expenses);
+
+        var expenseCategories = await unitOfWork.ExpenseCategoryRepository.GetAllCategoriesAsync(userId, ct);
+        var householdMembers = await unitOfWork.HouseholdMemberRepository.GetAllAsync(userId, ct);
+        var customFilters = new List<FilterFieldDefinition>();
+
+        var categoryFilter = new FilterFieldDefinition
         {
-            Result = result,
-            ExpenseSum = totalExpenseSum,
-            SortOptions = OptionsBuilder.GetExpenseOrIncomeOptions(true),
-            HouseholdMemberOptions = houseHoldMembersListItems,
-            ExpenseCategoryOptions = expenseCategoriesListItems
+            PropertyName = "ExpenseCategory_Name",
+            PropertyPath = "ExpenseCategory.Name",
+            Label = "Kategorie výdaje",
+            PropertyType = typeof(string),
+            UnderlyingType = typeof(string),
+            InputType = FilterInputType.Select,
+            AllowedOperators =
+            [
+                FilterOperator.None,
+                FilterOperator.Equal,
+                FilterOperator.NotEqual
+            ],
+            SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "ExpenseCategory_Name"),
+            Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "ExpenseCategory_Name"),
+            Order = 1,
+            GroupName = "Kategorie výdaje",
+            Options = expenseCategories.Select(x => new FilterOptionItem
+            {
+                Text = x.Name,
+                Value = x.Name
+            })
+            .ToList()
         };
+
+        var houseHoldmemberFilter = new FilterFieldDefinition
+        {
+            PropertyName = "HouseholdMember_Nickname",
+            PropertyPath = "HouseholdMember.Nickname",
+            Label = "Člen domácnosti",
+            PropertyType = typeof(string),
+            UnderlyingType = typeof(string),
+            InputType = FilterInputType.Select,
+            AllowedOperators =
+            [
+                FilterOperator.None,
+                FilterOperator.Equal,
+                FilterOperator.NotEqual
+            ],
+            SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "HouseholdMember_Nickname"),
+            Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "HouseholdMember_Nickname"),
+            Order = 2,
+            GroupName = "Člen domácnosti",
+            Options = householdMembers.Select(x => new FilterOptionItem
+            {
+                Text = x.Nickname,
+                Value = x.Nickname
+            })
+            .ToList()
+        };
+
+        customFilters.Add(categoryFilter);
+        customFilters.Add(houseHoldmemberFilter);
+
+        logger.LogInformation("User with ID: {UserId} retrieved expenses grid. Total items after filtering: {TotalItemsCount}. " +
+            "Current page: {CurrentPage}. Page size: {PageSize}.",
+            userId,
+            totalItems,
+            gridRequest.Page,
+            gridRequest.PageSize);
+
+        return (new PagedResult<ExpenseViewModel>
+        {
+            Items = items,
+            Pager = pager,
+            GridRequest = gridRequest,
+            FilterModelType = typeof(Expense),
+            CustomFilters = customFilters
+        },
+        totalAmount);
     }
 
     public async Task DeleteAsync(int id, CancellationToken ct)

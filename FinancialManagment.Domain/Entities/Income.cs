@@ -20,11 +20,11 @@ public sealed class Income
     [FilterLabel("Částka příjmu")]
     public decimal Amount { get; set; }
 
-    [FilterOrder(2)]
+    [FilterOrder(4)]
     [FilterLabel("Datum příjmu")]
     public DateTime Date { get; set; }
 
-    [FilterOrder(4)]
+    [FilterOrder(5)]
     [FilterLabel("Popis příjmu")]
     public string? Description { get; set; }
 }

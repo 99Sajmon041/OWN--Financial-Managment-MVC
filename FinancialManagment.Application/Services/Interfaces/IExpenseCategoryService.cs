@@ -6,7 +6,7 @@ namespace FinancialManagment.Application.Services.Interfaces;
 
 public interface IExpenseCategoryService
 {
-    Task<PagedResultNew<ExpenseCategoryViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct);
+    Task<PagedResult<ExpenseCategoryViewModel>> GetAllAsync(GridRequest gridRequest, CancellationToken ct);
     Task AddAsync(ExpenseCategoryUpsertViewModel model, CancellationToken ct);
     Task UpdateAsync(int id, ExpenseCategoryUpsertViewModel model, CancellationToken ct);
     Task ChangeStatusAsync(int id, CancellationToken ct);

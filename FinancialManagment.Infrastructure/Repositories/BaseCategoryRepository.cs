@@ -1,8 +1,6 @@
-﻿using FinancialManagment.Domain.Entities;
-using FinancialManagment.Domain.EntityInterface;
+﻿using FinancialManagment.Domain.EntityInterface;
 using FinancialManagment.Domain.RepositoryInterfaces;
 using FinancialManagment.Infrastructure.Database;
-using FinancialManagment.Shared.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinancialManagment.Infrastructure.Repositories;
@@ -50,5 +48,13 @@ public abstract class BaseCategoryRepository<T>(FinancialManagementDbContext con
     public async Task<bool> BelongsToUserAndIsActiveAsync(int id, string userId, CancellationToken ct)
     {
         return await db.AnyAsync(x => x.ApplicationUserId == userId && x.Id == id && x.IsActive, ct);
+    }
+
+    public async Task<IReadOnlyList<T>> GetAllCategoriesAsync(string userId, CancellationToken ct)
+    {
+        return await db.AsNoTracking()
+            .Where(x => x.ApplicationUserId == userId)
+            .OrderBy(x => x.Name)
+            .ToListAsync(ct);
     }
 }
