@@ -56,22 +56,66 @@ public static class FilterDefinitionFactory
 
             FilterInputType inputType = property.GetCustomAttribute<FilterTypeAttribute>()?.InputType ?? ResolveInputType(property.PropertyType);
 
-            var definition = new FilterFieldDefinition
+            if (underlyingType == typeof(DateTime))
             {
-                PropertyName = property.Name,
-                PropertyPath = property.Name,
-                Label = label,
-                PropertyType = property.PropertyType,
-                UnderlyingType = underlyingType,
-                InputType = inputType,
-                AllowedOperators = ResolveAllowedOperators(underlyingType),
-                SelectedOperator = filterOperator,
-                Value = value,
-                Order = order,
-                GroupName = groupName
-            };
+                string fromPropertyName = $"{property.Name}_From";
+                string toPropertyName = $"{property.Name}_To";
 
-            definitions.Add(definition);
+                string? fromValue = filters.FirstOrDefault(x => x.PropertyName == fromPropertyName)?.Value;
+                string? toValue = filters.FirstOrDefault(x => x.PropertyName == toPropertyName)?.Value;
+
+                var dateFromDefinition = new FilterFieldDefinition
+                {
+                    PropertyName = fromPropertyName,
+                    PropertyPath = property.Name,
+                    Label = $"{label} od",
+                    PropertyType = property.PropertyType,
+                    UnderlyingType = underlyingType,
+                    InputType = inputType,
+                    AllowedOperators = [FilterOperator.GreaterThanOrEqual],
+                    SelectedOperator = FilterOperator.GreaterThanOrEqual,
+                    Value = fromValue,
+                    Order = order,
+                    GroupName = groupName
+                };
+
+                var dateToDefinition = new FilterFieldDefinition
+                {
+                    PropertyName = toPropertyName,
+                    PropertyPath = property.Name,
+                    Label = $"{label} do",
+                    PropertyType = property.PropertyType,
+                    UnderlyingType = underlyingType,
+                    InputType = inputType,
+                    AllowedOperators = [FilterOperator.LessThanOrEqual],
+                    SelectedOperator = FilterOperator.LessThanOrEqual,
+                    Value = toValue,
+                    Order = order,
+                    GroupName = groupName
+                };
+
+                definitions.Add(dateFromDefinition);
+                definitions.Add(dateToDefinition);
+            }
+            else
+            {
+                var definition = new FilterFieldDefinition
+                {
+                    PropertyName = property.Name,
+                    PropertyPath = property.Name,
+                    Label = label,
+                    PropertyType = property.PropertyType,
+                    UnderlyingType = underlyingType,
+                    InputType = inputType,
+                    AllowedOperators = ResolveAllowedOperators(underlyingType),
+                    SelectedOperator = filterOperator,
+                    Value = value,
+                    Order = order,
+                    GroupName = groupName
+                };
+
+                definitions.Add(definition);
+            }
         }
 
         return definitions
@@ -119,25 +163,69 @@ public static class FilterDefinitionFactory
             }
 
             int order = property.GetCustomAttribute<FilterOrderAttribute>()?.Order ?? int.MaxValue;
-
             FilterInputType inputType = property.GetCustomAttribute<FilterTypeAttribute>()?.InputType ?? ResolveInputType(property.PropertyType);
 
-            var definition = new FilterFieldDefinition
-            {
-                PropertyName = propertyName,
-                PropertyPath = propertyPath,
-                Label = label,
-                PropertyType = property.PropertyType,
-                UnderlyingType = underlyingType,
-                InputType = inputType,
-                AllowedOperators = ResolveAllowedOperators(underlyingType),
-                SelectedOperator = filterOperator,
-                Value = value,
-                Order = order,
-                GroupName = groupName
-            };
 
-            definitions.Add(definition);
+            if (underlyingType == typeof(DateTime))
+            {
+                string fromPropertyName = $"{propertyName}_From";
+                string toPropertyName = $"{propertyName}_To";
+
+                string? fromValue = filters.FirstOrDefault(x => x.PropertyName == fromPropertyName)?.Value;
+                string? toValue = filters.FirstOrDefault(x => x.PropertyName == toPropertyName)?.Value;
+
+                var dateFromDefinition = new FilterFieldDefinition
+                {
+                    PropertyName = fromPropertyName,
+                    PropertyPath = propertyPath,
+                    Label = $"{label} od",
+                    PropertyType = property.PropertyType,
+                    UnderlyingType = underlyingType,
+                    InputType = inputType,
+                    AllowedOperators = [FilterOperator.GreaterThanOrEqual],
+                    SelectedOperator = FilterOperator.GreaterThanOrEqual,
+                    Value = fromValue,
+                    Order = order,
+                    GroupName = groupName
+                };
+
+                var dateToDefinition = new FilterFieldDefinition
+                {
+                    PropertyName = toPropertyName,
+                    PropertyPath = propertyPath,
+                    Label = $"{label} do",
+                    PropertyType = property.PropertyType,
+                    UnderlyingType = underlyingType,
+                    InputType = inputType,
+                    AllowedOperators = [FilterOperator.LessThanOrEqual],
+                    SelectedOperator = FilterOperator.LessThanOrEqual,
+                    Value = toValue,
+                    Order = order,
+                    GroupName = groupName
+                };
+
+                definitions.Add(dateFromDefinition);
+                definitions.Add(dateToDefinition);
+            }
+            else
+            {
+                var definition = new FilterFieldDefinition
+                {
+                    PropertyName = propertyName,
+                    PropertyPath = propertyPath,
+                    Label = label,
+                    PropertyType = property.PropertyType,
+                    UnderlyingType = underlyingType,
+                    InputType = inputType,
+                    AllowedOperators = ResolveAllowedOperators(underlyingType),
+                    SelectedOperator = filterOperator,
+                    Value = value,
+                    Order = order,
+                    GroupName = groupName
+                };
+
+                definitions.Add(definition);
+            }
         }
     }
 
