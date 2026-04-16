@@ -43,7 +43,7 @@ public static class FilterDefinitionFactory
             FilterOperator filterOperator = FilterOperator.None;
 
             foreach (var filter in filters)
-            {
+            { 
                 if (filter.PropertyName == property.Name)
                 {
                     value = filter.Value;

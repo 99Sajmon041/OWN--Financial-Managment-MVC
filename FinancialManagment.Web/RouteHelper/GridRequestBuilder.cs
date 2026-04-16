@@ -71,10 +71,32 @@ public static class GridRequestBuilder
                 filterOperator = parsedOperator;
             }
 
+            string propertyPath;
+
+            bool from = propertyName.EndsWith("_From");
+            bool to = propertyName.EndsWith("_To");
+
+            if (from || to)
+            {
+                filterOperator = from ? FilterOperator.GreaterThanOrEqual : FilterOperator.LessThanOrEqual;
+
+                int index = propertyName.LastIndexOf('_');
+                propertyPath = propertyName.Substring(0, index);
+
+                if (propertyPath.Contains('_'))
+                {
+                    propertyPath = propertyPath.Replace('_', '.');
+                }
+            }
+            else
+            {
+                propertyPath = propertyName.Contains('_') ? propertyName.Replace('_', '.') : propertyName;
+            }
+
             gridRequest.Filters.Add(new FilterItem
             {
                 PropertyName = propertyName,
-                PropertyPath = propertyName.Contains('_') ? propertyName.Replace('_', '.') : propertyName,
+                PropertyPath = propertyPath,
                 Value = value,
                 Operator = filterOperator
             });
