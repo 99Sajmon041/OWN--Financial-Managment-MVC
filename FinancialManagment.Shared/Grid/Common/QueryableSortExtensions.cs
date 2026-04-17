@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Reflection;
 
 namespace FinancialManagment.Shared.Grid.Common;
 
@@ -19,33 +20,53 @@ public static class QueryableSortExtensions
         }
 
         string direction = parts[0].ToLowerInvariant();
-        string propertyName = parts[1];
+        string propertyPath = parts[1];
 
         if (direction != "asc" && direction != "desc")
         {
             return query;
         }
 
-        var property = typeof(T).GetProperty(propertyName);
+        ParameterExpression parameter = Expression.Parameter(typeof(T), "x");
+        Expression? propertyExpression = BuildPropertyExpression(parameter, propertyPath);
 
-        if (property == null)
+        if (propertyExpression == null)
         {
             return query;
         }
 
-        ParameterExpression parameter = Expression.Parameter(typeof(T), "x");
-        MemberExpression propertyExpression = Expression.Property(parameter, property);
         LambdaExpression lambda = Expression.Lambda(propertyExpression, parameter);
 
         string methodName = direction == "asc" ? "OrderBy" : "OrderByDescending";
 
-        MethodCallExpression methodCallExpression = Expression.Call(
+        MethodCallExpression resultExpression = Expression.Call(
             typeof(Queryable),
             methodName,
-            new[] { typeof(T), property.PropertyType },
+            [typeof(T), propertyExpression.Type],
             query.Expression,
             Expression.Quote(lambda));
 
-        return query.Provider.CreateQuery<T>(methodCallExpression);
+        return query.Provider.CreateQuery<T>(resultExpression);
+    }
+
+
+    private static Expression? BuildPropertyExpression(Expression parametr, string propertyPath)
+    {
+        string[] pathParts = propertyPath.Split('.');
+        Expression currentExpression = parametr;
+
+        foreach (string part in pathParts)
+        {
+            var property = currentExpression.Type.GetProperty(part);
+
+            if (property == null)
+            {
+                return null;
+            }
+
+            currentExpression = Expression.Property(currentExpression, property);
+        }
+
+        return currentExpression;
     }
 }
