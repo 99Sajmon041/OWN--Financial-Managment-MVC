@@ -1,6 +1,6 @@
 ﻿namespace FinancialManagment.Application.FilterModels;
 
-public sealed class StatisticsJsFilterModel
+public sealed class StatisticsFilterModel
 {
     public List<int> IncomeCategoriesId { get; set; } = [];
     public List<int> ExpenseCategoriesId { get; set; } = [];

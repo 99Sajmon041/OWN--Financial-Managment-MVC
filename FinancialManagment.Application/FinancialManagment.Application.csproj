@@ -17,4 +17,8 @@
     <ProjectReference Include="..\FinancialManagment.Shared\FinancialManagment.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\Monitoring\" />
+  </ItemGroup>
+
 </Project>

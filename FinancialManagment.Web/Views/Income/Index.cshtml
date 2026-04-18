@@ -49,11 +49,34 @@
                     </a>
                 </th>
                 <th>
+                    <a asp-action="Index"
+                       asp-controller="Income"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_HouseholdMember.Nickname")"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
                     Člen
+                    <a asp-action="Index"
+                       asp-controller="Income"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_HouseholdMember.Nickname")"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
                 </th>
                 <th>
+                    <a asp-action="Index"
+                       asp-controller="Income"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_IncomeCategory.Name")"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
                     Kategorie
-                </th>
+                    <a asp-action="Index"
+                       asp-controller="Income"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_IncomeCategory.Name")"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
                 <th>
                     <a asp-action="Index"
                        asp-controller="Income"

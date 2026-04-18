@@ -15,7 +15,7 @@ public sealed class StatisticsService(
     IUnitOfWork unitOfWork,
     ICurrentUser currentUser) : IStatisticsService
 {
-    public async Task<StatisticsJsViewModel> GetJsStatisticsAsync(StatisticsJsFilterModel model, CancellationToken ct)
+    public async Task<StatisticsJsViewModel> GetJsStatisticsAsync(StatisticsFilterModel model, CancellationToken ct)
     {
         var userId = currentUser.ValidatedUserId;
         var (houseHoldmembersListItems, incomeCategoriesListItems, expenseCategoriesListItems) = await GetSelectListData(userId, ct);

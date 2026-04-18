@@ -5,5 +5,5 @@ namespace FinancialManagment.Application.Services.Interfaces;
 
 public interface IStatisticsService
 {
-    Task<StatisticsJsViewModel> GetJsStatisticsAsync(StatisticsJsFilterModel model, CancellationToken ct);
+    Task<StatisticsJsViewModel> GetJsStatisticsAsync(StatisticsFilterModel model, CancellationToken ct);
 }
