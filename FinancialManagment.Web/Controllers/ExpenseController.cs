@@ -6,127 +6,126 @@ using FinancialManagment.Web.RouteHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinancialManagment.Web.Controllers
+namespace FinancialManagment.Web.Controllers;
+
+[Authorize]
+public class ExpenseController(IExpenseService expenseService) : Controller
 {
-    [Authorize]
-    public class ExpenseController(IExpenseService expenseService) : Controller
+    [HttpGet]
+    public async Task<IActionResult> Index(CancellationToken ct)
     {
-        [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken ct)
+        GridRequest gridRequest = GridRequestBuilder.GetFromRequest(Request);
+
+        var (result, totalAmount) = await expenseService.GetAllAsync(gridRequest, ct);
+
+        ViewBag.TotalAmount = totalAmount;
+        return View(result);
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    {
+        await expenseService.DeleteAsync(id, ct);
+
+        TempData["Success"] = "Výdaj úspěšně odstraněn.";
+        return RedirectToAction(nameof(Index));
+    }
+
+
+    [HttpGet]
+    public async Task<IActionResult> Create(CancellationToken ct)
+    {
+        try
         {
-            GridRequest gridRequest = GridRequestBuilder.GetFromRequest(Request);
-
-            var (result, totalAmount) = await expenseService.GetAllAsync(gridRequest, ct);
-
-            ViewBag.TotalAmount = totalAmount;
-            return View(result);
+            var model = await expenseService.GetForCreateAsync(ct);
+            return View(model);
         }
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        catch (DomainException ex)
         {
-            await expenseService.DeleteAsync(id, ct);
-
-            TempData["Success"] = "Výdaj úspěšně odstraněn.";
+            TempData["Error"] = ex.Message;
             return RedirectToAction(nameof(Index));
         }
+    }
 
 
-        [HttpGet]
-        public async Task<IActionResult> Create(CancellationToken ct)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(ExpenseUpsertViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
         {
-            try
-            {
-                var model = await expenseService.GetForCreateAsync(ct);
-                return View(model);
-            }
-            catch (DomainException ex)
-            {
-                TempData["Error"] = ex.Message;
-                return RedirectToAction(nameof(Index));
-            }
-        }
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ExpenseUpsertViewModel model, CancellationToken ct)
-        {
-            if (!ModelState.IsValid)
-            {
-                await expenseService.FillSelectOptionsAsync(model, ct);
-                return View(model);
-            }
-
-            try
-            {
-                await expenseService.AddAsync(model, ct);
-
-                TempData["Success"] = "Výdaj úspěšně přidán.";
-                return RedirectToAction(nameof(Index));
-            }
-            catch (DomainException ex)
-            {
-                await expenseService.FillSelectOptionsAsync(model, ct);
-
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View(model);
-            }
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> Update(int id, CancellationToken ct)
-        {
-            var model = await expenseService.GetForUpdateAsync(id, ct);
+            await expenseService.FillSelectOptionsAsync(model, ct);
             return View(model);
         }
 
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(int id, ExpenseUpsertViewModel model, CancellationToken ct)
+        try
         {
-            if (!ModelState.IsValid)
-            {
-                await expenseService.FillSelectOptionsAsync(model, ct);
-                return View(model);
-            }
+            await expenseService.AddAsync(model, ct);
 
-            try
-            {
-                await expenseService.UpdateAsync(id, model, ct);
+            TempData["Success"] = "Výdaj úspěšně přidán.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DomainException ex)
+        {
+            await expenseService.FillSelectOptionsAsync(model, ct);
 
-                TempData["Success"] = "Výdaj úspěšně upraven.";
-                return RedirectToAction(nameof(Index));
-            }
-            catch (DomainException ex)
-            {
-                await expenseService.FillSelectOptionsAsync(model, ct);
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
+    }
 
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View(model);
-            }
+
+    [HttpGet]
+    public async Task<IActionResult> Update(int id, CancellationToken ct)
+    {
+        var model = await expenseService.GetForUpdateAsync(id, ct);
+        return View(model);
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Update(int id, ExpenseUpsertViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            await expenseService.FillSelectOptionsAsync(model, ct);
+            return View(model);
         }
 
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteImage(int id, CancellationToken ct)
+        try
         {
-            var (deleted, message) = await expenseService.DeleteImageAsync(id, ct);
-            if (deleted)
-            {
-                TempData["Success"] = message;
-                return RedirectToAction(nameof(Update), new { id });
-            }
-            else
-            {
-                TempData["Error"] = message;
-                return RedirectToAction(nameof(Update), new { id });
-            }
+            await expenseService.UpdateAsync(id, model, ct);
+
+            TempData["Success"] = "Výdaj úspěšně upraven.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DomainException ex)
+        {
+            await expenseService.FillSelectOptionsAsync(model, ct);
+
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteImage(int id, CancellationToken ct)
+    {
+        var (deleted, message) = await expenseService.DeleteImageAsync(id, ct);
+        if (deleted)
+        {
+            TempData["Success"] = message;
+            return RedirectToAction(nameof(Update), new { id });
+        }
+        else
+        {
+            TempData["Error"] = message;
+            return RedirectToAction(nameof(Update), new { id });
         }
     }
 }

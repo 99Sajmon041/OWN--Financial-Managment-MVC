@@ -82,6 +82,14 @@
                                     Statistiky
                                 </a>
                             </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link nav-pill @(ViewContext.RouteData.Values["controller"]?.ToString() == "RequestMonitoring" ? "active-pill" : "")"
+                                   asp-controller="RequestMonitoring"
+                                   asp-action="Index">
+                                    Vytížení
+                                </a>
+                            </li>
                         </ul>
                     }
 

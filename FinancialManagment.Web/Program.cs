@@ -78,9 +78,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<RequestMonitoringMiddleware>();
+
 app.MapDefaultControllerRoute();
 
 try

@@ -174,6 +174,70 @@ public static class FilterExpressionBuilder
             return Expression.Lambda<Func<T, bool>>(comparisonExpression, parameter);
         }
 
+        if (underlyingType == typeof(long))
+        {
+            if (!long.TryParse(value, out long parsedValue))
+            {
+                return null;
+            }
+
+            ConstantExpression constant;
+            BinaryExpression comparisonExpression;
+
+            if (propertyType == typeof(long?))
+            {
+                constant = Expression.Constant((long?)parsedValue, typeof(long?));
+            }
+            else
+            {
+                constant = Expression.Constant(parsedValue, typeof(long));
+            }
+
+            comparisonExpression = filterOperator switch
+            {
+                FilterOperator.NotEqual => Expression.NotEqual(propertyExpression, constant),
+                FilterOperator.LessThan => Expression.LessThan(propertyExpression, constant),
+                FilterOperator.LessThanOrEqual => Expression.LessThanOrEqual(propertyExpression, constant),
+                FilterOperator.GreaterThan => Expression.GreaterThan(propertyExpression, constant),
+                FilterOperator.GreaterThanOrEqual => Expression.GreaterThanOrEqual(propertyExpression, constant),
+                _ => Expression.Equal(propertyExpression, constant)
+            };
+
+            return Expression.Lambda<Func<T, bool>>(comparisonExpression, parameter);
+        }
+
+        if (underlyingType == typeof(double))
+        {
+            if (!double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
+            {
+                return null;
+            }
+
+            ConstantExpression constant;
+            BinaryExpression comparisonExpression;
+
+            if (propertyType == typeof(double?))
+            {
+                constant = Expression.Constant((double?)parsedValue, typeof(double?));
+            }
+            else
+            {
+                constant = Expression.Constant(parsedValue, typeof(double));
+            }
+
+            comparisonExpression = filterOperator switch
+            {
+                FilterOperator.NotEqual => Expression.NotEqual(propertyExpression, constant),
+                FilterOperator.LessThan => Expression.LessThan(propertyExpression, constant),
+                FilterOperator.LessThanOrEqual => Expression.LessThanOrEqual(propertyExpression, constant),
+                FilterOperator.GreaterThan => Expression.GreaterThan(propertyExpression, constant),
+                FilterOperator.GreaterThanOrEqual => Expression.GreaterThanOrEqual(propertyExpression, constant),
+                _ => Expression.Equal(propertyExpression, constant)
+            };
+
+            return Expression.Lambda<Func<T, bool>>(comparisonExpression, parameter);
+        }
+
         if (underlyingType == typeof(DateTime))
         {
             if (!DateTime.TryParse(value, out DateTime parsedValue))

@@ -1,21 +1,22 @@
 ﻿using FinancialManagment.Application.Models.Monitoring;
 using FinancialManagment.Application.Services.Interfaces;
+using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Shared.Grid.Common;
+using FinancialManagment.Shared.Grid.Filtering;
 using FinancialManagment.Shared.Grid.Paging;
+using FinancialManagment.Shared.Utilities;
 using System.Globalization;
+using System.Reflection;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace FinancialManagment.Web.LoggingService;
 
-public sealed class RequestMonitoringLogService : IRequestMonitoringLogService
+public sealed class RequestMonitoringLogService(
+    IWebHostEnvironment environment,
+    ICurrentUser currentUser,
+    ILogger<RequestMonitoringLogService> logger) : IRequestMonitoringLogService
 {
-    private readonly string logsDirectoryPath;
-    private readonly IWebHostEnvironment _environment;
-
-    public RequestMonitoringLogService(IWebHostEnvironment environment)
-    {
-        _environment = environment;
-        logsDirectoryPath = Path.Combine(_environment.ContentRootPath, "LogPowerUsage", "RequestMonitoring");
-    }
+    private readonly string logsDirectoryPath = Path.Combine(environment.ContentRootPath, "LogPowerUsage", "RequestMonitoring");
 
     public async Task WriteLogAsync(RequestMonitoringLogItem item, CancellationToken ct)
     {
@@ -28,13 +29,26 @@ public sealed class RequestMonitoringLogService : IRequestMonitoringLogService
         await File.AppendAllTextAsync(filePath, logLine + Environment.NewLine, ct);
     }
 
-    public async Task<PagedResult<RequestMonitoringLogItem>> ReadLogsByDateAsync(GridRequest gridRequest, DateOnly date, CancellationToken ct)
+    public async Task<PagedResult<RequestMonitoringLogItem>> ReadLogsByDateAsync(
+        GridRequest gridRequest, 
+        DateOnly date, 
+        Assembly assembly,
+        CancellationToken ct)
     {
         string filePath = GetFilePath(date);
 
         if (!File.Exists(filePath))
         {
-            return new PagedResult<RequestMonitoringLogItem> { };
+            var logPager = new Pager(0, gridRequest.Page, gridRequest.PageSize);
+
+            return new PagedResult<RequestMonitoringLogItem>
+            {
+                Items = [],
+                Pager = logPager,
+                GridRequest = gridRequest,
+                FilterModelType = typeof(RequestMonitoringLogItem),
+                CustomFilters = []
+            };
         }
 
         string[] lines = await File.ReadAllLinesAsync(filePath, ct);
@@ -58,21 +72,98 @@ public sealed class RequestMonitoringLogService : IRequestMonitoringLogService
 
         var queryResult = result.AsQueryable();
 
+        var customFilters = new List<FilterFieldDefinition>();
+
+        var statusCodes = new FilterFieldDefinition
+        {
+            PropertyName = "StatusCode",
+            PropertyPath = "StatusCode",
+            Label = "Status kód",
+            PropertyType = typeof(string),
+            UnderlyingType = typeof(string),
+            InputType = FilterInputType.Select,
+            AllowedOperators =
+            [
+                FilterOperator.None,
+                FilterOperator.Equal,
+                FilterOperator.NotEqual
+            ],
+            SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "StatusCode"),
+            Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "StatusCode"),
+            Order = 4,
+            GroupName = "Monitoring log",
+            Options = OptionsBuilder.GetStatusCodes()
+        };
+
+        var httpMethods = new FilterFieldDefinition
+        {
+            PropertyName = "HttpMethod",
+            PropertyPath = "HttpMethod",
+            Label = "HTTP Methoda",
+            PropertyType = typeof(string),
+            UnderlyingType = typeof(string),
+            InputType = FilterInputType.Select,
+            AllowedOperators =
+            [
+                FilterOperator.None,
+                FilterOperator.Equal,
+                FilterOperator.NotEqual
+            ],
+            SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "HttpMethod"),
+            Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "HttpMethod"),
+            Order = 5,
+            GroupName = "Monitoring log",
+            Options = OptionsBuilder.GetMethods()
+        };
+
+        var paths = new FilterFieldDefinition
+        {
+            PropertyName = "Path",
+            PropertyPath = "Path",
+            Label = "Cesta (URL)",
+            PropertyType = typeof(string),
+            UnderlyingType = typeof(string),
+            InputType = FilterInputType.Select,
+            AllowedOperators =
+            [
+                FilterOperator.None,
+                FilterOperator.Equal,
+                FilterOperator.NotEqual
+            ],
+            SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "Path"),
+            Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "Path"),
+            Order = 6,
+            GroupName = "Monitoring log",
+            Options = OptionsBuilder.GetEndpointPaths(assembly)
+        };
+
+
+        customFilters.Add(statusCodes);
+        customFilters.Add(httpMethods);
+        customFilters.Add(paths);
+
+        queryResult = queryResult.ApplyFilters(gridRequest.Filters);
+
         int totalItems = result.Count;
 
         var pager = new Pager(totalItems, gridRequest.Page, gridRequest.PageSize);
 
-        queryResult = queryResult.ApplyPaging(pager);
         queryResult = queryResult.OrderBy(x => x.Timestamp);
+        queryResult = queryResult.ApplyPaging(pager);
 
         result = queryResult.ToList();
+
+        var userId = currentUser.ValidatedUserId;
+
+        logger.LogInformation("User with ID: {UserId} checks application usage statistics.", userId);
 
         return new PagedResult<RequestMonitoringLogItem>
         {
             Items = result,
             Pager = pager,
             GridRequest = gridRequest,
-            FilterModelType = typeof(RequestMonitoringLogItem)
+            FilterModelType = typeof(RequestMonitoringLogItem),
+            CustomFilters = customFilters
         };
     }
 
@@ -86,7 +177,7 @@ public sealed class RequestMonitoringLogService : IRequestMonitoringLogService
         return Path.Combine(logsDirectoryPath, $"request-monitoring-{date:yyyy-MM-dd}.log");
     }
 
-    private string CreateLogLine(RequestMonitoringLogItem item)
+    private static string CreateLogLine(RequestMonitoringLogItem item)
     {
         return string.Join("|",
             item.Timestamp.ToString("O", CultureInfo.InvariantCulture),
@@ -95,8 +186,7 @@ public sealed class RequestMonitoringLogService : IRequestMonitoringLogService
             item.Controller,
             item.Action,
             item.DurationMs,
-            item.CpuUsagePercent,
-            item.CpuUsagePercent.ToString(CultureInfo.InvariantCulture),
+            item.CpuTimeUsedMs.ToString(CultureInfo.InvariantCulture),
             item.MemoryUsageMb.ToString(CultureInfo.InvariantCulture),
             item.StatusCode);
     }
@@ -117,11 +207,11 @@ public sealed class RequestMonitoringLogService : IRequestMonitoringLogService
             out DateTime timestamp);
 
         bool parsedDuration = long.TryParse(parts[5], out long durationMs);
-        bool parsedCpu = double.TryParse(parts[6], CultureInfo.InvariantCulture, out double cpuUsagePercent);
+        bool parsedCpuTime = long.TryParse(parts[6], out long cpuTimeUsedMs);
         bool parsedMemory = double.TryParse(parts[7], CultureInfo.InvariantCulture, out double memoryUsageMb);
         bool parsedStatusCode = int.TryParse(parts[8], out int statusCode);
 
-        if (!parsedTimestamp || !parsedDuration || !parsedCpu || !parsedMemory || !parsedStatusCode)
+        if (!parsedTimestamp || !parsedDuration || !parsedCpuTime || !parsedMemory || !parsedStatusCode)
         {
             return null;
         }
@@ -134,9 +224,9 @@ public sealed class RequestMonitoringLogService : IRequestMonitoringLogService
             Controller = parts[3],
             Action = parts[4],
             DurationMs = durationMs,
-            CpuUsagePercent = cpuUsagePercent,
+            CpuTimeUsedMs = cpuTimeUsedMs,
             MemoryUsageMb = memoryUsageMb,
-            StatusCode = statusCode
+            StatusCode = statusCode.ToString()
         };
     }
 }

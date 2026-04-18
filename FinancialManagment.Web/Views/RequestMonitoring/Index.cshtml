@@ -1,0 +1,94 @@
+﻿@model PagedResult<RequestMonitoringLogItem>
+
+@{
+    ViewData["Title"] = "Vytížení aplikace";
+    string selectedDate = Context.Request.Query["date"].FirstOrDefault() ?? DateTime.UtcNow.ToString("yyyy-MM-dd");
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-6">Vytížení aplikace (Endpointy)</h1>
+</div>
+
+@await Component.InvokeAsync("GridFilters", new GridFiltersComponentModel
+{
+    ModelType = Model.FilterModelType!,
+    Filters = Model.GridRequest.Filters,
+    Action = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty,
+    Controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty,
+    PageSize = Model.GridRequest.PageSize,
+    FiltersCollapsed = Model.GridRequest.FiltersCollapsed,
+    CustomFilters = Model.CustomFilters
+})
+
+<div class="mb-4">
+    <label for="logDate" class="form-label">Vyberte datum logu:</label>
+
+    <div class="col-12 col-sm-8 col-md-6 col-lg-4 px-0">
+        <input type="date"
+               class="form-control"
+               id="logDate"
+               name="date"
+               value="@selectedDate" />
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(x => x.Items[0].Timestamp)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].Path)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].HttpMethod)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].Controller)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].Action)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].DurationMs)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].CpuTimeUsedMs)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].MemoryUsageMb)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].StatusCode)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items.Count == 0)
+            {
+                <tr>
+                    <td colspan="9" class="text-center">Záznamy nenalezeny</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var log in Model.Items)
+                {
+                    bool isDangerRow = log.CpuTimeUsedMs > 2000 || log.MemoryUsageMb > 2048 || log.DurationMs > 2000;
+
+                    <tr class="@(isDangerRow ? "table-danger" : "")">
+                        <td>@log.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")</td>
+                        <td>@log.Path</td>
+                        <td>@log.HttpMethod</td>
+                        <td>@log.Controller</td>
+                        <td>@log.Action</td>
+                        <td>@log.DurationMs</td>
+                        <td>@log.CpuTimeUsedMs</td>
+                        <td>@log.MemoryUsageMb</td>
+                        <td>@log.StatusCode</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@await Component.InvokeAsync("Pager", new PagerPartialViewModel
+{
+    Pager = Model.Pager,
+    Action = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty,
+    Controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty,
+    PageSize = Model.GridRequest.PageSize,
+    Filters = Model.GridRequest.Filters,
+    FiltersCollapsed = Model.GridRequest.FiltersCollapsed
+})
+
+<div class="d-flex justify-content-start mt-3">
+    <a class="btn btn-outline-primary" asp-controller="Home" asp-action="Index">
+        Domů
+    </a>
+</div>

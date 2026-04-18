@@ -23,4 +23,8 @@
     <ProjectReference Include="..\FinancialManagment.Infrastructure\FinancialManagment.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="LogPowerUsage\RequestMonitoring\" />
+  </ItemGroup>
+
 </Project>

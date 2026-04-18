@@ -428,3 +428,19 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+//Send GET request of Index monitoring performance View include URL date parameter
+document.addEventListener("DOMContentLoaded", function () {
+    const logDateInput = document.getElementById("logDate");
+
+    logDateInput.addEventListener("change", function () {
+        const selectedDate = this.value;
+
+        const url = new URL(window.location.href);
+        url.searchParams.set("date", selectedDate);
+        url.searchParams.set("page", "1");
+
+        window.location.href = url.toString();
+    });
+});

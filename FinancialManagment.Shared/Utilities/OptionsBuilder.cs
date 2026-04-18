@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using FinancialManagment.Shared.Grid.Filtering;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace FinancialManagment.Shared.Utilities;
 
@@ -66,5 +69,39 @@ public static class OptionsBuilder
         }
 
         return years;
+    }
+
+    public static List<FilterOptionItem> GetMethods()
+    {
+        return
+        [
+            new FilterOptionItem { Text = "GET", Value = "GET" },
+            new FilterOptionItem { Text = "POST", Value = "POST" }
+        ];
+    }
+
+    public static List<FilterOptionItem> GetStatusCodes()
+    {
+        return
+        [
+            new FilterOptionItem { Text = "200", Value = "200" },
+            new FilterOptionItem { Text = "201", Value = "201" },
+            new FilterOptionItem { Text = "204", Value = "204" },
+            new FilterOptionItem { Text = "301", Value = "301" },
+            new FilterOptionItem { Text = "302", Value = "302" },
+            new FilterOptionItem { Text = "400", Value = "400" },
+            new FilterOptionItem { Text = "401", Value = "401" },
+            new FilterOptionItem { Text = "403", Value = "403" },
+            new FilterOptionItem { Text = "404", Value = "404" },
+            new FilterOptionItem { Text = "405", Value = "405" },
+            new FilterOptionItem { Text = "422", Value = "422" },
+            new FilterOptionItem { Text = "500", Value = "500" }
+        ];
+    }
+
+    public static List<FilterOptionItem> GetEndpointPaths(Assembly assembly)
+    {
+        throw new NotImplementedException();
+        // Dodělám neřeš :-) Ale až zítra :-D Jdu spinkat .-D
     }
 }

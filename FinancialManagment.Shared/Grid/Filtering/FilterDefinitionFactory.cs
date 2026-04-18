@@ -248,7 +248,11 @@ public static class FilterDefinitionFactory
             operators.Add(FilterOperator.Equal);
             operators.Add(FilterOperator.NotEqual);
         }
-        else if (underlyingType == typeof(int) || underlyingType == typeof(decimal) || underlyingType == typeof(DateTime))
+        else if (underlyingType == typeof(int)  ||
+             underlyingType == typeof(decimal)  || 
+             underlyingType == typeof(DateTime) ||
+             underlyingType == typeof(double)   ||
+             underlyingType == typeof(long))
         {
             operators.Add(FilterOperator.Equal);
             operators.Add(FilterOperator.NotEqual);
@@ -275,6 +279,8 @@ public static class FilterDefinitionFactory
             || underlyingType == typeof(int)
             || underlyingType == typeof(decimal)
             || underlyingType == typeof(DateTime)
+            || underlyingType == typeof(double)
+            || underlyingType == typeof(long)
             || underlyingType.IsEnum;
     }
 
@@ -287,7 +293,7 @@ public static class FilterDefinitionFactory
             return FilterInputType.Select;
         }
 
-        if (underlyingType == typeof(int) || underlyingType == typeof(decimal))
+        if (underlyingType == typeof(int) || underlyingType == typeof(decimal) || underlyingType == typeof(long) || underlyingType == typeof(double))
         {
             return FilterInputType.Number;
         }
