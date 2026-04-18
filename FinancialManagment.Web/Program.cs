@@ -6,6 +6,7 @@ using FinancialManagment.Infrastructure.Database;
 using FinancialManagment.Infrastructure.Extensions;
 using FinancialManagment.Infrastructure.Identity;
 using FinancialManagment.Web.Image;
+using FinancialManagment.Web.LoggingService;
 using FinancialManagment.Web.MiddleWare;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -27,6 +28,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IRequestMonitoringLogService, RequestMonitoringLogService>();
+
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
