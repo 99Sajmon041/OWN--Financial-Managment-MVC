@@ -32,6 +32,22 @@ public sealed class RequestMonitoringMiddleware(RequestDelegate next)
                 TimeSpan cpuAfter = currentProcess.TotalProcessorTime;
                 long memoryAfterBytes = currentProcess.WorkingSet64;
 
+                string handledStatusCode = string.Empty;
+                string handledExceptionType = string.Empty;
+
+                if (context.Items.TryGetValue("HandledStatusCode", out object? handledStatusCodeValue))
+                {
+                    if (handledStatusCodeValue is int parsedStatusCode)
+                    {
+                        handledStatusCode = parsedStatusCode.ToString();
+                    }
+                }
+
+                if (context.Items.TryGetValue("HandledExceptionType", out object? handledExceptionTypeValue))
+                {
+                    handledExceptionType = handledExceptionTypeValue?.ToString() ?? "-";
+                }
+
                 var logItem = new RequestMonitoringLogItem
                 {
                     Timestamp = timestamp,
@@ -42,7 +58,9 @@ public sealed class RequestMonitoringMiddleware(RequestDelegate next)
                     DurationMs = stopwatch.ElapsedMilliseconds,
                     CpuTimeUsedMs = CalculateCpuTimeUsedMs(cpuBefore, cpuAfter),
                     MemoryUsageMb = ConvertBytesToMb(memoryAfterBytes),
-                    StatusCode = context.Response.StatusCode.ToString()
+                    FinalStatusCode = context.Response.StatusCode.ToString(),
+                    HandledStatusCode = handledStatusCode,
+                    HandledExceptionType = handledExceptionType
                 };
 
                 await requestMonitoringLogService.WriteLogAsync(logItem, context.RequestAborted);

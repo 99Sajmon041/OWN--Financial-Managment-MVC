@@ -44,6 +44,9 @@ public class ExpenseController(IExpenseService expenseService) : Controller
         }
         catch (DomainException ex)
         {
+            Request.HttpContext.Items["HandledStatusCode"] = StatusCodes.Status400BadRequest;
+            Request.HttpContext.Items["HandledExceptionType"] = ex.GetType().Name;
+
             TempData["Error"] = ex.Message;
             return RedirectToAction(nameof(Index));
         }
@@ -70,6 +73,9 @@ public class ExpenseController(IExpenseService expenseService) : Controller
         catch (DomainException ex)
         {
             await expenseService.FillSelectOptionsAsync(model, ct);
+
+            Request.HttpContext.Items["HandledStatusCode"] = StatusCodes.Status400BadRequest;
+            Request.HttpContext.Items["HandledExceptionType"] = ex.GetType().Name;
 
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
@@ -105,6 +111,9 @@ public class ExpenseController(IExpenseService expenseService) : Controller
         catch (DomainException ex)
         {
             await expenseService.FillSelectOptionsAsync(model, ct);
+
+            Request.HttpContext.Items["HandledStatusCode"] = StatusCodes.Status400BadRequest;
+            Request.HttpContext.Items["HandledExceptionType"] = ex.GetType().Name;
 
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);

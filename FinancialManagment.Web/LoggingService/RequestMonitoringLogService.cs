@@ -73,10 +73,10 @@ public sealed class RequestMonitoringLogService(
 
         var customFilters = new List<FilterFieldDefinition>();
 
-        var statusCodes = new FilterFieldDefinition
+        var handleStatusCodes = new FilterFieldDefinition
         {
-            PropertyName = "StatusCode",
-            PropertyPath = "StatusCode",
+            PropertyName = "HandledStatusCode",
+            PropertyPath = "HandledStatusCode",
             Label = "Status kód",
             PropertyType = typeof(string),
             UnderlyingType = typeof(string),
@@ -87,8 +87,8 @@ public sealed class RequestMonitoringLogService(
                 FilterOperator.Equal,
                 FilterOperator.NotEqual
             ],
-            SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "StatusCode"),
-            Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "StatusCode"),
+            SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "HandledStatusCode"),
+            Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "HandledStatusCode"),
             Order = 4,
             GroupName = "Monitoring log",
             Options = OptionsBuilder.GetStatusCodes()
@@ -137,7 +137,7 @@ public sealed class RequestMonitoringLogService(
         };
 
 
-        customFilters.Add(statusCodes);
+        customFilters.Add(handleStatusCodes);
         customFilters.Add(httpMethods);
         customFilters.Add(paths);
 
@@ -187,14 +187,16 @@ public sealed class RequestMonitoringLogService(
             item.DurationMs,
             item.CpuTimeUsedMs.ToString(CultureInfo.InvariantCulture),
             item.MemoryUsageMb.ToString(CultureInfo.InvariantCulture),
-            item.StatusCode);
+            item.FinalStatusCode,
+            item.HandledStatusCode,
+            item.HandledExceptionType);
     }
 
     private RequestMonitoringLogItem? ParseLogLine(string line)
     {
         string[] parts = line.Split('|');
 
-        if (parts.Length != 9)
+        if (parts.Length != 11)
         {
             return null;
         }
@@ -208,9 +210,8 @@ public sealed class RequestMonitoringLogService(
         bool parsedDuration = long.TryParse(parts[5], out long durationMs);
         bool parsedCpuTime = long.TryParse(parts[6], out long cpuTimeUsedMs);
         bool parsedMemory = double.TryParse(parts[7], CultureInfo.InvariantCulture, out double memoryUsageMb);
-        bool parsedStatusCode = int.TryParse(parts[8], out int statusCode);
 
-        if (!parsedTimestamp || !parsedDuration || !parsedCpuTime || !parsedMemory || !parsedStatusCode)
+        if (!parsedTimestamp || !parsedDuration || !parsedCpuTime || !parsedMemory)
         {
             return null;
         }
@@ -225,7 +226,9 @@ public sealed class RequestMonitoringLogService(
             DurationMs = durationMs,
             CpuTimeUsedMs = cpuTimeUsedMs,
             MemoryUsageMb = memoryUsageMb,
-            StatusCode = statusCode.ToString()
+            FinalStatusCode = parts[8],
+            HandledStatusCode = string.IsNullOrWhiteSpace(parts[9]) ? "-" : parts[9],
+            HandledExceptionType = string.IsNullOrWhiteSpace(parts[10]) ? "-" : parts[10]
         };
     }
 }

@@ -44,14 +44,16 @@
                 <th>@Html.DisplayNameFor(x => x.Items[0].DurationMs)</th>
                 <th>@Html.DisplayNameFor(x => x.Items[0].CpuTimeUsedMs)</th>
                 <th>@Html.DisplayNameFor(x => x.Items[0].MemoryUsageMb)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].StatusCode)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].FinalStatusCode)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].HandledStatusCode)</th>
+                <th>@Html.DisplayNameFor(x => x.Items[0].HandledExceptionType)</th>
             </tr>
         </thead>
         <tbody>
             @if (Model.Items.Count == 0)
             {
                 <tr>
-                    <td colspan="9" class="text-center">Záznamy nenalezeny</td>
+                    <td colspan="11" class="text-center">Záznamy nenalezeny</td>
                 </tr>
             }
             else
@@ -69,7 +71,9 @@
                         <td>@log.DurationMs</td>
                         <td>@log.CpuTimeUsedMs</td>
                         <td>@log.MemoryUsageMb</td>
-                        <td>@log.StatusCode</td>
+                        <td>@log.FinalStatusCode</td>
+                        <td>@log.HandledStatusCode</td>
+                        <td>@log.HandledExceptionType</td>
                     </tr>
                 }
             }

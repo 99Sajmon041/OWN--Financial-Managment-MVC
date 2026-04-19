@@ -47,6 +47,9 @@ public class HouseholdMemberController(IHouseholdMemberService householdMemberSe
         }
         catch (Exception ex) when (ex is ConflictException or DomainException)
         {
+            Request.HttpContext.Items["HandledStatusCode"] = ex is ConflictException ? StatusCodes.Status409Conflict : StatusCodes.Status400BadRequest;
+            Request.HttpContext.Items["HandledExceptionType"] = ex.GetType().Name;
+
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
         }
@@ -78,6 +81,9 @@ public class HouseholdMemberController(IHouseholdMemberService householdMemberSe
         }
         catch (Exception ex) when (ex is ConflictException or DomainException)
         {
+            Request.HttpContext.Items["HandledStatusCode"] = ex is ConflictException ? StatusCodes.Status409Conflict : StatusCodes.Status400BadRequest;
+            Request.HttpContext.Items["HandledExceptionType"] = ex.GetType().Name;
+
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
         }
@@ -96,6 +102,9 @@ public class HouseholdMemberController(IHouseholdMemberService householdMemberSe
         }
         catch(DomainException ex)
         {
+            Request.HttpContext.Items["HandledStatusCode"] = StatusCodes.Status400BadRequest;
+            Request.HttpContext.Items["HandledExceptionType"] = ex.GetType().Name;
+
             TempData["Error"] = ex.Message;
             return RedirectToAction(nameof(Index));
         }

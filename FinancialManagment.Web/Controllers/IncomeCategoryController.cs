@@ -45,6 +45,9 @@ public class IncomeCategoryController(IIncomeCategoryService incomeCategoryServi
         }
         catch (ConflictException ex)
         {
+            Request.HttpContext.Items["HandledStatusCode"] = StatusCodes.Status409Conflict;
+            Request.HttpContext.Items["HandledExceptionType"] = ex.GetType().Name;
+
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
         }

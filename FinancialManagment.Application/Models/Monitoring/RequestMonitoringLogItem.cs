@@ -42,6 +42,14 @@ public sealed class RequestMonitoringLogItem
     public double MemoryUsageMb { get; set; }
 
     [NotFilterable]
-    [Display(Name = "Status kód")]
-    public string StatusCode { get; set; } = string.Empty;
+    [Display(Name = "Finální status kód")]
+    public string FinalStatusCode { get; set; } = string.Empty;
+
+    [NotFilterable]
+    [Display(Name = "Zachycený status kód")]
+    public string? HandledStatusCode { get; set; }
+
+    [NotFilterable]
+    [Display(Name = "Typ zachycené výjimky")]
+    public string? HandledExceptionType { get; set; }
 }
