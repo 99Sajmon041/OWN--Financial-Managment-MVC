@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Vytížení aplikace";
-    string selectedDate = Context.Request.Query["date"].FirstOrDefault() ?? DateTime.UtcNow.ToString("yyyy-MM-dd");
+    string selectedDate = Context.Request.Query["date"].FirstOrDefault() ?? DateTime.Now.ToString("yyyy-MM-dd");
 }
 
 <div class="text-center mb-5">

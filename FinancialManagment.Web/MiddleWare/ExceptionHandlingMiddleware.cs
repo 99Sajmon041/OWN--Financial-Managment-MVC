@@ -21,10 +21,8 @@ public sealed class ExceptionHandlingMiddleware(
                 throw;
             }
 
-            int statusCode;
-            string message;
 
-            MapException(ex, out statusCode, out message);
+            MapException(ex, out int statusCode, out string message);
 
             logger.Log(
                 GetLogLevel(statusCode),
@@ -66,20 +64,6 @@ public sealed class ExceptionHandlingMiddleware(
         {
             statusCode = StatusCodes.Status404NotFound;
             message = nf.Message;
-            return;
-        }
-
-        if (ex is ConflictException cf)
-        {
-            statusCode = StatusCodes.Status409Conflict;
-            message = cf.Message;
-            return;
-        }
-
-        if (ex is DomainException de)
-        {
-            statusCode = StatusCodes.Status400BadRequest;
-            message = de.Message;
             return;
         }
 

@@ -101,7 +101,27 @@ public static class OptionsBuilder
 
     public static List<FilterOptionItem> GetEndpointPaths(Assembly assembly)
     {
-        throw new NotImplementedException();
-        // Dodělám neřeš :-) Ale až zítra :-D Jdu spinkat .-D
+        List<string> paths = assembly
+            .GetTypes()
+            .Where(type => type.IsClass && !type.IsAbstract && typeof(Controller).IsAssignableFrom(type) && type.Name.EndsWith("Controller"))
+            .SelectMany(controllerType =>
+            {
+                string controllerName = controllerType.Name.Replace("Controller", string.Empty);
+
+                return controllerType
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                    .Where(method => !method.IsSpecialName && method.GetCustomAttribute<NonActionAttribute>() == null)
+                    .Select(method => $"{controllerName}/{method.Name}");
+            })
+            .Distinct()
+            .OrderBy(path => path)
+            .ToList();
+
+        return paths.Select(path => new FilterOptionItem
+        {
+            Text = path,
+            Value = path
+        })
+        .ToList();            
     }
 }

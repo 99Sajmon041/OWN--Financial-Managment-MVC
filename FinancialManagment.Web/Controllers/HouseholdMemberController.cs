@@ -45,7 +45,7 @@ public class HouseholdMemberController(IHouseholdMemberService householdMemberSe
             TempData["Success"] = "Člen domácnosti byl úspěšně přidán.";
             return RedirectToAction(nameof(Index));
         }
-        catch(ConflictException ex)
+        catch (Exception ex) when (ex is ConflictException or DomainException)
         {
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);

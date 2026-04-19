@@ -7,7 +7,6 @@ using FinancialManagment.Shared.Grid.Paging;
 using FinancialManagment.Shared.Utilities;
 using System.Globalization;
 using System.Reflection;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace FinancialManagment.Web.LoggingService;
 
@@ -144,7 +143,7 @@ public sealed class RequestMonitoringLogService(
 
         queryResult = queryResult.ApplyFilters(gridRequest.Filters);
 
-        int totalItems = result.Count;
+        int totalItems = queryResult.Count();
 
         var pager = new Pager(totalItems, gridRequest.Page, gridRequest.PageSize);
 

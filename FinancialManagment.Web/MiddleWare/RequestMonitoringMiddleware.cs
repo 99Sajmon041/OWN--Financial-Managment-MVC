@@ -10,7 +10,7 @@ public sealed class RequestMonitoringMiddleware(RequestDelegate next)
     {
         Process currentProcess = Process.GetCurrentProcess();
 
-        DateTime timestamp = DateTime.UtcNow;
+        DateTime timestamp = DateTime.Now;
         TimeSpan cpuBefore = currentProcess.TotalProcessorTime;
 
         Stopwatch stopwatch = Stopwatch.StartNew();
@@ -23,25 +23,30 @@ public sealed class RequestMonitoringMiddleware(RequestDelegate next)
         {
             stopwatch.Stop();
 
-            currentProcess.Refresh();
+            string route = GetRoute(context);
 
-            TimeSpan cpuAfter = currentProcess.TotalProcessorTime;
-            long memoryAfterBytes = currentProcess.WorkingSet64;
-
-            var logItem = new RequestMonitoringLogItem
+            if (!string.IsNullOrWhiteSpace(route))
             {
-                Timestamp = timestamp,
-                HttpMethod = context.Request.Method,
-                Path = context.Request.Path.ToString(),
-                Controller = GetControllerName(context),
-                Action = GetActionName(context),
-                DurationMs = stopwatch.ElapsedMilliseconds,
-                CpuTimeUsedMs = CalculateCpuTimeUsedMs(cpuBefore, cpuAfter),
-                MemoryUsageMb = ConvertBytesToMb(memoryAfterBytes),
-                StatusCode = context.Response.StatusCode.ToString()
-            };
+                currentProcess.Refresh();
 
-            await requestMonitoringLogService.WriteLogAsync(logItem, context.RequestAborted);
+                TimeSpan cpuAfter = currentProcess.TotalProcessorTime;
+                long memoryAfterBytes = currentProcess.WorkingSet64;
+
+                var logItem = new RequestMonitoringLogItem
+                {
+                    Timestamp = timestamp,
+                    HttpMethod = context.Request.Method,
+                    Path = route,
+                    Controller = GetControllerName(context),
+                    Action = GetActionName(context),
+                    DurationMs = stopwatch.ElapsedMilliseconds,
+                    CpuTimeUsedMs = CalculateCpuTimeUsedMs(cpuBefore, cpuAfter),
+                    MemoryUsageMb = ConvertBytesToMb(memoryAfterBytes),
+                    StatusCode = context.Response.StatusCode.ToString()
+                };
+
+                await requestMonitoringLogService.WriteLogAsync(logItem, context.RequestAborted);
+            }
         }
     }
 
@@ -55,6 +60,19 @@ public sealed class RequestMonitoringMiddleware(RequestDelegate next)
     {
         object? action = context.GetRouteValue("action");
         return action?.ToString() ?? "-";
+    }
+
+    private static string GetRoute(HttpContext context)
+    {
+        object? controller = context.GetRouteValue("controller");
+        object? action = context.GetRouteValue("action");
+
+        if (controller is null || action is null)
+        {
+            return string.Empty;
+        }
+
+        return $"{controller}/{action}";
     }
 
     private static double ConvertBytesToMb(long bytes)

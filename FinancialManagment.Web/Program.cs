@@ -79,10 +79,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseMiddleware<RequestMonitoringMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapDefaultControllerRoute();
 
