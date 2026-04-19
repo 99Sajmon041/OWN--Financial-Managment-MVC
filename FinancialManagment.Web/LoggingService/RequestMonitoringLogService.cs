@@ -147,7 +147,7 @@ public sealed class RequestMonitoringLogService(
 
         var pager = new Pager(totalItems, gridRequest.Page, gridRequest.PageSize);
 
-        queryResult = queryResult.OrderBy(x => x.Timestamp);
+        queryResult = queryResult.ApplySorting(gridRequest.SortOrder);
         queryResult = queryResult.ApplyPaging(pager);
 
         result = queryResult.ToList();

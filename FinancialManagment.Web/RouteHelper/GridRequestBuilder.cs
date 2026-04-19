@@ -55,7 +55,8 @@ public static class GridRequestBuilder
                 item.Key == "pageSize" ||
                 item.Key == "sortOrder" || 
                 item.Key == "filtersCollapsed" ||
-                item.Key.EndsWith("_Operator"))
+                item.Key.EndsWith("_Operator") ||
+                item.Key == "selectedDate")
             {
                 continue;
             }

@@ -438,7 +438,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectedDate = this.value;
 
         const url = new URL(window.location.href);
-        url.searchParams.set("date", selectedDate);
+        url.searchParams.set("selectedDate", selectedDate);
         url.searchParams.set("page", "1");
 
         window.location.href = url.toString();

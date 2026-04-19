@@ -10,9 +10,9 @@ namespace FinancialManagment.Web.Controllers;
 public class RequestMonitoringController(IRequestMonitoringLogService requestMonitoringService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index(DateTime? date, CancellationToken ct)
+    public async Task<IActionResult> Index(DateTime? selectedDate, CancellationToken ct)
     {
-        DateOnly dateOnly = DateOnly.FromDateTime(date ?? DateTime.Now);
+        DateOnly dateOnly = DateOnly.FromDateTime(selectedDate ?? DateTime.Now);
 
         GridRequest gridRequest = GridRequestBuilder.GetFromRequest(Request);
 

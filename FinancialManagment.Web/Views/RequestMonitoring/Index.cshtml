@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Vytížení aplikace";
-    string selectedDate = Context.Request.Query["date"].FirstOrDefault() ?? DateTime.Now.ToString("yyyy-MM-dd");
+    string selectedDate = Context.Request.Query["selectedDate"].FirstOrDefault() ?? DateTime.Now.ToString("yyyy-MM-dd");
 }
 
 <div class="text-center mb-5">
@@ -17,6 +17,7 @@
     Controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty,
     PageSize = Model.GridRequest.PageSize,
     FiltersCollapsed = Model.GridRequest.FiltersCollapsed,
+    SortOrder = Model.GridRequest.SortOrder,
     CustomFilters = Model.CustomFilters
 })
 
@@ -37,16 +38,176 @@
         <thead>
             <tr>
                 <th>@Html.DisplayNameFor(x => x.Items[0].Timestamp)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].Path)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].HttpMethod)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].Controller)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].Action)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].DurationMs)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].CpuTimeUsedMs)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].MemoryUsageMb)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].FinalStatusCode)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].HandledStatusCode)</th>
-                <th>@Html.DisplayNameFor(x => x.Items[0].HandledExceptionType)</th>
+                <th>
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_Path")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
+                    @Html.DisplayNameFor(x => x.Items[0].Path)
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_Path")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_HttpMethod")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
+                    @Html.DisplayNameFor(x => x.Items[0].HttpMethod)
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_HttpMethod")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_Controller")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
+                    @Html.DisplayNameFor(x => x.Items[0].Controller)
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_Controller")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_Action")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
+                    @Html.DisplayNameFor(x => x.Items[0].Action)
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_Action")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_DurationMs")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
+                    @Html.DisplayNameFor(x => x.Items[0].DurationMs)
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_DurationMs")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_CpuTimeUsedMs")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
+                    @Html.DisplayNameFor(x => x.Items[0].CpuTimeUsedMs)
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_CpuTimeUsedMs")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_MemoryUsageMb")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
+                    @Html.DisplayNameFor(x => x.Items[0].MemoryUsageMb)
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_MemoryUsageMb")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_FinalStatusCode")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
+                    @Html.DisplayNameFor(x => x.Items[0].FinalStatusCode)
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_FinalStatusCode")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_HandledStatusCode")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
+                    @Html.DisplayNameFor(x => x.Items[0].HandledStatusCode)
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_HandledStatusCode")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "asc_HandledExceptionType")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-up-short"></i>
+                    </a>
+                    @Html.DisplayNameFor(x => x.Items[0].HandledExceptionType)
+                    <a asp-action="Index"
+                       asp-controller="RequestMonitoring"
+                       asp-all-route-data="@GridRequestBuilder.GetRouteValues(Model.GridRequest, "desc_HandledExceptionType")"
+                       asp-route-selectedDate="@selectedDate"
+                       class="text-decoration-none">
+                        <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -88,6 +249,7 @@
     Controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty,
     PageSize = Model.GridRequest.PageSize,
     Filters = Model.GridRequest.Filters,
+    SortOrder = Model.GridRequest.SortOrder,
     FiltersCollapsed = Model.GridRequest.FiltersCollapsed
 })
 

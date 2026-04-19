@@ -364,6 +364,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-/FinancialManagment.Web/wwwroot/images/
 /FinancialManagment.Web/wwwroot/lib/bootstrap-icons/icons
 /FinancialManagment.Web/wwwroot/lib/bootstrap-icons
