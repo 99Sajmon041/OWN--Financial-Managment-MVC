@@ -16,6 +16,7 @@ public static class ApplicationServicesRegistrations
         services.AddScoped<IIncomeService, IncomeService>();
         services.AddScoped<IExpenseService, ExpenseService>();
         services.AddScoped<IStatisticsService, StatisticsService>();
+        services.AddScoped<ICsvExportService, CsvExportService>();
 
         services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 
