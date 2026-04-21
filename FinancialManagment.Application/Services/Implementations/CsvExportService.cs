@@ -7,7 +7,7 @@ namespace FinancialManagment.Application.Services.Implementations;
 
 public sealed class CsvExportService : ICsvExportService
 {
-    public byte[] ExportToCsv<T>(IEnumerable<T> items, IReadOnlyList<CsvColumnDefinition<T>> columns)
+    public byte[] ExportToCsv<T>(IEnumerable<T> items, IReadOnlyList<CsvColumnDefinition> columns)
     {
         StringBuilder stringBuilder = new();
 
@@ -22,9 +22,9 @@ public sealed class CsvExportService : ICsvExportService
         {
             List<string> values = [];
 
-            foreach (CsvColumnDefinition<T> column in orderedColumns)
+            foreach (CsvColumnDefinition column in orderedColumns)
             {
-                object? rawValue = column.ValueSelector(item);
+                object? rawValue = column.PropertyInfo.GetValue(item);
                 string formattedValue = FormatValue(rawValue);
 
                 values.Add(EscapeValue(formattedValue));

@@ -1,13 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace FinancialManagment.Application.Export;
 
 public static class CsvColumnDefinitionBuilder
 {
-    public static List<CsvColumnDefinition<T>> Build<T>()
+    public static List<CsvColumnDefinition> Build<T>()
     {
-        List<CsvColumnDefinition<T>> columns = [];
+        List<CsvColumnDefinition> columns = [];
 
         PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
@@ -18,13 +17,11 @@ public static class CsvColumnDefinitionBuilder
                 continue;
             }
 
-            string header = property.GetCustomAttribute<DisplayAttribute>()?.Name ?? property.Name;
-
-            columns.Add(new CsvColumnDefinition<T>
+            columns.Add(new CsvColumnDefinition
             {
-                Header = header,
+                Header = property.Name,
                 Order = int.MaxValue,
-                ValueSelector = item => property.GetValue(item)
+                PropertyInfo = property
             });
         }
 

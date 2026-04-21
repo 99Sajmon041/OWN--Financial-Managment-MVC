@@ -166,6 +166,41 @@ public sealed class RequestMonitoringLogService(
         };
     }
 
+    public async Task<List<RequestMonitoringLogItem>> GetAllReadLogsByDateAsync(DateOnly date, CancellationToken ct)
+    {
+        string filePath = GetFilePath(date);
+
+        if (!File.Exists(filePath))
+        {
+            return [];
+        }
+
+        string[] lines = await File.ReadAllLinesAsync(filePath, ct);
+
+        List<RequestMonitoringLogItem> result = [];
+
+        foreach (string line in lines)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            RequestMonitoringLogItem? parsedItem = ParseLogLine(line);
+
+            if (parsedItem is not null)
+            {
+                result.Add(parsedItem);
+            }
+        }
+
+        var userId = currentUser.ValidatedUserId;
+
+        logger.LogInformation("User with ID: {UserId} checks application usage statistics.", userId);
+
+        return result;
+    }
+
     private string GetFilePath(DateTime timestamp)
     {
         return Path.Combine(logsDirectoryPath, $"request-monitoring-{timestamp:yyyy-MM-dd}.log");
