@@ -53,7 +53,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\simon\Desktop\FinancialManagment\AppKeys\FinancialManagement_Prod"))
+    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\AppKeys\FinancialManagement_Prod"))
     .SetApplicationName("FinancialManagement.Prod");
 
 builder.Services.AddAntiforgery(options =>
