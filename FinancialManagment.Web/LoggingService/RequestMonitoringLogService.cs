@@ -89,7 +89,7 @@ public sealed class RequestMonitoringLogService(
             ],
             SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "HandledStatusCode"),
             Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "HandledStatusCode"),
-            Order = 4,
+            Order = 5,
             GroupName = "Monitoring log",
             Options = OptionsBuilder.GetStatusCodes()
         };
@@ -100,7 +100,7 @@ public sealed class RequestMonitoringLogService(
             PropertyPath = "HttpMethod",
             Label = "HTTP Methoda",
             PropertyType = typeof(string),
-            UnderlyingType = typeof(string),
+            UnderlyingType = typeof(string), 
             InputType = FilterInputType.Select,
             AllowedOperators =
             [
@@ -110,7 +110,7 @@ public sealed class RequestMonitoringLogService(
             ],
             SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "HttpMethod"),
             Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "HttpMethod"),
-            Order = 5,
+            Order = 6,
             GroupName = "Monitoring log",
             Options = OptionsBuilder.GetMethods()
         };
@@ -131,7 +131,7 @@ public sealed class RequestMonitoringLogService(
             ],
             SelectedOperator = FilterHelper.GetSelectedOperator(gridRequest.Filters, "Path"),
             Value = FilterHelper.GetSelectedValue(gridRequest.Filters, "Path"),
-            Order = 6,
+            Order = 7,
             GroupName = "Monitoring log",
             Options = OptionsBuilder.GetEndpointPaths(assembly)
         };
@@ -224,14 +224,15 @@ public sealed class RequestMonitoringLogService(
             item.MemoryUsageMb.ToString(CultureInfo.InvariantCulture),
             item.FinalStatusCode,
             item.HandledStatusCode,
-            item.HandledExceptionType);
+            item.HandledExceptionType,
+            item.IpAddress);
     }
 
-    private RequestMonitoringLogItem? ParseLogLine(string line)
+    private static RequestMonitoringLogItem? ParseLogLine(string line)
     {
         string[] parts = line.Split('|');
 
-        if (parts.Length != 11)
+        if (parts.Length != 12)
         {
             return null;
         }
@@ -263,7 +264,8 @@ public sealed class RequestMonitoringLogService(
             MemoryUsageMb = memoryUsageMb,
             FinalStatusCode = parts[8],
             HandledStatusCode = string.IsNullOrWhiteSpace(parts[9]) ? "-" : parts[9],
-            HandledExceptionType = string.IsNullOrWhiteSpace(parts[10]) ? "-" : parts[10]
+            HandledExceptionType = string.IsNullOrWhiteSpace(parts[10]) ? "-" : parts[10],
+            IpAddress = parts[11],
         };
     }
 }

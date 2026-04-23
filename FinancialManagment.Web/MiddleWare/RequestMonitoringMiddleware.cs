@@ -1,6 +1,8 @@
 ﻿using FinancialManagment.Application.Models.Monitoring;
 using FinancialManagment.Application.Services.Interfaces;
+using System.Net.Sockets;
 using System.Diagnostics;
+using System.Net;
 
 namespace FinancialManagment.Web.MiddleWare;
 
@@ -60,7 +62,8 @@ public sealed class RequestMonitoringMiddleware(RequestDelegate next)
                     MemoryUsageMb = ConvertBytesToMb(memoryAfterBytes),
                     FinalStatusCode = context.Response.StatusCode.ToString(),
                     HandledStatusCode = handledStatusCode,
-                    HandledExceptionType = handledExceptionType
+                    HandledExceptionType = handledExceptionType,
+                    IpAddress = GetIpv4Address(context)
                 };
 
                 await requestMonitoringLogService.WriteLogAsync(logItem, context.RequestAborted);
@@ -108,5 +111,14 @@ public sealed class RequestMonitoringMiddleware(RequestDelegate next)
         }
 
         return (long)Math.Round(cpuUsedMs, 0);
+    }
+
+    private static string GetIpv4Address(HttpContext context)
+    {
+        return context.Connection.RemoteIpAddress is null
+                       ? "-"
+                       : IPAddress.IsLoopback(context.Connection.RemoteIpAddress)
+                           ? "127.0.0.1"
+                           : context.Connection.RemoteIpAddress.MapToIPv4().ToString();
     }
 }

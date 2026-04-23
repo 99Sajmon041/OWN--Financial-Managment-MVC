@@ -52,4 +52,8 @@ public sealed class RequestMonitoringLogItem
     [NotFilterable]
     [Display(Name = "Typ zachycené výjimky")]
     public string? HandledExceptionType { get; set; }
+
+    [FilterOrder(4)]
+    [Display(Name = "IP adresa")]
+    public string IpAddress { get; set; } = string.Empty;
 }

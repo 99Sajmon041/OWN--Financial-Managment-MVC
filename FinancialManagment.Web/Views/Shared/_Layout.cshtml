@@ -12,7 +12,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm mb-3 position-relative app-navbar">
+        <nav class="navbar navbar-expand-xxl navbar-light bg-white border-bottom shadow-sm mb-3 position-relative app-navbar">
             <div class="container-fluid">
 
                 <a class="navbar-brand fw-semibold text-dark mb-0 text-decoration-none brand-link"
@@ -93,29 +93,38 @@
                         </ul>
                     }
 
-                    <div class="d-flex align-items-md-center gap-2 mt-3 mt-md-0 ms-md-auto">
+                    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 mt-3 mt-md-0 ms-md-auto auth-panel">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <span class="text-muted small d-none d-md-inline">
+                            <div class="user-info text-muted small">
+                                <i class="bi bi-person-circle me-1"></i>
                                 @(User.FindFirst("full_name")?.Value ?? User.Identity?.Name)
-                            </span>
+                            </div>
 
-                            <form asp-controller="Account" asp-action="Logout" method="post" class="mb-0">
-                                @Html.AntiForgeryToken()
+                            <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
+                                <a class="btn btn-sm btn-outline-secondary auth-btn" asp-controller="Account" asp-action="ChangePassword">
+                                    Změnit heslo
+                                </a>
 
-                                <button type="submit" class="btn btn-danger btn-sm w-100 w-md-auto auth-btn">
-                                    Odhlásit
-                                </button>
-                            </form>
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="mb-0">
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit" class="btn btn-danger btn-sm auth-btn">
+                                        Odhlásit
+                                    </button>
+                                </form>
+                            </div>
                         }
                         else
                         {
-                            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm w-100 w-md-auto auth-btn mx-2">
-                                Přihlásit
-                            </a>
-                            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-sm w-100 w-md-auto auth-btn">
-                                Registrovat
-                            </a>
+                            <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
+                                <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm auth-btn">
+                                    Přihlásit
+                                </a>
+                                <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-sm auth-btn">
+                                    Registrovat
+                                </a>
+                            </div>
                         }
                     </div>
 

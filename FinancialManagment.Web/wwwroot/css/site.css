@@ -120,7 +120,7 @@ body {
         box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.18);
     }
 
-@media (max-width: 767.98px) {
+@media (max-width: 1399.98px) {
     .navbar-collapse {
         margin-top: 0.9rem;
         padding: 0.85rem;
@@ -136,8 +136,16 @@ body {
     .nav-animated .nav-link {
         width: 100%;
     }
-}
 
+    .user-info {
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .auth-btn {
+        width: 100%;
+    }
+}
 .auth-btn {
     border-radius: 0.8rem;
     padding: 0.45rem 0.9rem;
@@ -367,4 +375,40 @@ body {
 .ts-dropdown .no-results {
     padding: 0.5rem 0.75rem;
     color: #adb5bd;
+}
+
+.monitoring-table {
+    width: 100%;
+}
+    .monitoring-table th,
+    .monitoring-table td {
+        white-space: nowrap;
+    }
+
+.auth-panel {
+    min-width: 220px;
+}
+
+.user-info {
+    white-space: nowrap;
+}
+
+.auth-btn {
+    min-width: 120px;
+}
+
+@media (max-width: 767.98px) {
+    .user-info {
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .auth-btn {
+        width: 100%;
+    }
+}
+
+.nav-pill,
+.user-info {
+    white-space: nowrap;
 }

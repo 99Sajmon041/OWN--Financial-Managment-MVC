@@ -3,6 +3,7 @@ using FinancialManagment.Application.Models.Account;
 using FinancialManagment.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FinancialManagment.Web.Controllers;
 
@@ -23,6 +24,7 @@ public class AccountController(IAccountService accountService) : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("AuthPolicy")]
     [AllowAnonymous]
     public async Task<IActionResult> Register(RegisterViewModel model, CancellationToken ct)
     {
@@ -69,6 +71,7 @@ public class AccountController(IAccountService accountService) : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("AuthPolicy")]
     [AllowAnonymous]
     public async Task<IActionResult> Login(LoginViewModel model, CancellationToken ct)
     {
@@ -107,5 +110,39 @@ public class AccountController(IAccountService accountService) : Controller
 
         TempData["Success"] = "Uživatel byl úspěšně odhlášen.";
         return RedirectToAction("Index", "Home");
+    }
+
+    [HttpGet]
+    [Authorize]
+    public IActionResult ChangePassword()
+    {
+        return View();
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        try
+        {
+            await accountService.ChangePasswordAsync(model, ct);
+            await accountService.LogoutAsync(ct);
+
+            TempData["Success"] = "Heslo bylo úspěšně změněno, je nutné se opětovně přihlásit.";
+
+            return RedirectToAction(nameof(Login));
+        }
+        catch (DomainException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
     }
 }

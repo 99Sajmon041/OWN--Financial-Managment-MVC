@@ -1,6 +1,7 @@
 ﻿using FinancialManagment.Application.Exceptions;
 using FinancialManagment.Application.Models.Account;
 using FinancialManagment.Application.Services.Interfaces;
+using FinancialManagment.Application.UserIdentity;
 using FinancialManagment.Domain.Entities;
 using FinancialManagment.Domain.RepositoryInterfaces;
 using Microsoft.AspNetCore.Identity;
@@ -12,7 +13,8 @@ public sealed class AccountService(
     ILogger<AccountService> logger,
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
-    IUnitOfWork unitOfWork) : IAccountService
+    IUnitOfWork unitOfWork,
+    ICurrentUser currentUser) : IAccountService
 {
     public async Task RegisterAsync(RegisterViewModel model, CancellationToken ct)
     {
@@ -94,5 +96,31 @@ public sealed class AccountService(
         ct.ThrowIfCancellationRequested();
 
         await signInManager.SignOutAsync();
+    }
+
+    public async Task ChangePasswordAsync(ChangePasswordViewModel model, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        string userId = currentUser.ValidatedUserId;
+
+        ApplicationUser? user = await userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            logger.LogWarning("User with ID: {UserId} was not found.", userId);
+            throw new DomainException("Uživatel nebyl nalezen. Změnu hesla není možné provést.");
+        }
+
+        IdentityResult passwordResult = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+        if (!passwordResult.Succeeded)
+        {
+            string errorMessage = string.Join(", ", passwordResult.Errors.Select(x => x.Description));
+
+            logger.LogWarning("User with ID: {UserId} tried to change own password, but failed. Error: {Error}", userId, errorMessage);
+
+            throw new DomainException("Chyba při změně hesla. heslo nejde změnit - kontaktujte administrátora webu.");
+        }
+
+        logger.LogInformation("User with ID: {UserId} has changed password.", userId);
     }
 }
