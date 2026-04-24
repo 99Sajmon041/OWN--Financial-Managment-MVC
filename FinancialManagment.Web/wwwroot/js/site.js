@@ -444,3 +444,28 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = url.toString();
     });
 });
+
+
+//fake table horizontal scroll script
+document.addEventListener("DOMContentLoaded", function () {
+    const topScroll = document.querySelector(".table-scroll-top");
+    const topScrollInner = document.querySelector(".table-scroll-top-inner");
+    const tableWrapper = document.querySelector(".monitoring-table-wrapper");
+    const table = document.querySelector(".monitoring-table");
+
+    function syncScrollWidth() {
+        topScrollInner.style.width = table.scrollWidth + "px";
+    }
+
+    syncScrollWidth();
+
+    topScroll.addEventListener("scroll", function () {
+        tableWrapper.scrollLeft = topScroll.scrollLeft;
+    });
+
+    tableWrapper.addEventListener("scroll", function () {
+        topScroll.scrollLeft = tableWrapper.scrollLeft;
+    });
+
+    window.addEventListener("resize", syncScrollWidth);
+});

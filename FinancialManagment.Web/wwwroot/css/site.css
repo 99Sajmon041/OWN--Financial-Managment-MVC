@@ -378,12 +378,25 @@ body {
 }
 
 .monitoring-table {
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
 }
+
     .monitoring-table th,
     .monitoring-table td {
         white-space: nowrap;
     }
+
+.table-scroll-top {
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 16px;
+    margin-bottom: 4px;
+}
+
+.table-scroll-top-inner {
+    height: 1px;
+}
 
 .auth-panel {
     min-width: 220px;
