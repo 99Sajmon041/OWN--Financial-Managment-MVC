@@ -37,6 +37,7 @@ public static class GridRequestBuilder
         {
             gridRequest.Page = page;
         }
+
         if (int.TryParse(request.Query["pageSize"], out int pageSize))
         {
             gridRequest.PageSize = pageSize;

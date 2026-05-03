@@ -49,10 +49,10 @@ public static class QueryableSortExtensions
     }
 
 
-    private static Expression? BuildPropertyExpression(Expression parametr, string propertyPath)
+    private static Expression? BuildPropertyExpression(Expression parameter, string propertyPath)
     {
         string[] pathParts = propertyPath.Split('.');
-        Expression currentExpression = parametr;
+        Expression currentExpression = parameter;
 
         foreach (string part in pathParts)
         {
